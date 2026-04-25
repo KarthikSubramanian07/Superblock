@@ -1,7 +1,7 @@
 import { create } from 'zustand'
-import type { Tile, Hotspot, Agent, Intervention, SimResult, ActiveTab } from '@/types'
+import type { Tile, Hotspot, Agent, Intervention, SimResult, DiagnosisResult, IngestionStatus, ActiveTab } from '@/types'
 import { getMockTilesAtIndex, getMockHotspot, getMockNearestHotspot, getMockAgents, getMockInterventions } from '@/data/mock'
-import { fetchLiveAgents, simulateIntervention, fetchPlannerInterventions } from '@/lib/api'
+import { fetchLiveAgents, simulateIntervention, fetchPlannerInterventions, fetchDiagnosis, fetchIngestionStatus } from '@/lib/api'
 import { INITIAL_HOUR, SIM_MOCK_DELAY_MS } from '@/lib/config'
 import type { Hotspot as HotspotType } from '@/types'
 
@@ -38,6 +38,8 @@ interface StoreState {
 
   // Hotspot
   selectedHotspot: Hotspot | null
+  diagnosisResult: DiagnosisResult | null
+  ingestionStatus: IngestionStatus | null
 
   // Simulation
   simRunning: boolean
@@ -62,14 +64,16 @@ export const useStore = create<StoreState>()((set, get) => ({
   setIsLive: async (live: boolean) => {
     set({ isLive: live })
     if (live) {
-      const [liveAgents, livePlanner] = await Promise.all([
+      const [liveAgents, livePlanner, liveIngestion] = await Promise.all([
         fetchLiveAgents(),
         fetchPlannerInterventions(),
+        fetchIngestionStatus(),
       ])
       if (liveAgents) set({ agents: liveAgents })
       if (livePlanner) set({ liveRankedInterventions: livePlanner })
+      if (liveIngestion) set({ ingestionStatus: liveIngestion })
     } else {
-      set({ agents: getMockAgents(), liveRankedInterventions: null })
+      set({ agents: getMockAgents(), liveRankedInterventions: null, ingestionStatus: null })
     }
   },
   setIsConnecting: (v: boolean) => set({ isConnecting: v }),
@@ -86,7 +90,7 @@ export const useStore = create<StoreState>()((set, get) => ({
   selectedHexId: null,
   setSelectedHex: (id: string | null) => {
     if (!id) {
-      set({ selectedHexId: null, selectedHotspot: null })
+      set({ selectedHexId: null, selectedHotspot: null, diagnosisResult: null })
       return
     }
     // Live hotspots take priority; fall back to mock exact match; then synthesise from nearest
@@ -106,7 +110,14 @@ export const useStore = create<StoreState>()((set, get) => ({
         }
       }
     }
-    set({ selectedHexId: id, selectedHotspot: hotspot, activeTab: 'hotspot' })
+    set({ selectedHexId: id, selectedHotspot: hotspot, activeTab: 'hotspot', diagnosisResult: null })
+
+    // In live mode only — fetch real diagnosis from backend
+    if (get().isLive) {
+      fetchDiagnosis(id).then(result => {
+        if (result) set({ diagnosisResult: result })
+      })
+    }
   },
 
   // Panels
@@ -125,6 +136,8 @@ export const useStore = create<StoreState>()((set, get) => ({
 
   // Hotspot
   selectedHotspot: null,
+  diagnosisResult: null,
+  ingestionStatus: null,
 
   // Simulation
   simRunning: false,

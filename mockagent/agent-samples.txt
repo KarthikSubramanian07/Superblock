@@ -1,0 +1,187 @@
+SUPERBLOCK — AGENT API REFERENCE
+Mock server: http://localhost:8000
+=================================
+
+
+── INGESTION AGENT ─────────────────────────────────────────────────────────────
+
+Endpoint : GET /ingestion/status
+Input    : (none)
+
+Sample response:
+{
+  "packets_per_min": 47,
+  "sensors_online":  12,
+  "last_batch_id":   128,
+  "total_tiles":     2791,
+  "status":          "active"           // "active" | "idle" | "error"
+}
+
+
+── MAPPING AGENT ────────────────────────────────────────────────────────────────
+
+Endpoint : GET /tiles?hour={0–23}
+Input    : hour  (integer, 0–23)
+
+Sample response (array of tile objects):
+[
+  {
+    "h3_index":  "8b29a1d71911fff",
+    "als_score": 0.84,                  // 0.0–1.0  (higher = more stress)
+    "context":   "stationary",          // "stationary" | "walking" | "transit_like"
+    "noise_db":  78
+  },
+  ...
+]
+
+Endpoint : GET /hotspots
+Input    : (none)
+
+Sample response (array of named hotspot objects):
+[
+  {
+    "h3_index":       "8b29a1d71911fff",
+    "location_label": "5th & Grand",
+    "als_score":      0.84,
+    "noise_db":       78,
+    "context":        "stationary",
+    "severity":       "high",           // "low" | "medium" | "high"
+    "stressors":      ["heat_exposure", "noise_pollution", "pedestrian_crowding"]
+  },
+  ...
+]
+
+
+── DIAGNOSIS AGENT ──────────────────────────────────────────────────────────────
+
+Endpoint : GET /diagnosis?h3_index={h3_index}
+Input    : h3_index  (string, H3 cell ID at resolution 11)
+
+Sample request:
+  GET /diagnosis?h3_index=8b29a1d71911fff
+
+Sample response:
+{
+  "h3_index":           "8b29a1d71911fff",
+  "summary":            "High stress at 5th & Grand — Heat exposure dominant",
+  "primary_stressor":   "Heat exposure",
+  "stressors":          ["heat_exposure", "noise_pollution", "pedestrian_crowding"],
+  "als_score":          0.84,
+  "severity":           "high",         // "low" | "medium" | "high"
+  "recommended_action": "Priority intervention recommended"
+}
+
+Error (missing param):
+  HTTP 400  { "error": "h3_index required" }
+
+
+── PLANNER AGENT ────────────────────────────────────────────────────────────────
+
+Endpoint : GET /planner/interventions
+Input    : (none)
+
+Sample response (array ranked by relief_coefficient descending):
+[
+  {
+    "id":                  "longer_walk_signal",
+    "label":               "Longer Walk Signal",
+    "icon":                "🚦",
+    "predicted_als_delta": -0.14,       // negative = stress reduction
+    "estimated_cost_usd":  1200,
+    "relief_coefficient":  0.0001167,   // impact per dollar — higher = better
+    "description":         "Extend pedestrian crossing time by 15s at 5th & Grand"
+  },
+  {
+    "id":                  "shade_canopy",
+    "label":               "Shade Canopy",
+    "icon":                "🌿",
+    "predicted_als_delta": -0.24,
+    "estimated_cost_usd":  8500,
+    "relief_coefficient":  0.0000282,
+    "description":         "Install shade sails along 5th St reducing surface temp by 4°C"
+  },
+  {
+    "id":                  "parklet",
+    "label":               "Parklet",
+    "icon":                "🪑",
+    "predicted_als_delta": -0.18,
+    "estimated_cost_usd":  12000,
+    "relief_coefficient":  0.000015,
+    "description":         "Install resting parklet with seating and greenery"
+  },
+  {
+    "id":                  "pedestrian_bridge",
+    "label":               "Pedestrian Bridge",
+    "icon":                "🌉",
+    "predicted_als_delta": -0.31,
+    "estimated_cost_usd":  95000,
+    "relief_coefficient":  0.00000326,
+    "description":         "Grade-separated crossing eliminating vehicle conflict zone"
+  }
+]
+
+
+── SIMULATION AGENT ─────────────────────────────────────────────────────────────
+
+Endpoint : POST /simulate
+Input    : JSON body
+
+Sample request body:
+{
+  "h3_index":        "8b29a1d71911fff",
+  "intervention_id": "shade_canopy",
+  "als_before":      0.84
+}
+
+Sample response:
+{
+  "intervention_id":   "shade_canopy",
+  "h3_index":          "8b29a1d71911fff",
+  "als_before":        0.84,
+  "als_after":         0.60,
+  "als_delta":         -0.24,
+  "percent_reduction": 29
+}
+
+Errors:
+  HTTP 400  { "error": "Missing simulation payload" }   — body fields absent
+  HTTP 404  { "error": "Intervention not found" }       — unknown intervention_id
+
+
+── NARRATOR AGENT ───────────────────────────────────────────────────────────────
+
+  No endpoint implemented yet.
+  Planned: POST /narrator/summary
+  Inputs (proposed): hotspot data + simulation result
+  Output (proposed): plain-English summary for dashboard display
+
+
+── SHARED / UTILITY ─────────────────────────────────────────────────────────────
+
+Endpoint : GET /health
+Input    : (none)
+Response : "OK"
+
+Endpoint : GET /agents
+Input    : (none)
+Sample response (array — used by Agent Panel to display pipeline status):
+[
+  { "id": "ingestion",  "label": "Ingestion Agent",  "status": "active",  "message": "Receiving 47 packets/min" },
+  { "id": "mapping",    "label": "Mapping Agent",    "status": "active",  "message": "3 red zones detected"     },
+  { "id": "diagnosis",  "label": "Diagnosis Agent",  "status": "idle",    "message": "Waiting for hotspot query"},
+  { "id": "simulation", "label": "Simulation Agent", "status": "idle",    "message": "Ready"                   },
+  { "id": "planner",    "label": "Planner Agent",    "status": "idle",    "message": "Ready"                   },
+  { "id": "narrator",   "label": "Narrator Agent",   "status": "idle",    "message": "Ready"                   }
+]
+
+WebSocket : ws://localhost:8000/ws/tiles
+  Streams tile arrays in real time (same shape as GET /tiles response).
+  Current mock: echo only — does not push proactively.
+
+
+── STATUS / FIELD ENUMERATIONS ──────────────────────────────────────────────────
+
+Agent status  : "active" | "processing" | "idle" | "error"
+Severity      : "low" | "medium" | "high"
+Context       : "stationary" | "walking" | "transit_like"
+ALS score     : 0.0–1.0   (< 0.3 green, 0.3–0.5 yellow, 0.5–0.7 orange, ≥ 0.7 red)

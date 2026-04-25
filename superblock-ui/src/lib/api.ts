@@ -1,4 +1,4 @@
-import type { Tile, Hotspot, Agent, SimResult, Intervention } from '@/types'
+import type { Tile, Hotspot, Agent, SimResult, Intervention, DiagnosisResult, IngestionStatus } from '@/types'
 
 const BASE     = (import.meta.env.VITE_API_BASE_URL      as string | undefined) ?? 'http://localhost:8000'
 const P_HEALTH   = (import.meta.env.VITE_API_PATH_HEALTH   as string | undefined) ?? '/health'
@@ -7,6 +7,8 @@ const P_HOTSPOTS = (import.meta.env.VITE_API_PATH_HOTSPOTS as string | undefined
 const P_AGENTS   = (import.meta.env.VITE_API_PATH_AGENTS   as string | undefined) ?? '/agents'
 const P_SIMULATE = (import.meta.env.VITE_API_PATH_SIMULATE as string | undefined) ?? '/simulate'
 const P_PLANNER_INTERVENTIONS = (import.meta.env.VITE_API_PATH_PLANNER_INTERVENTIONS as string | undefined) ?? '/planner/interventions'
+const P_DIAGNOSIS = (import.meta.env.VITE_API_PATH_DIAGNOSIS as string | undefined) ?? '/diagnosis'
+const P_INGESTION_STATUS = (import.meta.env.VITE_API_PATH_INGESTION_STATUS as string | undefined) ?? '/ingestion/status'
 
 async function get<T>(path: string, timeoutMs = 3000): Promise<T | null> {
   try {
@@ -44,6 +46,14 @@ export async function fetchLiveAgents(): Promise<Agent[] | null> {
   const data = await get<Agent[] | { agents: Agent[] }>(P_AGENTS)
   if (!data) return null
   return Array.isArray(data) ? data : (data as { agents: Agent[] }).agents ?? null
+}
+
+export async function fetchIngestionStatus(): Promise<IngestionStatus | null> {
+  return get<IngestionStatus>(P_INGESTION_STATUS)
+}
+
+export async function fetchDiagnosis(h3_index: string): Promise<DiagnosisResult | null> {
+  return get<DiagnosisResult>(`${P_DIAGNOSIS}?h3_index=${encodeURIComponent(h3_index)}`)
 }
 
 export async function fetchPlannerInterventions(): Promise<Intervention[] | null> {

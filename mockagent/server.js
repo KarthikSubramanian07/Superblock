@@ -24,6 +24,64 @@ app.get('/hotspots', (req, res) => res.json(mockData.hotspots))
 // Agents
 app.get('/agents', (req, res) => res.json(mockData.agents))
 
+// Ingestion status
+app.get('/ingestion/status', (req, res) => {
+  console.log('[ingestion] /ingestion/status called')
+  const response = {
+    packets_per_min: 47,
+    sensors_online: 12,
+    last_batch_id: 128,
+    total_tiles: mockData.timeframes?.[0]?.tiles?.length ?? 0,
+    status: 'active',
+  }
+  console.log('[ingestion] /ingestion/status response', response)
+  res.json(response)
+})
+
+// Diagnosis
+const STRESSOR_LABELS = {
+  heat_exposure: 'Heat exposure',
+  noise_pollution: 'Noise pollution',
+  pedestrian_crowding: 'Pedestrian crowding',
+  air_quality: 'Air quality',
+  transit_delay: 'Transit delay',
+}
+
+app.get('/diagnosis', (req, res) => {
+  const { h3_index } = req.query
+  if (!h3_index) return res.status(400).json({ error: 'h3_index required' })
+
+  console.log('[diagnosis] /diagnosis called for', h3_index)
+
+  const hotspot = mockData.hotspots.find(h => h.h3_index === h3_index)
+
+  if (hotspot) {
+    const primary = hotspot.stressors[0] ?? 'urban_stress'
+    const primaryLabel = STRESSOR_LABELS[primary] ?? primary
+    res.json({
+      h3_index,
+      summary: `${hotspot.severity[0].toUpperCase() + hotspot.severity.slice(1)} stress at ${hotspot.location_label} — ${primaryLabel} dominant`,
+      primary_stressor: primaryLabel,
+      stressors: hotspot.stressors,
+      als_score: hotspot.als_score,
+      severity: hotspot.severity,
+      recommended_action: hotspot.als_score >= 0.7
+        ? 'Priority intervention recommended'
+        : 'Monitor and assess further',
+    })
+  } else {
+    res.json({
+      h3_index,
+      summary: 'Moderate stress detected — insufficient profile data',
+      primary_stressor: 'Urban stress',
+      stressors: ['urban_stress'],
+      als_score: 0.5,
+      severity: 'medium',
+      recommended_action: 'Collect additional sensor data',
+    })
+  }
+})
+
 // Planner interventions — ranked by relief_coefficient desc
 app.get('/planner/interventions', (req, res) => {
   const interventions = (mockData.interventions ?? [])
@@ -74,6 +132,8 @@ const server = app.listen(PORT, () => {
   console.log(`  GET  /tiles`)
   console.log(`  GET  /hotspots`)
   console.log(`  GET  /agents`)
+  console.log(`  GET  /ingestion/status`)
+  console.log(`  GET  /diagnosis`)
   console.log(`  GET  /planner/interventions`)
   console.log(`  POST /simulate`)
 })

@@ -33,6 +33,24 @@ export interface Intervention {
   description: string
 }
 
+export interface IngestionStatus {
+  packets_per_min: number
+  sensors_online: number
+  last_batch_id: number
+  total_tiles: number
+  status: 'active' | 'idle' | 'error'
+}
+
+export interface DiagnosisResult {
+  h3_index: string
+  summary: string
+  primary_stressor: string
+  stressors: string[]
+  als_score: number
+  severity: 'low' | 'medium' | 'high'
+  recommended_action: string
+}
+
 export interface SimResult {
   intervention_id: string
   h3_index: string

@@ -103,6 +103,9 @@ export default function AgentPanel() {
   const agents = useStore(s => s.agents)
   const simRunning = useStore(s => s.simRunning)
   const selectedHotspot = useStore(s => s.selectedHotspot)
+  const diagnosisResult = useStore(s => s.diagnosisResult)
+  const ingestionStatus = useStore(s => s.ingestionStatus)
+  const isLive = useStore(s => s.isLive)
 
   // Local display state — cycles messages for active agents every 3.5s
   const [display, setDisplay] = useState<Record<string, { message: string; status: Agent['status'] }>>(() =>
@@ -119,13 +122,22 @@ export default function AgentPanel() {
       } else if (prev['simulation']?.status === 'processing') {
         next['simulation'] = { message: 'Simulation complete', status: 'active' }
       }
-      // Diagnosis agent activates when a hotspot is selected
-      if (selectedHotspot) {
+      // Ingestion agent: live mode shows real stats
+      if (isLive && ingestionStatus) {
+        next['ingestion'] = {
+          message: `Receiving ${ingestionStatus.packets_per_min} packets/min · ${ingestionStatus.sensors_online} sensors online`,
+          status: ingestionStatus.status,
+        }
+      }
+      // Diagnosis agent: live mode shows real result; demo shows fake processing
+      if (isLive && diagnosisResult) {
+        next['diagnosis'] = { message: diagnosisResult.summary, status: 'active' }
+      } else if (selectedHotspot) {
         next['diagnosis'] = { message: `Diagnosing ${selectedHotspot.location_label ?? 'zone'}…`, status: 'processing' }
       }
       return next
     })
-  }, [simRunning, selectedHotspot])
+  }, [simRunning, selectedHotspot, diagnosisResult, ingestionStatus, isLive])
 
   // Cycle messages for active/processing agents
   useEffect(() => {
