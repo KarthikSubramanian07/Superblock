@@ -1,6 +1,7 @@
 from uagents import Agent, Context, Protocol, Model
 from pydantic import BaseModel, Field
 from typing import List
+from config import AGENT_SEEDS, AGENT_PORTS
 
 class SimulationScenario(BaseModel):
     scenario_name: str
@@ -112,7 +113,23 @@ def create_implementation_roadmap(ranked_scenarios: List[dict]) -> List[dict]:
     
     return roadmap
 
-planner_agent.include(planning_proto, publish_manifest=True)
+
+def run_planning_request(payload: dict) -> dict:
+    """Import-safe helper for backend orchestration."""
+    request = PlanningRequest(**payload)
+    ranked_scenarios = rank_by_brc(request.scenarios)
+    roadmap = create_implementation_roadmap(ranked_scenarios)
+    plan = RankedPlan(
+        ranked_interventions=ranked_scenarios,
+        total_budget=sum(s["implementation_cost"] for s in ranked_scenarios[:3]),
+        expected_impact=(
+            f"Expected {ranked_scenarios[0]['als_reduction']}% ALS reduction"
+            if ranked_scenarios else "No impact estimate available"
+        ),
+        implementation_roadmap=roadmap,
+    )
+    return plan.model_dump()
 
 if __name__ == "__main__":
+    planner_agent.include(planner_proto, publish_manifest=True)
     planner_agent.run()

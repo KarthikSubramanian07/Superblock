@@ -28,6 +28,12 @@ class SessionSmootherStore:
         with self._lock:
             self._store.pop(session_id, None)
 
+    def clear_all(self) -> int:
+        with self._lock:
+            count = len(self._store)
+            self._store.clear()
+            return count
+
 
 session_smoother_store = SessionSmootherStore()
 
@@ -48,6 +54,12 @@ class SessionScalarStore:
     def clear(self, session_id: str) -> None:
         with self._lock:
             self._store.pop(session_id, None)
+
+    def clear_all(self) -> int:
+        with self._lock:
+            count = len(self._store)
+            self._store.clear()
+            return count
 
 
 als_scalar_store = SessionScalarStore()
@@ -79,6 +91,10 @@ class EventStore:
         with self._lock:
             self._events_by_user.clear()
 
+    def total_events(self) -> int:
+        with self._lock:
+            return sum(len(events) for events in self._events_by_user.values())
+
 
 watch_event_store = EventStore()
 
@@ -107,6 +123,10 @@ class EdgePacketStore:
         with self._lock:
             self._packets.clear()
             self._version = 0
+
+    def total_packets(self) -> int:
+        with self._lock:
+            return len(self._packets)
 
 
 edge_packet_store = EdgePacketStore()

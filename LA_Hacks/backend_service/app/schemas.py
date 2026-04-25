@@ -264,6 +264,8 @@ class EdgeTelemetryIngestionResponse(BaseModel):
     stored_packets: int
     unique_tiles: int
     latest_timestamp: datetime
+    ingestion_mode: str
+    official_contract: str
 
 
 class MapTileResponse(BaseModel):
@@ -383,6 +385,36 @@ class AgentPlanningRequestResponse(BaseModel):
     scenarios: List[Dict[str, Any]]
 
 
+class AgentWorkflowRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    h3_index: Optional[str] = None
+
+
+class AgentWorkflowResponse(BaseModel):
+    selected_h3_index: str
+    diagnosis_alert: Dict[str, Any]
+    simulation_request: Dict[str, Any]
+    planning_request: Dict[str, Any]
+    ranked_plan: Dict[str, Any]
+    narrative_summary: Dict[str, str]
+
+
+class AgentLiveWorkflowResponse(BaseModel):
+    selected_h3_index: str
+    agent_execution_mode: str
+    agent_call_order: List[str]
+    ingestion_results: List[Dict[str, Any]]
+    mapping_results: List[Dict[str, Any]]
+    diagnosis_alert: Dict[str, Any]
+    diagnosis_result: Dict[str, Any]
+    simulation_request: Dict[str, Any]
+    simulation_scenarios: List[Dict[str, Any]]
+    planning_request: Dict[str, Any]
+    ranked_plan: Dict[str, Any]
+    narrative_report: Dict[str, Any]
+
+
 class WatchPrivacyPacketItemResponse(BaseModel):
     user_id: str
     timestamp: datetime
@@ -398,3 +430,36 @@ class WatchPrivacyPacketSequenceResponse(BaseModel):
     model_version: str
     h3_resolution: int
     derivation_mode: str
+
+
+class DemoStatusResponse(BaseModel):
+    official_ingestion_path: str
+    edge_packet_count: int
+    watch_event_count: int
+    unique_edge_users: int
+    active_tile_count: int
+    hotspot_count: int
+    latest_edge_timestamp: Optional[datetime] = None
+    red_zone_count: int
+    dev_only_paths: List[str]
+    frontend_endpoints: List[str]
+    agent_endpoints: List[str]
+
+
+class DemoResetResponse(BaseModel):
+    status: str
+    cleared_edge_packets: int
+    cleared_watch_events: int
+    cleared_context_sessions: int
+    cleared_als_sessions: int
+
+
+class AppIngestionContractResponse(BaseModel):
+    official_ingestion_path: str
+    method: str
+    description: str
+    packet_fields: Dict[str, str]
+    dev_only_paths: List[str]
+    frontend_endpoints: List[str]
+    agent_endpoints: List[str]
+    example_payload: Dict[str, Any]

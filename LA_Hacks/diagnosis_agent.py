@@ -16,7 +16,11 @@ import requests
 from uagents import Agent, Context, Protocol
 from pydantic import BaseModel, Field
 from typing import List, Literal, Optional
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+except ImportError:  # pragma: no cover
+    def load_dotenv() -> None:
+        return None
 
 load_dotenv()
 
@@ -214,6 +218,26 @@ FAILURE_DETAILS = {
         "recommendations": ["No intervention needed — continue monitoring."],
     },
 }
+
+
+def run_diagnosis_request(payload: dict) -> dict:
+    """Import-safe helper for backend orchestration."""
+    alert = RedZoneAlert(**payload)
+    failure_mode, confidence, evidence = classify_failure_mode(alert)
+    details = FAILURE_DETAILS[failure_mode]
+    severity = severity_from_als(alert.avg_als)
+    result = DiagnosisResult(
+        h3_index=alert.h3_index,
+        failure_mode=failure_mode,
+        severity=severity,
+        confidence=confidence,
+        signal_evidence=evidence,
+        root_causes=details["root_causes"],
+        recommendations=details["recommendations"],
+        avg_als=alert.avg_als,
+        asi_reasoning=None,
+    )
+    return result.model_dump()
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ASI:One Query

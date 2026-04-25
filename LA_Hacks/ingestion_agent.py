@@ -152,6 +152,26 @@ def strip_device_token(packet: ALSPacket) -> ValidatedPacket:
     )
 
 
+def run_ingestion_request(raw_data: dict) -> dict:
+    """Import-safe helper for backend orchestration."""
+    packet = ALSPacket(**raw_data)
+    is_valid, reason, confidence = validate_proof_of_human(packet)
+    if not is_valid:
+        return {
+            "accepted": False,
+            "reason": reason,
+            "confidence_score": confidence,
+            "validated_packet": None,
+        }
+    clean_packet = strip_device_token(packet)
+    return {
+        "accepted": True,
+        "reason": "Validated and forwarded to mapping layer",
+        "confidence_score": confidence,
+        "validated_packet": clean_packet.model_dump(),
+    }
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Message Handler
 # ─────────────────────────────────────────────────────────────────────────────
@@ -238,7 +258,6 @@ async def on_startup(ctx: Context):
 # Register & Run
 # ─────────────────────────────────────────────────────────────────────────────
 
-ingestion_agent.include(ingestion_proto, publish_manifest=True)
-
 if __name__ == "__main__":
+    ingestion_agent.include(ingestion_proto, publish_manifest=True)
     ingestion_agent.run()

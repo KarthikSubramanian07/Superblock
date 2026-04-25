@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 
 from app.agent_integration import (
+    build_agent_orchestration_flow,
     build_planning_request_for_agent,
     build_red_zone_alerts_for_agents,
     build_simulation_request_for_agent,
@@ -33,6 +35,7 @@ from app.model_loader import (
     probabilities_to_classes,
     smooth_probabilities,
 )
+from app.live_agent_bridge import run_live_agent_workflow
 from app.schemas import (
     ALSModelInfoResponse,
     ALSPredictionRequest,
@@ -48,11 +51,17 @@ from app.schemas import (
     AgentRedZoneAlertResponse,
     AgentRedZoneAlertsResponse,
     AgentSimulationRequestResponse,
+    AgentLiveWorkflowResponse,
+    AgentWorkflowRequest,
+    AgentWorkflowResponse,
     EdgeTelemetryIngestionRequest,
     EdgeTelemetryIngestionResponse,
     AgentHotspotResponse,
     AgentHotspotsResponse,
+    AppIngestionContractResponse,
     HealthResponse,
+    DemoResetResponse,
+    DemoStatusResponse,
     HotspotDetailResponse,
     MapTileHistoryResponse,
     MapTilesResponse,
@@ -83,6 +92,68 @@ from app.settings import get_settings
 from training.als_constants import ALS_FEATURE_NAMES
 
 app = FastAPI(title="The Living City Context Classifier", version="1.0.0")
+logger = logging.getLogger(__name__)
+
+OFFICIAL_INGESTION_PATH = "/ingest/edge-packets"
+DEV_ONLY_PATHS = [
+    "/ingest/watch-events",
+    "/predict/als/watch/sequence",
+    "/predict/als/watch/privacy-packets",
+]
+FRONTEND_ENDPOINTS = [
+    "/map/tiles",
+    "/ws/map/tiles",
+    "/map/tiles/history",
+    "/map/tiles/{h3_index}",
+]
+AGENT_ENDPOINTS = [
+    "/agents/hotspots",
+    "/agents/diagnosis/red-zone-alerts",
+    "/agents/simulation-request/{h3_index}",
+    "/agents/planning-request/{h3_index}",
+    "/agents/orchestrate",
+    "/agents/orchestrate/live",
+]
+
+
+def _build_app_ingestion_contract() -> AppIngestionContractResponse:
+    return AppIngestionContractResponse(
+        official_ingestion_path=OFFICIAL_INGESTION_PATH,
+        method="POST",
+        description=(
+            "Production app and device builds should send only privacy-safe edge packets "
+            "to this endpoint. Raw watch-event routes remain available for development only."
+        ),
+        packet_fields={
+            "user_id": "string",
+            "timestamp": "ISO 8601 UTC string",
+            "h3_index": "H3 resolution 9 string",
+            "als_score": "float in [0.0, 1.0]",
+            "context": "stationary | walking | transit_like",
+            "noise_db": "float in [0.0, 140.0]",
+        },
+        dev_only_paths=DEV_ONLY_PATHS,
+        frontend_endpoints=FRONTEND_ENDPOINTS,
+        agent_endpoints=AGENT_ENDPOINTS,
+        example_payload={
+            "packets": [
+                {
+                    "user_id": "demo_user_01",
+                    "timestamp": "2026-04-24T10:15:30Z",
+                    "h3_index": "8929a1d7577ffff",
+                    "als_score": 0.82,
+                    "context": "walking",
+                    "noise_db": 72.0,
+                }
+            ]
+        },
+    )
+
+
+def _latest_edge_timestamp(packets: list[dict[str, object]]) -> object | None:
+    if not packets:
+        return None
+    return max(packet["timestamp"] for packet in packets)
 
 
 @app.get("/health", response_model=HealthResponse)
@@ -205,12 +276,20 @@ def ingest_edge_packets(
     stored_packets = edge_packet_store.append_packets(serialized_packets)
     unique_tiles = len({packet.h3_index for packet in payload.packets})
     latest_timestamp = max(packet.timestamp for packet in payload.packets)
+    logger.info(
+        "Ingested %s edge packets across %s tile(s); latest=%s",
+        len(payload.packets),
+        unique_tiles,
+        latest_timestamp.isoformat(),
+    )
 
     return EdgeTelemetryIngestionResponse(
         accepted_packets=len(payload.packets),
         stored_packets=stored_packets,
         unique_tiles=unique_tiles,
         latest_timestamp=latest_timestamp,
+        ingestion_mode="privacy_safe_edge_packets",
+        official_contract=OFFICIAL_INGESTION_PATH,
     )
 
 
@@ -218,6 +297,55 @@ def ingest_edge_packets(
 def get_map_tiles() -> MapTilesResponse:
     tiles = aggregate_packets_to_tiles(edge_packet_store.get_packets())
     return MapTilesResponse(tiles=tiles, tile_count=len(tiles))
+
+
+@app.get("/contracts/app-ingestion", response_model=AppIngestionContractResponse)
+def get_app_ingestion_contract() -> AppIngestionContractResponse:
+    return _build_app_ingestion_contract()
+
+
+@app.get("/demo/status", response_model=DemoStatusResponse)
+def get_demo_status() -> DemoStatusResponse:
+    packets = edge_packet_store.get_packets()
+    tiles = aggregate_packets_to_tiles(packets)
+    hotspots = build_agent_hotspots(packets, limit=50)
+    return DemoStatusResponse(
+        official_ingestion_path=OFFICIAL_INGESTION_PATH,
+        edge_packet_count=edge_packet_store.total_packets(),
+        watch_event_count=watch_event_store.total_events(),
+        unique_edge_users=len({str(packet["user_id"]) for packet in packets}),
+        active_tile_count=len(tiles),
+        hotspot_count=len(hotspots),
+        latest_edge_timestamp=_latest_edge_timestamp(packets),
+        red_zone_count=sum(1 for tile in tiles if tile["status"] == "red_zone"),
+        dev_only_paths=DEV_ONLY_PATHS,
+        frontend_endpoints=FRONTEND_ENDPOINTS,
+        agent_endpoints=AGENT_ENDPOINTS,
+    )
+
+
+@app.post("/demo/reset", response_model=DemoResetResponse)
+def reset_demo_state() -> DemoResetResponse:
+    cleared_edge_packets = edge_packet_store.total_packets()
+    cleared_watch_events = watch_event_store.total_events()
+    cleared_context_sessions = session_smoother_store.clear_all()
+    cleared_als_sessions = als_scalar_store.clear_all()
+    edge_packet_store.clear()
+    watch_event_store.clear()
+    logger.info(
+        "Reset demo state: cleared %s edge packets, %s watch events, %s context sessions, %s als sessions",
+        cleared_edge_packets,
+        cleared_watch_events,
+        cleared_context_sessions,
+        cleared_als_sessions,
+    )
+    return DemoResetResponse(
+        status="reset",
+        cleared_edge_packets=cleared_edge_packets,
+        cleared_watch_events=cleared_watch_events,
+        cleared_context_sessions=cleared_context_sessions,
+        cleared_als_sessions=cleared_als_sessions,
+    )
 
 
 @app.get("/map/tiles/history", response_model=MapTileHistoryResponse)
@@ -291,6 +419,38 @@ def get_agent_planning_request(h3_index: str) -> AgentPlanningRequestResponse:
     if request_payload is None:
         raise HTTPException(status_code=404, detail=f"Unknown h3_index: {h3_index}")
     return AgentPlanningRequestResponse(**request_payload)
+
+
+@app.post("/agents/orchestrate", response_model=AgentWorkflowResponse)
+def orchestrate_agent_flow(payload: AgentWorkflowRequest) -> AgentWorkflowResponse:
+    flow = build_agent_orchestration_flow(
+        edge_packet_store.get_packets(),
+        h3_index=payload.h3_index,
+    )
+    if flow is None:
+        detail = (
+            f"Unknown h3_index: {payload.h3_index}"
+            if payload.h3_index
+            else "No hotspots available to orchestrate."
+        )
+        raise HTTPException(status_code=404, detail=detail)
+    return AgentWorkflowResponse(**flow)
+
+
+@app.post("/agents/orchestrate/live", response_model=AgentLiveWorkflowResponse)
+def orchestrate_live_agent_flow(payload: AgentWorkflowRequest) -> AgentLiveWorkflowResponse:
+    flow = run_live_agent_workflow(
+        edge_packet_store.get_packets(),
+        h3_index=payload.h3_index,
+    )
+    if flow is None:
+        detail = (
+            f"Unknown h3_index: {payload.h3_index}"
+            if payload.h3_index
+            else "No hotspots available to orchestrate."
+        )
+        raise HTTPException(status_code=404, detail=detail)
+    return AgentLiveWorkflowResponse(**flow)
 
 
 @app.post("/simulate/intervention", response_model=SimulationResponse)

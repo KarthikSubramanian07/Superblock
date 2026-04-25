@@ -20,6 +20,7 @@ class Settings(BaseModel):
     als_feature_names_path: Path = als_artifacts_dir / "feature_names.json"
     als_metrics_path: Path = als_artifacts_dir / "metrics.json"
     als_model_version: str = "als-regressor-v1"
+    agent_system_dir: Path | None = None
 
 
 @lru_cache(maxsize=1)

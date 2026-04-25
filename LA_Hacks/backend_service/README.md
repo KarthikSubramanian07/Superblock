@@ -127,6 +127,38 @@ To load the same mock data through the privacy-safe prize-track flow:
 python3 scripts/load_mock_privacy_packets.py --json living_city_mock_data/mock_events.json --limit-users 3
 ```
 
+## Official backend path
+
+For teammate integration, treat the backend like this:
+
+- Official app/device ingestion path: `POST /ingest/edge-packets`
+- Frontend map path: `GET /map/tiles` or `WS /ws/map/tiles`
+- Agent/backend orchestration path: `/agents/*`
+
+These routes are now considered development-only and should not be the main app contract:
+
+- `POST /ingest/watch-events`
+- `POST /predict/als/watch/sequence`
+- `POST /predict/als/watch/privacy-packets`
+
+You can also inspect the official runtime contract directly from the API:
+
+```bash
+curl http://127.0.0.1:8000/contracts/app-ingestion
+```
+
+And check current demo/backend state with:
+
+```bash
+curl http://127.0.0.1:8000/demo/status
+```
+
+Reset demo state quickly with:
+
+```bash
+curl -X POST http://127.0.0.1:8000/demo/reset
+```
+
 To export the trained context classifier to ONNX for the ZETIC Melange flow:
 
 ```bash
@@ -139,7 +171,7 @@ See [docs/prize_track_runbook.md](/Users/jeevikakiran/Documents/PersonalLearning
 
 ### `POST /ingest/watch-events`
 
-Use this Stage 1 endpoint to ingest Apple Watch-style event data for a single user. The API expects JSON, not CSV.
+Development-only endpoint for Stage 1 Apple Watch-style event ingestion. The API expects JSON, not CSV.
 
 Request:
 
@@ -190,7 +222,7 @@ Returns all accepted watch events currently stored for a user, along with the la
 
 ### `POST /ingest/edge-packets`
 
-Use this for the prize-track backend path. These packets contain only the privacy-safe fields that should leave the device.
+This is the official production-facing backend input for the app team and the prize-track flow. These packets contain only the privacy-safe fields that should leave the device.
 
 Request:
 
@@ -208,6 +240,14 @@ Request:
   ]
 }
 ```
+
+Response now includes:
+- `ingestion_mode`
+- `official_contract`
+
+If the app team needs a single source of truth, point them to:
+- `GET /contracts/app-ingestion`
+- `POST /ingest/edge-packets`
 
 ### `GET /map/tiles`
 
@@ -352,6 +392,58 @@ Returns an agent-ready simulation request payload with:
 
 Returns an agent-ready planning payload with simulated intervention scenarios shaped for the planner agent.
 
+### `POST /agents/orchestrate`
+
+End-to-end backend orchestration endpoint for the existing agent system. It selects a hotspot, builds the diagnosis payload, builds the simulation request, builds the planning payload, and returns a ranked plan plus a narrative summary in one response.
+
+Request:
+
+```json
+{
+  "h3_index": "8929a1d7577ffff"
+}
+```
+
+You can omit `h3_index` to let the backend pick the highest-priority hotspot automatically.
+
+### `POST /agents/orchestrate/live`
+
+Runs the actual LA_Hacks agent module logic in sequence:
+- `ingestion_agent`
+- `mapping_agent`
+- `diagnosis_agent`
+- `simulation_agent`
+- `planner_agent`
+- `narrator_agent`
+
+This is the closest backend-side approximation to true end-to-end live agent execution without requiring all six uAgent processes to be networked together during development.
+
+### `GET /contracts/app-ingestion`
+
+Returns the current official backend contract for the app/device team, including:
+- the real ingestion path
+- packet field names and types
+- dev-only routes to avoid
+- frontend endpoints
+- agent endpoints
+- an example payload
+
+### `GET /demo/status`
+
+Returns demo-readiness information including:
+- total edge packet count
+- total stored watch event count
+- unique edge users
+- active tile count
+- hotspot count
+- red zone count
+- latest edge timestamp
+- official ingestion path
+
+### `POST /demo/reset`
+
+Clears in-memory demo state so you can restart a run quickly without restarting the server.
+
 ### `GET /health`
 
 Returns whether model artifacts are loaded and ready.
@@ -489,7 +581,7 @@ Use this for ordered historical windows when you want raw and smoothed ALS in on
 
 ### `POST /predict/als/watch/sequence`
 
-Use this when you have Stage 1 Apple Watch-style event payloads instead of precomputed ALS features. The API derives the ALS feature set from watch metrics using a heuristic mapping, then runs the existing ALS regressor.
+Development-only route. Use this when you have Stage 1 Apple Watch-style event payloads instead of precomputed ALS features. The API derives the ALS feature set from watch metrics using a heuristic mapping, then runs the existing ALS regressor.
 
 Request:
 

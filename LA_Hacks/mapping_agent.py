@@ -180,6 +180,30 @@ def get_twin_summary() -> DigitalTwinSummary:
     )
 
 
+def run_mapping_request(payload: dict) -> dict:
+    """Import-safe helper for backend orchestration."""
+    msg = ValidatedPacket(**payload)
+    tile = msg.h3_index
+    tile_windows[tile].append(msg)
+    if len(tile_windows[tile]) > TILE_WINDOW_SIZE:
+        tile_windows[tile].pop(0)
+    stats = aggregate_tile(tile)
+    is_red_zone = bool(stats and stats["avg_als"] >= RED_ZONE_ALS_THRESHOLD)
+    return {
+        "tile_snapshot": {
+            "h3_index": tile,
+            "avg_als": stats["avg_als"],
+            "sample_count": stats["sample_count"],
+            "is_red_zone": is_red_zone,
+            "context_distribution": stats["context_distribution"],
+            "noise_bucket": stats["noise_bucket"],
+            "heat_flag": stats["heat_flag"],
+            "gait_quality": stats["gait_quality"],
+        },
+        "digital_twin_summary": get_twin_summary().model_dump(),
+    }
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Agent + Protocol
 # ─────────────────────────────────────────────────────────────────────────────
@@ -342,8 +366,7 @@ async def on_startup(ctx: Context):
 # Register & Run
 # ─────────────────────────────────────────────────────────────────────────────
 
-mapping_agent.include(mapping_proto, publish_manifest=True)
-
 if __name__ == "__main__":
+    mapping_agent.include(mapping_proto, publish_manifest=True)
     mapping_agent.run()
     

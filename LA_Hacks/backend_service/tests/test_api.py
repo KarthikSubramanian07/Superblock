@@ -7,7 +7,7 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from app import model_loader
-from app.session_state import edge_packet_store, watch_event_store
+from app.session_state import als_scalar_store, edge_packet_store, session_smoother_store, watch_event_store
 from app.settings import get_settings
 from tests.test_training import make_prepared_frame
 from training.features import expected_feature_names
@@ -254,6 +254,8 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         body = response.json()
         self.assertEqual(body["accepted_packets"], 2)
+        self.assertEqual(body["ingestion_mode"], "privacy_safe_edge_packets")
+        self.assertEqual(body["official_contract"], "/ingest/edge-packets")
 
         map_response = self.client.get("/map/tiles")
         self.assertEqual(map_response.status_code, 200)
@@ -443,6 +445,108 @@ class ApiTests(unittest.TestCase):
         self.assertGreaterEqual(len(body["scenarios"]), 1)
         self.assertIn("scenario_name", body["scenarios"][0])
 
+    def test_agents_orchestrate(self) -> None:
+        payload = {
+            "packets": [
+                {
+                    "user_id": "demo_user_01",
+                    "timestamp": "2026-04-24T10:15:30Z",
+                    "h3_index": "8929a1d7577ffff",
+                    "als_score": 0.82,
+                    "context": "walking",
+                    "noise_db": 72.0,
+                },
+                {
+                    "user_id": "demo_user_02",
+                    "timestamp": "2026-04-24T10:16:30Z",
+                    "h3_index": "8929a1d7577ffff",
+                    "als_score": 0.74,
+                    "context": "walking",
+                    "noise_db": 70.0,
+                },
+            ]
+        }
+        self.client.post("/ingest/edge-packets", json=payload)
+        response = self.client.post("/agents/orchestrate", json={})
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertEqual(body["selected_h3_index"], "8929a1d7577ffff")
+        self.assertIn("diagnosis_alert", body)
+        self.assertIn("ranked_plan", body)
+        self.assertIn("narrative_summary", body)
+
+    def test_agents_orchestrate_without_hotspots_returns_404(self) -> None:
+        response = self.client.post("/agents/orchestrate", json={})
+        self.assertEqual(response.status_code, 404)
+
+    def test_agents_orchestrate_falls_back_when_no_red_zone(self) -> None:
+        payload = {
+            "packets": [
+                {
+                    "user_id": "demo_user_01",
+                    "timestamp": "2026-04-24T10:15:30Z",
+                    "h3_index": "8929a1d7577ffff",
+                    "als_score": 0.52,
+                    "context": "walking",
+                    "noise_db": 60.0,
+                },
+                {
+                    "user_id": "demo_user_02",
+                    "timestamp": "2026-04-24T10:16:30Z",
+                    "h3_index": "8929a1d7577ffff",
+                    "als_score": 0.54,
+                    "context": "walking",
+                    "noise_db": 61.0,
+                },
+            ]
+        }
+        self.client.post("/ingest/edge-packets", json=payload)
+        response = self.client.post("/agents/orchestrate", json={})
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertEqual(body["selected_h3_index"], "8929a1d7577ffff")
+
+    def test_agents_orchestrate_live(self) -> None:
+        payload = {
+            "packets": [
+                {
+                    "user_id": "demo_user_01",
+                    "timestamp": "2026-04-24T10:15:30Z",
+                    "h3_index": "8929a1d7577ffff",
+                    "als_score": 0.82,
+                    "context": "walking",
+                    "noise_db": 72.0,
+                },
+                {
+                    "user_id": "demo_user_02",
+                    "timestamp": "2026-04-24T10:16:30Z",
+                    "h3_index": "8929a1d7577ffff",
+                    "als_score": 0.74,
+                    "context": "walking",
+                    "noise_db": 70.0,
+                },
+            ]
+        }
+        self.client.post("/ingest/edge-packets", json=payload)
+        response = self.client.post("/agents/orchestrate/live", json={})
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertEqual(body["agent_execution_mode"], "live_module_execution")
+        self.assertEqual(
+            body["agent_call_order"],
+            [
+                "ingestion_agent",
+                "mapping_agent",
+                "diagnosis_agent",
+                "simulation_agent",
+                "planner_agent",
+                "narrator_agent",
+            ],
+        )
+        self.assertGreaterEqual(len(body["ingestion_results"]), 1)
+        self.assertIn("ranked_plan", body)
+        self.assertIn("narrative_report", body)
+
     def test_simulate_intervention(self) -> None:
         payload = {
             "packets": [
@@ -515,6 +619,89 @@ class ApiTests(unittest.TestCase):
             update = websocket.receive_json()
             self.assertEqual(update["tile_count"], 1)
             self.assertEqual(update["tiles"][0]["h3_index"], "8929a1d7577ffff")
+
+    def test_contracts_app_ingestion(self) -> None:
+        response = self.client.get("/contracts/app-ingestion")
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertEqual(body["official_ingestion_path"], "/ingest/edge-packets")
+        self.assertIn("/map/tiles", body["frontend_endpoints"])
+        self.assertIn("/agents/orchestrate/live", body["agent_endpoints"])
+        self.assertIn("/ingest/watch-events", body["dev_only_paths"])
+
+    def test_demo_status_and_reset(self) -> None:
+        session_smoother_store.append("context-demo", {"walking": 0.9}, 3)
+        als_scalar_store.append("als-demo", 0.75, 3)
+        self.client.post(
+            "/ingest/watch-events",
+            json={
+                "user_id": "demo_user_09",
+                "events": [
+                    {
+                        "timestamp": "2026-04-24T10:15:30Z",
+                        "location": {"lat": 34.0689, "lng": -118.4452},
+                        "metrics": {
+                            "heart_rate": 95,
+                            "wrist_temperature": 0.5,
+                            "environmental_sound_level": 64.0,
+                            "exercise_time": 10,
+                            "walking_distance": 0.3,
+                            "running_distance": 0.0,
+                            "physical_effort": 0.4,
+                            "respiratory_rate": 16,
+                            "blood_oxygen": 98,
+                            "sleep": 7.0,
+                            "walking_speed": 1.1,
+                            "walking_steadiness": 0.9,
+                            "step_length": 0.64,
+                            "stair_speed": 0.0,
+                            "stairs_up": 0,
+                            "stairs_down": 0,
+                            "stand_minutes": 20,
+                            "active_energy": 28,
+                            "resting_energy": 10
+                        }
+                    }
+                ]
+            },
+        )
+        self.client.post(
+            "/ingest/edge-packets",
+            json={
+                "packets": [
+                    {
+                        "user_id": "demo_user_01",
+                        "timestamp": "2026-04-24T10:15:30Z",
+                        "h3_index": "8929a1d7577ffff",
+                        "als_score": 0.82,
+                        "context": "walking",
+                        "noise_db": 72.0,
+                    }
+                ]
+            },
+        )
+
+        status_response = self.client.get("/demo/status")
+        self.assertEqual(status_response.status_code, 200)
+        status_body = status_response.json()
+        self.assertEqual(status_body["official_ingestion_path"], "/ingest/edge-packets")
+        self.assertEqual(status_body["edge_packet_count"], 1)
+        self.assertEqual(status_body["watch_event_count"], 1)
+        self.assertEqual(status_body["unique_edge_users"], 1)
+        self.assertEqual(status_body["active_tile_count"], 1)
+
+        reset_response = self.client.post("/demo/reset")
+        self.assertEqual(reset_response.status_code, 200)
+        reset_body = reset_response.json()
+        self.assertEqual(reset_body["status"], "reset")
+        self.assertEqual(reset_body["cleared_edge_packets"], 1)
+        self.assertEqual(reset_body["cleared_watch_events"], 1)
+        self.assertEqual(reset_body["cleared_context_sessions"], 1)
+        self.assertEqual(reset_body["cleared_als_sessions"], 1)
+
+        empty_status = self.client.get("/demo/status").json()
+        self.assertEqual(empty_status["edge_packet_count"], 0)
+        self.assertEqual(empty_status["watch_event_count"], 0)
 
     def test_non_numeric_feature_returns_422(self) -> None:
         features = make_valid_feature_payload()
