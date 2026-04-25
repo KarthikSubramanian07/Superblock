@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import type { Tile, Hotspot, Agent, Intervention, SimResult, ActiveTab } from '@/types'
 import { getMockTilesAtIndex, getMockHotspot, getMockNearestHotspot, getMockAgents, getMockInterventions } from '@/data/mock'
+import { fetchLiveAgents, simulateIntervention } from '@/lib/api'
 import { INITIAL_HOUR, SIM_MOCK_DELAY_MS } from '@/lib/config'
 import type { Hotspot as HotspotType } from '@/types'
 
@@ -32,6 +33,8 @@ interface StoreState {
 
   // Agents
   agents: Agent[]
+  setAgents: (agents: Agent[]) => void
+  fetchLiveAgents: () => Promise<void>
 
   // Hotspot
   selectedHotspot: Hotspot | null
@@ -41,7 +44,7 @@ interface StoreState {
   simResult: SimResult | null
   selectedInterventionId: string | null
   setSelectedIntervention: (id: string) => void
-  runSimulation: () => void
+  runSimulation: () => Promise<void>
 
   // Interventions
   interventions: Intervention[]
@@ -54,7 +57,19 @@ export const useStore = create<StoreState>()((set, get) => ({
   isConnecting: false,
   isDemoMode: true,
   toggleDemoMode: () => set(s => ({ isDemoMode: !s.isDemoMode })),
-  setIsLive: (live: boolean) => set({ isLive: live }),
+  setIsLive: async (live: boolean) => {
+    set({ isLive: live })
+    if (live) {
+      // Fetch live agents when switching to live mode
+      const liveAgents = await fetchLiveAgents()
+      if (liveAgents) {
+        set({ agents: liveAgents })
+      }
+    } else {
+      // Fall back to mock agents in demo mode
+      set({ agents: getMockAgents() })
+    }
+  },
   setIsConnecting: (v: boolean) => set({ isConnecting: v }),
 
   // Time
@@ -98,6 +113,13 @@ export const useStore = create<StoreState>()((set, get) => ({
 
   // Agents
   agents: getMockAgents(),
+  setAgents: (agents: Agent[]) => set({ agents }),
+  fetchLiveAgents: async () => {
+    const liveAgents = await fetchLiveAgents()
+    if (liveAgents) {
+      set({ agents: liveAgents })
+    }
+  },
 
   // Hotspot
   selectedHotspot: null,
@@ -107,31 +129,45 @@ export const useStore = create<StoreState>()((set, get) => ({
   simResult: null,
   selectedInterventionId: null,
   setSelectedIntervention: (id: string) => set({ selectedInterventionId: id || null, simResult: null }),
-  runSimulation: () => {
+  runSimulation: async () => {
     const { selectedHotspot, selectedInterventionId, interventions } = get()
     const intervention = interventions.find(i => i.id === selectedInterventionId)
-    if (!intervention) return
+    if (!intervention || !selectedHotspot) return
 
-    const alsBefore = selectedHotspot?.als_score ?? 0.75
+    const alsBefore = selectedHotspot.als_score
+    set({ simRunning: true, simResult: null })
+
+    try {
+      const result = await simulateIntervention({
+        h3_index: selectedHotspot.h3_index,
+        intervention_id: intervention.id,
+        als_before: alsBefore,
+      })
+
+      if (result) {
+        set({ simRunning: false, simResult: result })
+        return
+      }
+    } catch {
+      // fall back to client-side mock simulation if backend is unavailable
+    }
+
     const alsAfter = Math.max(0.01, alsBefore + intervention.predicted_als_delta)
     const alsDelta = Math.round((alsAfter - alsBefore) * 100) / 100
     const percentReduction = Math.round((Math.abs(alsDelta) / alsBefore) * 100)
 
-    set({ simRunning: true })
-
-    setTimeout(() => {
-      set({
-        simRunning: false,
-        simResult: {
-          intervention_id: intervention.id,
-          h3_index: selectedHotspot?.h3_index ?? '',
-          als_before: Math.round(alsBefore * 100) / 100,
-          als_after: Math.round(alsAfter * 100) / 100,
-          als_delta: alsDelta,
-          percent_reduction: percentReduction,
-        },
-      })
-    }, SIM_MOCK_DELAY_MS)
+    await new Promise(resolve => setTimeout(resolve, SIM_MOCK_DELAY_MS))
+    set({
+      simRunning: false,
+      simResult: {
+        intervention_id: intervention.id,
+        h3_index: selectedHotspot.h3_index,
+        als_before: Math.round(alsBefore * 100) / 100,
+        als_after: Math.round(alsAfter * 100) / 100,
+        als_delta: alsDelta,
+        percent_reduction: percentReduction,
+      },
+    })
   },
 
   // Interventions

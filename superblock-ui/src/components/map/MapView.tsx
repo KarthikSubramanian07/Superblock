@@ -61,15 +61,17 @@ export default function MapView() {
       id: 'stress-layer',
       data: tiles,
       getHexagon: d => d.h3_index,
-      getFillColor: d => alsToColor(d.als_score),
+      getFillColor: d => selectedHexId === d.h3_index ? [255, 255, 0, 200] : alsToColor(d.als_score), // Yellow highlight for selected
+      getLineColor: d => selectedHexId === d.h3_index ? [0, 0, 0, 255] : [0, 0, 0, 0], // Black border for selected
+      getLineWidth: d => selectedHexId === d.h3_index ? 2 : 0,
       extruded: false,
-      stroked: false,
+      stroked: true,
       filled: true,
       pickable: true,
       onClick: (info: PickingInfo<Tile>) => {
         if (info.object) setSelectedHex(info.object.h3_index)
       },
-      updateTriggers: { getFillColor: tiles },
+      updateTriggers: { getFillColor: [tiles, selectedHexId], getLineColor: selectedHexId, getLineWidth: selectedHexId },
     }),
 
     // Pulsing outer ring on hotspot centres

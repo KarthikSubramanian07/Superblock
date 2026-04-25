@@ -8,7 +8,7 @@ The UI is fully built and running with synthetic demo data. It is already wired 
 
 ## What I need from you
 
-Three HTTP endpoints and one WebSocket. All responses must be JSON.
+Four HTTP endpoints and one WebSocket. All responses must be JSON.
 
 ---
 
@@ -102,7 +102,42 @@ Or wrapped: `{ "hotspots": [ ... ] }`
 
 ---
 
-### 4. WebSocket — live tile stream
+### 4. Agents
+
+```
+GET /agents
+```
+
+Returns the current status of all agents in the system. Expected format:
+
+```json
+[
+  {
+    "id": "ingestion",
+    "label": "Ingestion Agent",
+    "status": "active",
+    "message": "Receiving 47 packets/min"
+  },
+  ...
+]
+```
+
+Or wrapped: `{ "agents": [ ... ] }`
+
+**Field reference:**
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | Unique agent identifier (e.g., `"ingestion"`) |
+| `label` | string | Human-readable name (e.g., `"Ingestion Agent"`) |
+| `status` | string | `"active"`, `"processing"`, `"idle"`, or `"error"` |
+| `message` | string | Current status message |
+
+This endpoint is optional. If not provided, the frontend falls back to mock agent statuses.
+
+---
+
+### 5. WebSocket — live tile stream
 
 ```
 WS /ws/tiles
@@ -132,6 +167,7 @@ This is the exact shape the frontend was built against. Use it as a reference fo
 - If `/health` succeeds but `/tiles` fails → falls back to mock data silently
 - If WebSocket connects → live tiles override mock data in real time
 - If WebSocket drops → automatically reconnects every 5 seconds
+- If `/agents` succeeds → live agent statuses override mock data
 - The header badge shows **LIVE** (green) when connected, **DEMO (offline)** (gray) when falling back
 
 ---
@@ -147,6 +183,7 @@ VITE_WS_URL=ws://localhost:8000/ws/tiles
 VITE_API_PATH_HEALTH=/health
 VITE_API_PATH_TILES=/tiles
 VITE_API_PATH_HOTSPOTS=/hotspots
+VITE_API_PATH_AGENTS=/agents
 ```
 
 If your server runs on a different port or your routes have a prefix (e.g. `/api/v1/tiles`), just tell Karthik the values and he updates `.env.local` — no code changes needed.

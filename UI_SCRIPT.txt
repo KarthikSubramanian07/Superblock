@@ -1,0 +1,51 @@
+# Superblock UI Demo Script
+
+## Introduction (30 seconds)
+"Welcome to Superblock, a real-time urban health dashboard visualizing stress patterns in Downtown LA using anonymized Apple Watch data. This demo shows how AI agents detect red zones and simulate interventions to improve community well-being. We're in demo mode with synthetic data—toggle to live for real Apple Watch streams."
+
+## Map Overview (1 minute)
+"Here's the 3D map of Downtown LA, colored by Acute Stress Level (ALS) from 0.0 to 1.0. Green is low stress, red is critical. H3 hexagons show aggregated data—privacy-protected, no raw biometrics leave devices.
+
+Notice the pulsing red dots: these are hotspots with ALS > 0.7 and stationary users. Click one to explore."
+
+[Click a hotspot, e.g., Civic Center]
+
+## Hotspot Panel (45 seconds)
+"This panel shows hotspot details: location, current ALS (84%), stressors (heat, noise), and context (stationary). The map highlights the selected hexagon in yellow with a black border for clarity."
+
+## Time Slider (30 seconds)
+"At the bottom, the time slider replays stress patterns from 6 AM to 10 PM. Drag to see how stress peaks during rush hours. This helps judges understand daily patterns."
+
+## Agents Panel (1 minute)
+"The multi-agent pipeline shows real-time activity—each agent has a specialized role in the urban health workflow:
+
+- Ingestion Agent: Receives anonymized data from Apple Watches (stress scores, context, H3 tiles) and streams it into the system.
+- Mapping Agent: Aggregates data into the 3D map, identifies red zones (ALS > 0.7, stationary users), and flags hotspots.
+- Diagnosis Agent: Now processing—analyzes selected hotspots to infer causes like heat, noise, congestion, or poor crossings.
+- Simulation Agent: Runs what-if scenarios for interventions (e.g., shade canopy) to predict stress reductions.
+- Planner Agent: Compares interventions by cost, impact, and Biological Relief Coefficient, ranking the best options.
+- Narrator Agent: Translates results into simple explanations for judges and stakeholders.
+
+In live mode, statuses and messages come from the backend; in demo mode, they simulate activity. Messages rotate to simulate live workflow—agents coordinate via Fetch.ai's Almanac for decentralized AI."
+
+## Simulation Panel (1.5 minutes)
+"Let's run a what-if simulation. Select an intervention—here's Shade Canopy: reduces ALS by 24% for $8,500.
+
+[Select Shade Canopy, run simulation]
+
+Result: ALS drops from 84% to 60%, a 24% reduction. This is a prediction for this hotspot.
+
+The chart below ranks all interventions by relief per dollar:
+- Longer Walk Signal: Best bang-for-buck.
+- Shade Canopy, Parklet, Pedestrian Bridge: Ranked by cost vs. impact.
+
+Simulations are instant—what-ifs for judges to compare options."
+
+## Demo Mode & Privacy (30 seconds)
+"Toggle demo mode here—synthetic data ensures reliable demos. In live mode, data streams from Apple Watches, but raw biometrics stay on-device. Only ALS scores and coarse locations are shared."
+
+## Closing (30 seconds)
+"Superblock empowers cities with human-centered health insights. Agents automate detection and recommendations, judges make informed decisions. Questions?"
+
+## Total Time: ~5 minutes
+## Tips: Speak confidently, pause for clicks, emphasize privacy and real-time aspects.
