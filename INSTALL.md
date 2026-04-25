@@ -99,11 +99,17 @@ VITE_WS_URL=ws://localhost:8000/ws/tiles
 VITE_API_PATH_HEALTH=/health
 VITE_API_PATH_TILES=/tiles
 VITE_API_PATH_HOTSPOTS=/hotspots
+VITE_API_PATH_AGENTS=/agents
+VITE_API_PATH_SIMULATE=/simulate
+VITE_API_PATH_PLANNER_INTERVENTIONS=/planner/interventions
+VITE_API_PATH_DIAGNOSIS=/diagnosis
+VITE_API_PATH_INGESTION_STATUS=/ingestion/status
 
 # Connection tuning (optional — defaults shown)
 VITE_POLL_INTERVAL_MS=30000
 VITE_WS_RECONNECT_MS=5000
 VITE_HEALTH_TIMEOUT_MS=2000
+
 ```
 
 > `.env.local` is excluded from git. Every machine needs its own copy.
