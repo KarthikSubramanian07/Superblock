@@ -375,6 +375,123 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(body["hotspots"][0]["rank"], 1)
         self.assertEqual(body["hotspots"][0]["h3_index"], "8929a1d7577ffff")
 
+    def test_agent_red_zone_alerts(self) -> None:
+        payload = {
+            "packets": [
+                {
+                    "user_id": "demo_user_01",
+                    "timestamp": "2026-04-24T10:15:30Z",
+                    "h3_index": "8929a1d7577ffff",
+                    "als_score": 0.82,
+                    "context": "walking",
+                    "noise_db": 72.0,
+                },
+                {
+                    "user_id": "demo_user_02",
+                    "timestamp": "2026-04-24T10:16:30Z",
+                    "h3_index": "8929a1d7577ffff",
+                    "als_score": 0.74,
+                    "context": "walking",
+                    "noise_db": 70.0,
+                },
+            ]
+        }
+        self.client.post("/ingest/edge-packets", json=payload)
+        response = self.client.get("/agents/diagnosis/red-zone-alerts?limit=5")
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertEqual(body["alert_count"], 1)
+        self.assertEqual(body["alerts"][0]["noise_bucket"], "High")
+
+    def test_agent_simulation_request(self) -> None:
+        payload = {
+            "packets": [
+                {
+                    "user_id": "demo_user_01",
+                    "timestamp": "2026-04-24T10:15:30Z",
+                    "h3_index": "8929a1d7577ffff",
+                    "als_score": 0.82,
+                    "context": "walking",
+                    "noise_db": 72.0,
+                }
+            ]
+        }
+        self.client.post("/ingest/edge-packets", json=payload)
+        response = self.client.get("/agents/simulation-request/8929a1d7577ffff")
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertIn("diagnosis", body)
+        self.assertIn("failure_modes", body["diagnosis"])
+
+    def test_agent_planning_request(self) -> None:
+        payload = {
+            "packets": [
+                {
+                    "user_id": "demo_user_01",
+                    "timestamp": "2026-04-24T10:15:30Z",
+                    "h3_index": "8929a1d7577ffff",
+                    "als_score": 0.82,
+                    "context": "walking",
+                    "noise_db": 72.0,
+                }
+            ]
+        }
+        self.client.post("/ingest/edge-packets", json=payload)
+        response = self.client.get("/agents/planning-request/8929a1d7577ffff")
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertGreaterEqual(len(body["scenarios"]), 1)
+        self.assertIn("scenario_name", body["scenarios"][0])
+
+    def test_simulate_intervention(self) -> None:
+        payload = {
+            "packets": [
+                {
+                    "user_id": "demo_user_01",
+                    "timestamp": "2026-04-24T10:15:30Z",
+                    "h3_index": "8929a1d7577ffff",
+                    "als_score": 0.82,
+                    "context": "walking",
+                    "noise_db": 72.0,
+                },
+                {
+                    "user_id": "demo_user_02",
+                    "timestamp": "2026-04-24T10:16:30Z",
+                    "h3_index": "8929a1d7577ffff",
+                    "als_score": 0.74,
+                    "context": "walking",
+                    "noise_db": 70.0,
+                },
+            ]
+        }
+        self.client.post("/ingest/edge-packets", json=payload)
+        response = self.client.post(
+            "/simulate/intervention",
+            json={
+                "h3_index": "8929a1d7577ffff",
+                "intervention_type": "shade_canopy",
+                "intensity": 1.0,
+                "budget_usd": 15000,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        body = response.json()
+        self.assertEqual(body["intervention_type"], "shade_canopy")
+        self.assertLess(body["after"]["avg_als"], body["before"]["avg_als"])
+        self.assertGreater(body["estimated_als_reduction"], 0.0)
+
+    def test_simulate_intervention_unknown_tile_returns_404(self) -> None:
+        response = self.client.post(
+            "/simulate/intervention",
+            json={
+                "h3_index": "missing-tile",
+                "intervention_type": "shade_canopy",
+                "intensity": 1.0,
+                "budget_usd": 15000,
+            },
+        )
+        self.assertEqual(response.status_code, 404)
+
     def test_map_tiles_websocket_streams_updates(self) -> None:
         with self.client.websocket_connect("/ws/map/tiles") as websocket:
             initial = websocket.receive_json()

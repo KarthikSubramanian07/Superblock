@@ -4,6 +4,11 @@ import asyncio
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 
+from app.agent_integration import (
+    build_planning_request_for_agent,
+    build_red_zone_alerts_for_agents,
+    build_simulation_request_for_agent,
+)
 from app.als_feature_contract import ALS_DEFAULT_FILL_VALUE, ALS_FEATURE_LIMITS
 from app.als_model_loader import (
     MissingAlsArtifactsError,
@@ -39,6 +44,10 @@ from app.schemas import (
     BatchContextPredictionResponse,
     ContextPredictionRequest,
     ContextPredictionResponse,
+    AgentPlanningRequestResponse,
+    AgentRedZoneAlertResponse,
+    AgentRedZoneAlertsResponse,
+    AgentSimulationRequestResponse,
     EdgeTelemetryIngestionRequest,
     EdgeTelemetryIngestionResponse,
     AgentHotspotResponse,
@@ -51,6 +60,8 @@ from app.schemas import (
     SequenceBatchContextPredictionResponse,
     SequenceContextPredictionRequest,
     SequenceContextPredictionResponse,
+    SimulationRequest,
+    SimulationResponse,
     WatchALSSequencePredictionItemResponse,
     WatchALSSequencePredictionRequest,
     WatchALSSequencePredictionResponse,
@@ -67,6 +78,7 @@ from app.session_state import (
     session_smoother_store,
     watch_event_store,
 )
+from app.simulation import simulate_intervention
 from app.settings import get_settings
 from training.als_constants import ALS_FEATURE_NAMES
 
@@ -242,6 +254,59 @@ def get_agent_hotspots(limit: int = 10) -> AgentHotspotsResponse:
         ],
         hotspot_count=len(hotspots),
     )
+
+
+@app.get("/agents/diagnosis/red-zone-alerts", response_model=AgentRedZoneAlertsResponse)
+def get_agent_red_zone_alerts(limit: int = 10) -> AgentRedZoneAlertsResponse:
+    alerts = build_red_zone_alerts_for_agents(edge_packet_store.get_packets(), limit=limit)
+    return AgentRedZoneAlertsResponse(
+        alerts=[AgentRedZoneAlertResponse(**alert) for alert in alerts],
+        alert_count=len(alerts),
+    )
+
+
+@app.get(
+    "/agents/simulation-request/{h3_index}",
+    response_model=AgentSimulationRequestResponse,
+)
+def get_agent_simulation_request(h3_index: str) -> AgentSimulationRequestResponse:
+    request_payload = build_simulation_request_for_agent(
+        edge_packet_store.get_packets(),
+        h3_index=h3_index,
+    )
+    if request_payload is None:
+        raise HTTPException(status_code=404, detail=f"Unknown h3_index: {h3_index}")
+    return AgentSimulationRequestResponse(**request_payload)
+
+
+@app.get(
+    "/agents/planning-request/{h3_index}",
+    response_model=AgentPlanningRequestResponse,
+)
+def get_agent_planning_request(h3_index: str) -> AgentPlanningRequestResponse:
+    request_payload = build_planning_request_for_agent(
+        edge_packet_store.get_packets(),
+        h3_index=h3_index,
+    )
+    if request_payload is None:
+        raise HTTPException(status_code=404, detail=f"Unknown h3_index: {h3_index}")
+    return AgentPlanningRequestResponse(**request_payload)
+
+
+@app.post("/simulate/intervention", response_model=SimulationResponse)
+def simulate_intervention_endpoint(
+    payload: SimulationRequest,
+) -> SimulationResponse:
+    result = simulate_intervention(
+        edge_packet_store.get_packets(),
+        h3_index=payload.h3_index,
+        intervention_type=payload.intervention_type,
+        intensity=payload.intensity,
+        budget_usd=payload.budget_usd,
+    )
+    if result is None:
+        raise HTTPException(status_code=404, detail=f"Unknown h3_index: {payload.h3_index}")
+    return SimulationResponse(**result)
 
 
 @app.websocket("/ws/map/tiles")

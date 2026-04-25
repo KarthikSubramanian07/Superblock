@@ -321,6 +321,68 @@ class AgentHotspotsResponse(BaseModel):
     hotspot_count: int
 
 
+InterventionType = Literal[
+    "shade_canopy",
+    "longer_crossing_time",
+    "parklet",
+    "pedestrian_bridge",
+]
+
+
+class SimulationRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    h3_index: str = Field(min_length=1)
+    intervention_type: InterventionType
+    intensity: float = Field(default=1.0, ge=0.1, le=2.0)
+    budget_usd: float = Field(default=0.0, ge=0.0)
+
+
+class SimulationTileSnapshotResponse(BaseModel):
+    h3_index: str
+    avg_als: float = Field(ge=0.0, le=1.0)
+    dominant_context: EdgeContext
+    noise_db: float = Field(ge=0.0, le=140.0)
+    status: ZoneStatus
+
+
+class SimulationResponse(BaseModel):
+    h3_index: str
+    intervention_type: InterventionType
+    budget_usd: float = Field(ge=0.0)
+    estimated_cost_usd: float = Field(ge=0.0)
+    estimated_als_reduction: float = Field(ge=0.0, le=1.0)
+    estimated_noise_reduction_db: float = Field(ge=0.0)
+    impact_score: float = Field(ge=0.0)
+    before: SimulationTileSnapshotResponse
+    after: SimulationTileSnapshotResponse
+    assumptions: List[str]
+
+
+class AgentRedZoneAlertResponse(BaseModel):
+    h3_index: str
+    avg_als: float = Field(ge=0.0, le=1.0)
+    sample_count: int
+    context_distribution: Dict[str, float]
+    noise_bucket: str
+    heat_flag: bool
+    gait_quality: str
+    duration_minutes: float
+
+
+class AgentRedZoneAlertsResponse(BaseModel):
+    alerts: List[AgentRedZoneAlertResponse]
+    alert_count: int
+
+
+class AgentSimulationRequestResponse(BaseModel):
+    diagnosis: Dict[str, Any]
+
+
+class AgentPlanningRequestResponse(BaseModel):
+    scenarios: List[Dict[str, Any]]
+
+
 class WatchPrivacyPacketItemResponse(BaseModel):
     user_id: str
     timestamp: datetime

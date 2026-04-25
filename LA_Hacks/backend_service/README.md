@@ -306,6 +306,52 @@ Returns ranked hotspot objects with:
 - `latest_timestamp`
 - `context_counts`
 
+### `POST /simulate/intervention`
+
+Simulation backend endpoint for what-if analysis.
+
+Request:
+
+```json
+{
+  "h3_index": "8929a1d7577ffff",
+  "intervention_type": "shade_canopy",
+  "intensity": 1.0,
+  "budget_usd": 15000
+}
+```
+
+Supported intervention types:
+- `shade_canopy`
+- `longer_crossing_time`
+- `parklet`
+- `pedestrian_bridge`
+
+Response includes:
+- `estimated_cost_usd`
+- `estimated_als_reduction`
+- `estimated_noise_reduction_db`
+- `impact_score`
+- `before`
+- `after`
+- `assumptions`
+
+### `GET /agents/diagnosis/red-zone-alerts`
+
+Returns agent-ready red zone alerts shaped for the existing diagnosis layer in `LA_Hacks/`.
+
+### `GET /agents/simulation-request/{h3_index}`
+
+Returns an agent-ready simulation request payload with:
+- `diagnosis.failure_modes`
+- `diagnosis.root_causes`
+- `diagnosis.recommendations`
+- `diagnosis.confidence`
+
+### `GET /agents/planning-request/{h3_index}`
+
+Returns an agent-ready planning payload with simulated intervention scenarios shaped for the planner agent.
+
 ### `GET /health`
 
 Returns whether model artifacts are loaded and ready.
