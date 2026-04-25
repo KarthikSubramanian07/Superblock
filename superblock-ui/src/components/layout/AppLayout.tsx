@@ -1,17 +1,19 @@
-import { useState } from 'react'
-import type { ActiveTab } from '@/types'
+import { useStore } from '@/store/useStore'
 import Header from './Header'
 import Sidebar from './Sidebar'
 import TimeSlider from '@/components/controls/TimeSlider'
 
 export default function AppLayout() {
-  const [isDemoMode, setIsDemoMode] = useState(true)
-  const [activeTab, setActiveTab] = useState<ActiveTab>('agents')
-  const [timeIndex, setTimeIndex] = useState(14)
+  const isDemoMode = useStore(s => s.isDemoMode)
+  const toggleDemoMode = useStore(s => s.toggleDemoMode)
+  const activeTab = useStore(s => s.activeTab)
+  const setActiveTab = useStore(s => s.setActiveTab)
+  const timeIndex = useStore(s => s.timeIndex)
+  const setTimeIndex = useStore(s => s.setTimeIndex)
 
   return (
     <div className="flex flex-col h-screen overflow-hidden" style={{ background: '#f1f4f9', color: '#0f172a' }}>
-      <Header isDemoMode={isDemoMode} onToggleDemo={() => setIsDemoMode(d => !d)} />
+      <Header isDemoMode={isDemoMode} onToggleDemo={toggleDemoMode} />
       <main className="flex flex-1 overflow-hidden">
         <MapPlaceholder />
         <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />

@@ -5,14 +5,15 @@ export const MOCK_TIMEFRAME_COUNT = data.timeframes.length // 17 (hours 6–22)
 export const MOCK_CENTER = data.center as [number, number]
 export const MOCK_NEIGHBORHOOD = data.neighborhood
 
-export function getMockTilesAtIndex(timeIndex: number): Tile[] {
-  const frame = data.timeframes[Math.max(0, Math.min(timeIndex, MOCK_TIMEFRAME_COUNT - 1))]
-  return frame.tiles as Tile[]
+// hour: 6–22
+export function getMockTilesAtIndex(hour: number): Tile[] {
+  const index = Math.max(0, Math.min(hour - 6, MOCK_TIMEFRAME_COUNT - 1))
+  return data.timeframes[index].tiles as Tile[]
 }
 
-export function getMockTimeLabel(timeIndex: number): string {
-  const frame = data.timeframes[Math.max(0, Math.min(timeIndex, MOCK_TIMEFRAME_COUNT - 1))]
-  return frame.label
+export function getMockTimeLabel(hour: number): string {
+  const index = Math.max(0, Math.min(hour - 6, MOCK_TIMEFRAME_COUNT - 1))
+  return data.timeframes[index].label
 }
 
 export function getMockHotspot(h3Index: string): Hotspot | null {
