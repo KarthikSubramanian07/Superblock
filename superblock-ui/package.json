@@ -11,6 +11,7 @@
     "generate-mock": "node scripts/generate-mock.mjs"
   },
   "dependencies": {
+    "@deck.gl/aggregation-layers": "^9.3.1",
     "@deck.gl/geo-layers": "^9.3.1",
     "@deck.gl/layers": "^9.3.1",
     "@deck.gl/react": "^9.3.1",
