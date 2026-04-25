@@ -9,16 +9,16 @@ export default function Header({ isDemoMode, onToggleDemo }: HeaderProps) {
       className="flex items-center px-5 gap-4 flex-shrink-0"
       style={{
         height: '56px',
-        background: '#12141e',
-        borderBottom: '1px solid #2a2d3a',
+        background: '#ffffff',
+        borderBottom: '1px solid #e2e8f0',
       }}
     >
       {/* Wordmark */}
       <div className="flex items-baseline gap-2">
-        <span style={{ color: '#f1f5f9', fontWeight: 600, fontSize: '1.1rem', letterSpacing: '-0.02em' }}>
+        <span style={{ color: '#0f172a', fontWeight: 700, fontSize: '1.1rem', letterSpacing: '-0.02em' }}>
           SuperBlock
         </span>
-        <span style={{ color: '#4b5563', fontSize: '0.7rem' }}>Urban Nervous System</span>
+        <span style={{ color: '#94a3b8', fontSize: '0.7rem' }}>Urban Nervous System</span>
       </div>
 
       <div className="flex-1" />
@@ -27,15 +27,15 @@ export default function Header({ isDemoMode, onToggleDemo }: HeaderProps) {
       {isDemoMode ? (
         <div
           className="flex items-center gap-2 px-3 py-1 rounded-full"
-          style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.2)' }}
+          style={{ background: '#fffbeb', border: '1px solid #fde68a' }}
         >
           <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b', display: 'inline-block' }} />
-          <span style={{ color: '#f59e0b', fontSize: '0.7rem', fontWeight: 500 }}>DEMO</span>
+          <span style={{ color: '#b45309', fontSize: '0.7rem', fontWeight: 600 }}>DEMO</span>
         </div>
       ) : (
         <div
           className="flex items-center gap-2 px-3 py-1 rounded-full"
-          style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)' }}
+          style={{ background: '#f0fdf4', border: '1px solid #bbf7d0' }}
         >
           <span className="relative flex" style={{ width: '8px', height: '8px' }}>
             <span
@@ -44,32 +44,32 @@ export default function Header({ isDemoMode, onToggleDemo }: HeaderProps) {
             />
             <span
               className="relative inline-flex rounded-full"
-              style={{ width: '8px', height: '8px', background: '#22c55e' }}
+              style={{ width: '8px', height: '8px', background: '#16a34a' }}
             />
           </span>
-          <span style={{ color: '#22c55e', fontSize: '0.7rem', fontWeight: 500 }}>LIVE</span>
+          <span style={{ color: '#15803d', fontSize: '0.7rem', fontWeight: 600 }}>LIVE</span>
         </div>
       )}
 
       {/* Privacy badge */}
       <div
         className="items-center gap-1.5 px-3 py-1 rounded-full hidden sm:flex"
-        style={{ background: '#1a1d2e', border: '1px solid #2a2d3a' }}
+        style={{ background: '#f8fafc', border: '1px solid #e2e8f0' }}
       >
         <span style={{ fontSize: '0.75rem' }}>🔒</span>
-        <span style={{ color: '#6b7280', fontSize: '0.7rem' }}>Raw biometrics: on-device</span>
+        <span style={{ color: '#64748b', fontSize: '0.7rem' }}>Raw biometrics: on-device</span>
       </div>
 
       {/* Demo toggle */}
       <div className="flex items-center gap-2">
-        <span style={{ color: '#4b5563', fontSize: '0.7rem' }} className="hidden sm:block">Demo</span>
+        <span style={{ color: '#94a3b8', fontSize: '0.7rem' }} className="hidden sm:block">Demo</span>
         <button
           onClick={onToggleDemo}
           className="relative inline-flex items-center rounded-full transition-colors focus:outline-none"
           style={{
             width: '36px',
             height: '20px',
-            background: isDemoMode ? '#f59e0b' : '#374151',
+            background: isDemoMode ? '#f59e0b' : '#cbd5e1',
           }}
           aria-label="Toggle demo mode"
         >

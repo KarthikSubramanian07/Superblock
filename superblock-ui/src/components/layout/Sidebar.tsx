@@ -20,14 +20,14 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
       className="flex flex-col overflow-hidden flex-shrink-0"
       style={{
         width: '380px',
-        background: '#12141e',
-        borderLeft: '1px solid #2a2d3a',
+        background: '#ffffff',
+        borderLeft: '1px solid #e2e8f0',
       }}
     >
       {/* Tab bar */}
       <div
         className="flex flex-shrink-0"
-        style={{ borderBottom: '1px solid #2a2d3a' }}
+        style={{ borderBottom: '1px solid #e2e8f0' }}
       >
         {TABS.map(tab => (
           <button
@@ -38,7 +38,7 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
               fontSize: '0.75rem',
               fontWeight: 500,
               borderBottom: activeTab === tab.id ? '2px solid #6366f1' : '2px solid transparent',
-              color: activeTab === tab.id ? '#f1f5f9' : '#6b7280',
+              color: activeTab === tab.id ? '#6366f1' : '#94a3b8',
               marginBottom: '-1px',
               background: 'transparent',
               cursor: 'pointer',
@@ -50,7 +50,7 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
       </div>
 
       {/* Panel content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto" style={{ background: '#f8fafc' }}>
         {activeTab === 'agents' && <AgentPanel />}
         {activeTab === 'hotspot' && <HotspotPanel />}
         {activeTab === 'simulation' && <SimPanel />}

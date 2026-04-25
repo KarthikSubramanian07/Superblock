@@ -18,11 +18,11 @@ export default function TimeSlider({ value, onChange }: TimeSliderProps) {
       style={{
         height: '60px',
         padding: '0 24px',
-        background: '#12141e',
-        borderTop: '1px solid #2a2d3a',
+        background: '#ffffff',
+        borderTop: '1px solid #e2e8f0',
       }}
     >
-      <span style={{ color: '#6b7280', fontSize: '0.75rem', width: '52px', flexShrink: 0 }}>
+      <span style={{ color: '#64748b', fontSize: '0.75rem', width: '52px', flexShrink: 0 }}>
         {formatHour(value)}
       </span>
       <div className="flex-1">
@@ -37,7 +37,7 @@ export default function TimeSlider({ value, onChange }: TimeSliderProps) {
         />
         <div className="flex justify-between" style={{ marginTop: '2px' }}>
           {TICK_LABELS.map(label => (
-            <span key={label} style={{ color: '#374151', fontSize: '0.65rem' }}>
+            <span key={label} style={{ color: '#94a3b8', fontSize: '0.65rem' }}>
               {label}
             </span>
           ))}

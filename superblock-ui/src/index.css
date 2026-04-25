@@ -1,17 +1,13 @@
 @import "tailwindcss";
 
-:root {
-  color-scheme: dark;
-}
-
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  background: #0f1117;
-  color: #f3f4f6;
+  background: #f1f4f9;
+  color: #0f172a;
   font-family: system-ui, -apple-system, sans-serif;
 }
 
