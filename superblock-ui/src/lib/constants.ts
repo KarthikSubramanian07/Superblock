@@ -3,4 +3,3 @@ export const MAP_ZOOM = 14
 export const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v11'
 export const H3_RESOLUTION = 9
 export const ALS_RED_ZONE_THRESHOLD = 0.7
-export const SIM_MOCK_DELAY_MS = 1500

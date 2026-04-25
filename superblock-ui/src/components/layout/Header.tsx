@@ -1,9 +1,11 @@
 interface HeaderProps {
   isDemoMode: boolean
+  isLive: boolean
+  isConnecting: boolean
   onToggleDemo: () => void
 }
 
-export default function Header({ isDemoMode, onToggleDemo }: HeaderProps) {
+export default function Header({ isDemoMode, isLive, isConnecting, onToggleDemo }: HeaderProps) {
   return (
     <header
       className="flex items-center px-5 gap-4 flex-shrink-0"
@@ -23,44 +25,39 @@ export default function Header({ isDemoMode, onToggleDemo }: HeaderProps) {
 
       <div className="flex-1" />
 
-      {/* Live / Demo badge */}
+      {/* Four-state badge: DEMO · CONNECTING… · OFFLINE · LIVE */}
       {isDemoMode ? (
-        <div
-          className="flex items-center gap-2 px-3 py-1 rounded-full"
-          style={{ background: '#fffbeb', border: '1px solid #fde68a' }}
-        >
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full" style={{ background: '#fffbeb', border: '1px solid #fde68a' }}>
           <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b', display: 'inline-block' }} />
           <span style={{ color: '#b45309', fontSize: '0.7rem', fontWeight: 600 }}>DEMO</span>
         </div>
-      ) : (
-        <div
-          className="flex items-center gap-2 px-3 py-1 rounded-full"
-          style={{ background: '#f0fdf4', border: '1px solid #bbf7d0' }}
-        >
+      ) : isConnecting ? (
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full" style={{ background: '#eff6ff', border: '1px solid #bfdbfe' }}>
+          <span style={{
+            width: '8px', height: '8px', borderRadius: '50%',
+            border: '2px solid #93c5fd', borderTopColor: '#3b82f6',
+            display: 'inline-block', animation: 'spin 0.8s linear infinite',
+          }} />
+          <span style={{ color: '#1d4ed8', fontSize: '0.7rem', fontWeight: 600 }}>CONNECTING…</span>
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      ) : isLive ? (
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full" style={{ background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
           <span className="relative flex" style={{ width: '8px', height: '8px' }}>
-            <span
-              className="animate-ping absolute inline-flex rounded-full"
-              style={{ width: '100%', height: '100%', background: '#4ade80', opacity: 0.75 }}
-            />
-            <span
-              className="relative inline-flex rounded-full"
-              style={{ width: '8px', height: '8px', background: '#16a34a' }}
-            />
+            <span className="animate-ping absolute inline-flex rounded-full" style={{ width: '100%', height: '100%', background: '#4ade80', opacity: 0.75 }} />
+            <span className="relative inline-flex rounded-full" style={{ width: '8px', height: '8px', background: '#16a34a' }} />
           </span>
           <span style={{ color: '#15803d', fontSize: '0.7rem', fontWeight: 600 }}>LIVE</span>
         </div>
+      ) : (
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full" style={{ background: '#f8fafc', border: '1px solid #cbd5e1' }}>
+          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#94a3b8', display: 'inline-block' }} />
+          <span style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>DEMO</span>
+          <span style={{ color: '#94a3b8', fontSize: '0.65rem' }}>(offline)</span>
+        </div>
       )}
 
-      {/* Privacy badge */}
-      <div
-        className="items-center gap-1.5 px-3 py-1 rounded-full hidden sm:flex"
-        style={{ background: '#f8fafc', border: '1px solid #e2e8f0' }}
-      >
-        <span style={{ fontSize: '0.75rem' }}>🔒</span>
-        <span style={{ color: '#64748b', fontSize: '0.7rem' }}>Raw biometrics: on-device</span>
-      </div>
-
-      {/* Demo toggle */}
+{/* Demo toggle */}
       <div className="flex items-center gap-2">
         <span style={{ color: '#94a3b8', fontSize: '0.7rem' }} className="hidden sm:block">Demo</span>
         <button

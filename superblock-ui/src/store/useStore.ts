@@ -1,15 +1,18 @@
 import { create } from 'zustand'
 import type { Tile, Hotspot, Agent, Intervention, SimResult, ActiveTab } from '@/types'
-import { getMockTilesAtIndex, getMockHotspot, getMockAgents, getMockInterventions } from '@/data/mock'
-import { SIM_MOCK_DELAY_MS } from '@/lib/constants'
+import { getMockTilesAtIndex, getMockHotspot, getMockNearestHotspot, getMockAgents, getMockInterventions } from '@/data/mock'
+import { INITIAL_HOUR, SIM_MOCK_DELAY_MS } from '@/lib/config'
+import type { Hotspot as HotspotType } from '@/types'
 
-const INITIAL_HOUR = 14 // 2 PM — peak stress, good for judge demo
 
 interface StoreState {
   // Connection
   isLive: boolean
+  isConnecting: boolean
   isDemoMode: boolean
   toggleDemoMode: () => void
+  setIsLive: (live: boolean) => void
+  setIsConnecting: (v: boolean) => void
 
   // Time (hour: 6–22)
   timeIndex: number
@@ -17,6 +20,9 @@ interface StoreState {
 
   // Map
   tiles: Tile[]
+  setTiles: (tiles: Tile[]) => void
+  liveHotspots: HotspotType[]
+  setLiveHotspots: (hotspots: HotspotType[]) => void
   selectedHexId: string | null
   setSelectedHex: (id: string | null) => void
 
@@ -45,8 +51,11 @@ interface StoreState {
 export const useStore = create<StoreState>()((set, get) => ({
   // Connection
   isLive: false,
+  isConnecting: false,
   isDemoMode: true,
   toggleDemoMode: () => set(s => ({ isDemoMode: !s.isDemoMode })),
+  setIsLive: (live: boolean) => set({ isLive: live }),
+  setIsConnecting: (v: boolean) => set({ isConnecting: v }),
 
   // Time
   timeIndex: INITIAL_HOUR,
@@ -54,17 +63,33 @@ export const useStore = create<StoreState>()((set, get) => ({
 
   // Map
   tiles: getMockTilesAtIndex(INITIAL_HOUR),
+  setTiles: (tiles: Tile[]) => set({ tiles }),
+  liveHotspots: [],
+  setLiveHotspots: (hotspots: HotspotType[]) => set({ liveHotspots: hotspots }),
   selectedHexId: null,
   setSelectedHex: (id: string | null) => {
     if (!id) {
       set({ selectedHexId: null, selectedHotspot: null })
       return
     }
-    set({
-      selectedHexId: id,
-      selectedHotspot: getMockHotspot(id),
-      activeTab: 'hotspot',
-    })
+    // Live hotspots take priority; fall back to mock exact match; then synthesise from nearest
+    let hotspot = get().liveHotspots.find(h => h.h3_index === id) ?? getMockHotspot(id)
+    if (!hotspot) {
+      const tile = get().tiles.find(t => t.h3_index === id)
+      if (tile) {
+        const nearest = getMockNearestHotspot(id)
+        if (nearest) {
+          hotspot = {
+            ...nearest,
+            h3_index: id,
+            als_score: tile.als_score,
+            noise_db: tile.noise_db,
+            context: tile.context,
+          }
+        }
+      }
+    }
+    set({ selectedHexId: id, selectedHotspot: hotspot, activeTab: 'hotspot' })
   },
 
   // Panels
@@ -81,7 +106,7 @@ export const useStore = create<StoreState>()((set, get) => ({
   simRunning: false,
   simResult: null,
   selectedInterventionId: null,
-  setSelectedIntervention: (id: string) => set({ selectedInterventionId: id, simResult: null }),
+  setSelectedIntervention: (id: string) => set({ selectedInterventionId: id || null, simResult: null }),
   runSimulation: () => {
     const { selectedHotspot, selectedInterventionId, interventions } = get()
     const intervention = interventions.find(i => i.id === selectedInterventionId)

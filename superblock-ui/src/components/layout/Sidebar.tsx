@@ -49,12 +49,20 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
         ))}
       </div>
 
-      {/* Panel content */}
-      <div className="flex-1 overflow-y-auto" style={{ background: '#f8fafc' }}>
+      {/* Panel content — key forces remount + fade on tab switch */}
+      <div
+        key={activeTab}
+        className="flex-1 overflow-y-auto"
+        style={{
+          background: '#f8fafc',
+          animation: 'fadeIn 0.18s ease',
+        }}
+      >
         {activeTab === 'agents' && <AgentPanel />}
         {activeTab === 'hotspot' && <HotspotPanel />}
         {activeTab === 'simulation' && <SimPanel />}
       </div>
+      <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }`}</style>
     </aside>
   )
 }
