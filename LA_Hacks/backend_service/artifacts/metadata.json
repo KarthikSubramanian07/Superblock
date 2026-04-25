@@ -1,0 +1,10 @@
+{
+  "model_version": "context-classifier-v1",
+  "classifier_name": "RandomForestClassifier",
+  "classes": [
+    "running",
+    "stationary",
+    "transit_like",
+    "walking"
+  ]
+}

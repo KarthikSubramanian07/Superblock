@@ -2,6 +2,7 @@ from uagents import Agent, Context, Protocol, Model
 from pydantic import BaseModel, Field
 from typing import List
 import requests
+from config import AGENT_SEEDS, AGENT_PORTS, ASI_ONE_API_KEY, ASI_ONE_ENDPOINT, MODEL
 
 class RankedPlan(BaseModel):
     ranked_interventions: List[dict]
@@ -95,7 +96,7 @@ def query_asi_one(prompt: str) -> str:
         ]
     }
     
-    response = requests.post(ASI_ONE_ENDPOINT, headers=headers, json=payload)
+    response = requests.post(ASI_ONE_ENDPOINT, headers=headers, json=payload, timeout=10)
     response.raise_for_status()
     return response.json()["choices"][0]["message"]["content"]
 
@@ -111,7 +112,19 @@ def parse_narrative_response(response: str) -> dict:
         "next_steps": sections[3] if len(sections) > 3 else ""
     }
 
-narrator_agent.include(narrator_proto, publish_manifest=True)
+
+def run_narration_request(payload: dict) -> dict:
+    """Import-safe helper for backend orchestration."""
+    request = NarrationRequest(**payload)
+    narrative = generate_narrative(RankedPlan(**request.plan.model_dump()), request.target_audience)
+    report = NarrativeReport(
+        executive_summary=narrative["executive_summary"],
+        technical_analysis=narrative["technical_analysis"],
+        recommendations=narrative["recommendations"],
+        next_steps=narrative["next_steps"],
+    )
+    return report.model_dump()
 
 if __name__ == "__main__":
+    narrator_agent.include(narrator_proto, publish_manifest=True)
     narrator_agent.run()

@@ -2,6 +2,7 @@ from uagents import Agent, Context, Protocol, Model
 from pydantic import BaseModel, Field
 from typing import List, Dict
 import requests
+from config import AGENT_SEEDS, AGENT_PORTS, ASI_ONE_API_KEY, ASI_ONE_ENDPOINT, MODEL
 
 class DiagnosisResult(BaseModel):
     failure_modes: List[dict]
@@ -125,7 +126,7 @@ def query_asi_one(prompt: str) -> str:
         ]
     }
     
-    response = requests.post(ASI_ONE_ENDPOINT, headers=headers, json=payload)
+    response = requests.post(ASI_ONE_ENDPOINT, headers=headers, json=payload, timeout=10)
     response.raise_for_status()
     return response.json()["choices"][0]["message"]["content"]
 
@@ -141,7 +142,14 @@ def parse_simulation_response(scenario: dict, response: str) -> SimulationScenar
         confidence=0.78
     )
 
-simulation_agent.include(simulation_proto, publish_manifest=True)
+
+def run_simulation_request(payload: dict) -> List[dict]:
+    """Import-safe helper for backend orchestration."""
+    request = SimulationRequest(**payload)
+    scenarios = generate_intervention_scenarios(request.diagnosis.failure_modes)
+    results = [simulate_scenario(scenario, request.diagnosis.failure_modes) for scenario in scenarios]
+    return [result.model_dump() for result in results]
 
 if __name__ == "__main__":
+    simulation_agent.include(simulation_proto, publish_manifest=True)
     simulation_agent.run()
