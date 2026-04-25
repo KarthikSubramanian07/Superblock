@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import type { Tile, Hotspot, Agent, Intervention, SimResult, ActiveTab } from '@/types'
 import { getMockTilesAtIndex, getMockHotspot, getMockNearestHotspot, getMockAgents, getMockInterventions } from '@/data/mock'
-import { fetchLiveAgents, simulateIntervention } from '@/lib/api'
+import { fetchLiveAgents, simulateIntervention, fetchPlannerInterventions } from '@/lib/api'
 import { INITIAL_HOUR, SIM_MOCK_DELAY_MS } from '@/lib/config'
 import type { Hotspot as HotspotType } from '@/types'
 
@@ -49,6 +49,8 @@ interface StoreState {
   // Interventions
   interventions: Intervention[]
   rankedInterventions: Intervention[]
+  liveRankedInterventions: Intervention[] | null
+  setLiveRankedInterventions: (items: Intervention[] | null) => void
 }
 
 export const useStore = create<StoreState>()((set, get) => ({
@@ -60,14 +62,14 @@ export const useStore = create<StoreState>()((set, get) => ({
   setIsLive: async (live: boolean) => {
     set({ isLive: live })
     if (live) {
-      // Fetch live agents when switching to live mode
-      const liveAgents = await fetchLiveAgents()
-      if (liveAgents) {
-        set({ agents: liveAgents })
-      }
+      const [liveAgents, livePlanner] = await Promise.all([
+        fetchLiveAgents(),
+        fetchPlannerInterventions(),
+      ])
+      if (liveAgents) set({ agents: liveAgents })
+      if (livePlanner) set({ liveRankedInterventions: livePlanner })
     } else {
-      // Fall back to mock agents in demo mode
-      set({ agents: getMockAgents() })
+      set({ agents: getMockAgents(), liveRankedInterventions: null })
     }
   },
   setIsConnecting: (v: boolean) => set({ isConnecting: v }),
@@ -175,4 +177,6 @@ export const useStore = create<StoreState>()((set, get) => ({
   rankedInterventions: [...getMockInterventions()].sort(
     (a, b) => b.relief_coefficient - a.relief_coefficient
   ),
+  liveRankedInterventions: null,
+  setLiveRankedInterventions: (items) => set({ liveRankedInterventions: items }),
 }))

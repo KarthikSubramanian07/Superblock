@@ -8,7 +8,10 @@ import type { Intervention } from '@/types'
 const CHART_COLORS = ['#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe']
 
 function InterventionChart() {
-  const interventions = useStore(s => s.rankedInterventions)
+  const rankedInterventions     = useStore(s => s.rankedInterventions)
+  const liveRankedInterventions = useStore(s => s.liveRankedInterventions)
+  const isLive                  = useStore(s => s.isLive)
+  const interventions           = (isLive && liveRankedInterventions) ? liveRankedInterventions : rankedInterventions
 
   const data = interventions.map(item => ({
     name: item.icon + ' ' + item.label,
@@ -96,8 +99,11 @@ function InterventionCard({
 }
 
 export default function SimPanel() {
-  const selectedHotspot        = useStore(s => s.selectedHotspot)
-  const rankedInterventions    = useStore(s => s.rankedInterventions)
+  const selectedHotspot         = useStore(s => s.selectedHotspot)
+  const rankedInterventionsBase = useStore(s => s.rankedInterventions)
+  const liveRankedInterventions = useStore(s => s.liveRankedInterventions)
+  const isLive                  = useStore(s => s.isLive)
+  const rankedInterventions     = (isLive && liveRankedInterventions) ? liveRankedInterventions : rankedInterventionsBase
   const selectedInterventionId = useStore(s => s.selectedInterventionId)
   const setSelectedIntervention = useStore(s => s.setSelectedIntervention)
   const runSimulation          = useStore(s => s.runSimulation)

@@ -24,6 +24,15 @@ app.get('/hotspots', (req, res) => res.json(mockData.hotspots))
 // Agents
 app.get('/agents', (req, res) => res.json(mockData.agents))
 
+// Planner interventions — ranked by relief_coefficient desc
+app.get('/planner/interventions', (req, res) => {
+  const interventions = (mockData.interventions ?? [])
+    .slice()
+    .sort((a, b) => b.relief_coefficient - a.relief_coefficient)
+  console.log('[planner] /planner/interventions called — returning', interventions.length, 'interventions')
+  res.json(interventions)
+})
+
 // Simulation
 app.post('/simulate', (req, res) => {
   const { h3_index, intervention_id, als_before } = req.body || {}
@@ -59,7 +68,15 @@ app.post('/simulate', (req, res) => {
 })
 
 // Start HTTP server
-const server = app.listen(PORT, () => console.log(`Mock server running on http://localhost:${PORT}`))
+const server = app.listen(PORT, () => {
+  console.log(`Mock server running on http://localhost:${PORT}`)
+  console.log(`  GET  /health`)
+  console.log(`  GET  /tiles`)
+  console.log(`  GET  /hotspots`)
+  console.log(`  GET  /agents`)
+  console.log(`  GET  /planner/interventions`)
+  console.log(`  POST /simulate`)
+})
 
 // WebSocket for /ws/tiles (basic echo for testing)
 const wss = new WebSocket.Server({ server, path: '/ws/tiles' })
