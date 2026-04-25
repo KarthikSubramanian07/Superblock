@@ -1,0 +1,2180 @@
+{
+  "neighborhood": "Downtown LA",
+  "center": [
+    -118.2437,
+    34.0522
+  ],
+  "timeframes": [
+    {
+      "label": "6:00 AM",
+      "time_index": 0,
+      "hour": 6,
+      "tiles": [
+        {
+          "h3_index": "8929a1d7577ffff",
+          "als_score": 0.64,
+          "context": "transit_like",
+          "noise_db": 85.7
+        },
+        {
+          "h3_index": "8929a1d7573ffff",
+          "als_score": 0.16,
+          "context": "walking",
+          "noise_db": 66
+        },
+        {
+          "h3_index": "8929a1d7563ffff",
+          "als_score": 0.17,
+          "context": "transit_like",
+          "noise_db": 64.5
+        },
+        {
+          "h3_index": "8929a1d7567ffff",
+          "als_score": 0.14,
+          "context": "transit_like",
+          "noise_db": 63.7
+        },
+        {
+          "h3_index": "8929a1d752bffff",
+          "als_score": 0.63,
+          "context": "walking",
+          "noise_db": 77.8
+        },
+        {
+          "h3_index": "8929a1d753bffff",
+          "als_score": 0.14,
+          "context": "stationary",
+          "noise_db": 61.5
+        },
+        {
+          "h3_index": "8929a1d750fffff",
+          "als_score": 0.14,
+          "context": "walking",
+          "noise_db": 64.6
+        },
+        {
+          "h3_index": "8929a1d750bffff",
+          "als_score": 0.1,
+          "context": "transit_like",
+          "noise_db": 63.2
+        },
+        {
+          "h3_index": "8929a1d7547ffff",
+          "als_score": 0.13,
+          "context": "walking",
+          "noise_db": 62.5
+        },
+        {
+          "h3_index": "8929a1d757bffff",
+          "als_score": 0.63,
+          "context": "walking",
+          "noise_db": 86.4
+        },
+        {
+          "h3_index": "8929a1d756bffff",
+          "als_score": 0.14,
+          "context": "transit_like",
+          "noise_db": 52.4
+        },
+        {
+          "h3_index": "8929a1d756fffff",
+          "als_score": 0.13,
+          "context": "stationary",
+          "noise_db": 59.7
+        },
+        {
+          "h3_index": "8929a1d719bffff",
+          "als_score": 0.14,
+          "context": "walking",
+          "noise_db": 61.3
+        },
+        {
+          "h3_index": "8929a1d7193ffff",
+          "als_score": 0.08,
+          "context": "walking",
+          "noise_db": 58.9
+        },
+        {
+          "h3_index": "8929a1d752fffff",
+          "als_score": 0.12,
+          "context": "walking",
+          "noise_db": 53.2
+        },
+        {
+          "h3_index": "8929a1d7523ffff",
+          "als_score": 0.13,
+          "context": "stationary",
+          "noise_db": 60.7
+        },
+        {
+          "h3_index": "8929a1d7533ffff",
+          "als_score": 0.11,
+          "context": "walking",
+          "noise_db": 64
+        },
+        {
+          "h3_index": "8929a1d7507ffff",
+          "als_score": 0.08,
+          "context": "walking",
+          "noise_db": 59.8
+        },
+        {
+          "h3_index": "8929a1d7503ffff",
+          "als_score": 0.12,
+          "context": "walking",
+          "noise_db": 56.4
+        }
+      ]
+    },
+    {
+      "label": "7:00 AM",
+      "time_index": 1,
+      "hour": 7,
+      "tiles": [
+        {
+          "h3_index": "8929a1d7577ffff",
+          "als_score": 0.65,
+          "context": "transit_like",
+          "noise_db": 76
+        },
+        {
+          "h3_index": "8929a1d7573ffff",
+          "als_score": 0.14,
+          "context": "stationary",
+          "noise_db": 54
+        },
+        {
+          "h3_index": "8929a1d7563ffff",
+          "als_score": 0.19,
+          "context": "stationary",
+          "noise_db": 56.6
+        },
+        {
+          "h3_index": "8929a1d7567ffff",
+          "als_score": 0.13,
+          "context": "stationary",
+          "noise_db": 67.8
+        },
+        {
+          "h3_index": "8929a1d752bffff",
+          "als_score": 0.6,
+          "context": "transit_like",
+          "noise_db": 89.4
+        },
+        {
+          "h3_index": "8929a1d753bffff",
+          "als_score": 0.14,
+          "context": "transit_like",
+          "noise_db": 65.9
+        },
+        {
+          "h3_index": "8929a1d750fffff",
+          "als_score": 0.2,
+          "context": "transit_like",
+          "noise_db": 64.5
+        },
+        {
+          "h3_index": "8929a1d750bffff",
+          "als_score": 0.2,
+          "context": "walking",
+          "noise_db": 68.5
+        },
+        {
+          "h3_index": "8929a1d7547ffff",
+          "als_score": 0.19,
+          "context": "transit_like",
+          "noise_db": 57.9
+        },
+        {
+          "h3_index": "8929a1d757bffff",
+          "als_score": 0.66,
+          "context": "stationary",
+          "noise_db": 82.7
+        },
+        {
+          "h3_index": "8929a1d756bffff",
+          "als_score": 0.21,
+          "context": "walking",
+          "noise_db": 62.6
+        },
+        {
+          "h3_index": "8929a1d756fffff",
+          "als_score": 0.15,
+          "context": "walking",
+          "noise_db": 66.9
+        },
+        {
+          "h3_index": "8929a1d719bffff",
+          "als_score": 0.17,
+          "context": "transit_like",
+          "noise_db": 56.9
+        },
+        {
+          "h3_index": "8929a1d7193ffff",
+          "als_score": 0.18,
+          "context": "stationary",
+          "noise_db": 68.3
+        },
+        {
+          "h3_index": "8929a1d752fffff",
+          "als_score": 0.2,
+          "context": "transit_like",
+          "noise_db": 64
+        },
+        {
+          "h3_index": "8929a1d7523ffff",
+          "als_score": 0.14,
+          "context": "walking",
+          "noise_db": 69.7
+        },
+        {
+          "h3_index": "8929a1d7533ffff",
+          "als_score": 0.21,
+          "context": "transit_like",
+          "noise_db": 64.2
+        },
+        {
+          "h3_index": "8929a1d7507ffff",
+          "als_score": 0.18,
+          "context": "walking",
+          "noise_db": 58.9
+        },
+        {
+          "h3_index": "8929a1d7503ffff",
+          "als_score": 0.22,
+          "context": "stationary",
+          "noise_db": 66.2
+        }
+      ]
+    },
+    {
+      "label": "8:00 AM",
+      "time_index": 2,
+      "hour": 8,
+      "tiles": [
+        {
+          "h3_index": "8929a1d7577ffff",
+          "als_score": 0.69,
+          "context": "walking",
+          "noise_db": 78.5
+        },
+        {
+          "h3_index": "8929a1d7573ffff",
+          "als_score": 0.27,
+          "context": "stationary",
+          "noise_db": 58.8
+        },
+        {
+          "h3_index": "8929a1d7563ffff",
+          "als_score": 0.29,
+          "context": "stationary",
+          "noise_db": 65.4
+        },
+        {
+          "h3_index": "8929a1d7567ffff",
+          "als_score": 0.23,
+          "context": "walking",
+          "noise_db": 61.3
+        },
+        {
+          "h3_index": "8929a1d752bffff",
+          "als_score": 0.69,
+          "context": "stationary",
+          "noise_db": 89.4
+        },
+        {
+          "h3_index": "8929a1d753bffff",
+          "als_score": 0.28,
+          "context": "walking",
+          "noise_db": 73.5
+        },
+        {
+          "h3_index": "8929a1d750fffff",
+          "als_score": 0.25,
+          "context": "transit_like",
+          "noise_db": 69.4
+        },
+        {
+          "h3_index": "8929a1d750bffff",
+          "als_score": 0.29,
+          "context": "transit_like",
+          "noise_db": 69.2
+        },
+        {
+          "h3_index": "8929a1d7547ffff",
+          "als_score": 0.32,
+          "context": "transit_like",
+          "noise_db": 57.7
+        },
+        {
+          "h3_index": "8929a1d757bffff",
+          "als_score": 0.74,
+          "context": "stationary",
+          "noise_db": 86
+        },
+        {
+          "h3_index": "8929a1d756bffff",
+          "als_score": 0.3,
+          "context": "walking",
+          "noise_db": 72.7
+        },
+        {
+          "h3_index": "8929a1d756fffff",
+          "als_score": 0.23,
+          "context": "transit_like",
+          "noise_db": 72.6
+        },
+        {
+          "h3_index": "8929a1d719bffff",
+          "als_score": 0.27,
+          "context": "transit_like",
+          "noise_db": 61.9
+        },
+        {
+          "h3_index": "8929a1d7193ffff",
+          "als_score": 0.32,
+          "context": "stationary",
+          "noise_db": 60.5
+        },
+        {
+          "h3_index": "8929a1d752fffff",
+          "als_score": 0.32,
+          "context": "stationary",
+          "noise_db": 74.2
+        },
+        {
+          "h3_index": "8929a1d7523ffff",
+          "als_score": 0.26,
+          "context": "transit_like",
+          "noise_db": 64.4
+        },
+        {
+          "h3_index": "8929a1d7533ffff",
+          "als_score": 0.25,
+          "context": "walking",
+          "noise_db": 64.4
+        },
+        {
+          "h3_index": "8929a1d7507ffff",
+          "als_score": 0.32,
+          "context": "walking",
+          "noise_db": 70
+        },
+        {
+          "h3_index": "8929a1d7503ffff",
+          "als_score": 0.27,
+          "context": "transit_like",
+          "noise_db": 64.5
+        }
+      ]
+    },
+    {
+      "label": "9:00 AM",
+      "time_index": 3,
+      "hour": 9,
+      "tiles": [
+        {
+          "h3_index": "8929a1d7577ffff",
+          "als_score": 0.79,
+          "context": "stationary",
+          "noise_db": 95
+        },
+        {
+          "h3_index": "8929a1d7573ffff",
+          "als_score": 0.33,
+          "context": "transit_like",
+          "noise_db": 67.5
+        },
+        {
+          "h3_index": "8929a1d7563ffff",
+          "als_score": 0.29,
+          "context": "walking",
+          "noise_db": 62.5
+        },
+        {
+          "h3_index": "8929a1d7567ffff",
+          "als_score": 0.36,
+          "context": "stationary",
+          "noise_db": 60.9
+        },
+        {
+          "h3_index": "8929a1d752bffff",
+          "als_score": 0.76,
+          "context": "stationary",
+          "noise_db": 90.6
+        },
+        {
+          "h3_index": "8929a1d753bffff",
+          "als_score": 0.3,
+          "context": "walking",
+          "noise_db": 73.2
+        },
+        {
+          "h3_index": "8929a1d750fffff",
+          "als_score": 0.29,
+          "context": "transit_like",
+          "noise_db": 63.5
+        },
+        {
+          "h3_index": "8929a1d750bffff",
+          "als_score": 0.34,
+          "context": "stationary",
+          "noise_db": 65.4
+        },
+        {
+          "h3_index": "8929a1d7547ffff",
+          "als_score": 0.36,
+          "context": "walking",
+          "noise_db": 66.5
+        },
+        {
+          "h3_index": "8929a1d757bffff",
+          "als_score": 0.74,
+          "context": "walking",
+          "noise_db": 93.2
+        },
+        {
+          "h3_index": "8929a1d756bffff",
+          "als_score": 0.32,
+          "context": "transit_like",
+          "noise_db": 61.7
+        },
+        {
+          "h3_index": "8929a1d756fffff",
+          "als_score": 0.32,
+          "context": "stationary",
+          "noise_db": 61.3
+        },
+        {
+          "h3_index": "8929a1d719bffff",
+          "als_score": 0.35,
+          "context": "stationary",
+          "noise_db": 65.4
+        },
+        {
+          "h3_index": "8929a1d7193ffff",
+          "als_score": 0.3,
+          "context": "walking",
+          "noise_db": 59
+        },
+        {
+          "h3_index": "8929a1d752fffff",
+          "als_score": 0.29,
+          "context": "stationary",
+          "noise_db": 60.1
+        },
+        {
+          "h3_index": "8929a1d7523ffff",
+          "als_score": 0.32,
+          "context": "stationary",
+          "noise_db": 61.1
+        },
+        {
+          "h3_index": "8929a1d7533ffff",
+          "als_score": 0.28,
+          "context": "stationary",
+          "noise_db": 72.4
+        },
+        {
+          "h3_index": "8929a1d7507ffff",
+          "als_score": 0.29,
+          "context": "transit_like",
+          "noise_db": 64.2
+        },
+        {
+          "h3_index": "8929a1d7503ffff",
+          "als_score": 0.29,
+          "context": "walking",
+          "noise_db": 62.8
+        }
+      ]
+    },
+    {
+      "label": "10:00 AM",
+      "time_index": 4,
+      "hour": 10,
+      "tiles": [
+        {
+          "h3_index": "8929a1d7577ffff",
+          "als_score": 0.7,
+          "context": "walking",
+          "noise_db": 91.9
+        },
+        {
+          "h3_index": "8929a1d7573ffff",
+          "als_score": 0.3,
+          "context": "transit_like",
+          "noise_db": 61.6
+        },
+        {
+          "h3_index": "8929a1d7563ffff",
+          "als_score": 0.3,
+          "context": "stationary",
+          "noise_db": 69.7
+        },
+        {
+          "h3_index": "8929a1d7567ffff",
+          "als_score": 0.32,
+          "context": "transit_like",
+          "noise_db": 58.7
+        },
+        {
+          "h3_index": "8929a1d752bffff",
+          "als_score": 0.72,
+          "context": "stationary",
+          "noise_db": 79.6
+        },
+        {
+          "h3_index": "8929a1d753bffff",
+          "als_score": 0.32,
+          "context": "stationary",
+          "noise_db": 71.3
+        },
+        {
+          "h3_index": "8929a1d750fffff",
+          "als_score": 0.26,
+          "context": "transit_like",
+          "noise_db": 69.6
+        },
+        {
+          "h3_index": "8929a1d750bffff",
+          "als_score": 0.25,
+          "context": "transit_like",
+          "noise_db": 72.5
+        },
+        {
+          "h3_index": "8929a1d7547ffff",
+          "als_score": 0.33,
+          "context": "transit_like",
+          "noise_db": 66.1
+        },
+        {
+          "h3_index": "8929a1d757bffff",
+          "als_score": 0.76,
+          "context": "walking",
+          "noise_db": 83.2
+        },
+        {
+          "h3_index": "8929a1d756bffff",
+          "als_score": 0.34,
+          "context": "stationary",
+          "noise_db": 72.8
+        },
+        {
+          "h3_index": "8929a1d756fffff",
+          "als_score": 0.3,
+          "context": "transit_like",
+          "noise_db": 69.9
+        },
+        {
+          "h3_index": "8929a1d719bffff",
+          "als_score": 0.27,
+          "context": "transit_like",
+          "noise_db": 69.2
+        },
+        {
+          "h3_index": "8929a1d7193ffff",
+          "als_score": 0.34,
+          "context": "transit_like",
+          "noise_db": 59.1
+        },
+        {
+          "h3_index": "8929a1d752fffff",
+          "als_score": 0.32,
+          "context": "stationary",
+          "noise_db": 69.1
+        },
+        {
+          "h3_index": "8929a1d7523ffff",
+          "als_score": 0.32,
+          "context": "transit_like",
+          "noise_db": 74.7
+        },
+        {
+          "h3_index": "8929a1d7533ffff",
+          "als_score": 0.26,
+          "context": "transit_like",
+          "noise_db": 61.6
+        },
+        {
+          "h3_index": "8929a1d7507ffff",
+          "als_score": 0.32,
+          "context": "stationary",
+          "noise_db": 70
+        },
+        {
+          "h3_index": "8929a1d7503ffff",
+          "als_score": 0.35,
+          "context": "transit_like",
+          "noise_db": 57.3
+        }
+      ]
+    },
+    {
+      "label": "11:00 AM",
+      "time_index": 5,
+      "hour": 11,
+      "tiles": [
+        {
+          "h3_index": "8929a1d7577ffff",
+          "als_score": 0.76,
+          "context": "walking",
+          "noise_db": 81.9
+        },
+        {
+          "h3_index": "8929a1d7573ffff",
+          "als_score": 0.3,
+          "context": "stationary",
+          "noise_db": 59.9
+        },
+        {
+          "h3_index": "8929a1d7563ffff",
+          "als_score": 0.35,
+          "context": "stationary",
+          "noise_db": 61.7
+        },
+        {
+          "h3_index": "8929a1d7567ffff",
+          "als_score": 0.31,
+          "context": "stationary",
+          "noise_db": 64.2
+        },
+        {
+          "h3_index": "8929a1d752bffff",
+          "als_score": 0.74,
+          "context": "stationary",
+          "noise_db": 93.4
+        },
+        {
+          "h3_index": "8929a1d753bffff",
+          "als_score": 0.32,
+          "context": "transit_like",
+          "noise_db": 64.3
+        },
+        {
+          "h3_index": "8929a1d750fffff",
+          "als_score": 0.33,
+          "context": "stationary",
+          "noise_db": 68.1
+        },
+        {
+          "h3_index": "8929a1d750bffff",
+          "als_score": 0.37,
+          "context": "walking",
+          "noise_db": 59.9
+        },
+        {
+          "h3_index": "8929a1d7547ffff",
+          "als_score": 0.33,
+          "context": "stationary",
+          "noise_db": 61.4
+        },
+        {
+          "h3_index": "8929a1d757bffff",
+          "als_score": 0.78,
+          "context": "stationary",
+          "noise_db": 85.4
+        },
+        {
+          "h3_index": "8929a1d756bffff",
+          "als_score": 0.31,
+          "context": "stationary",
+          "noise_db": 63.2
+        },
+        {
+          "h3_index": "8929a1d756fffff",
+          "als_score": 0.32,
+          "context": "stationary",
+          "noise_db": 62.8
+        },
+        {
+          "h3_index": "8929a1d719bffff",
+          "als_score": 0.33,
+          "context": "stationary",
+          "noise_db": 68.9
+        },
+        {
+          "h3_index": "8929a1d7193ffff",
+          "als_score": 0.33,
+          "context": "walking",
+          "noise_db": 67.2
+        },
+        {
+          "h3_index": "8929a1d752fffff",
+          "als_score": 0.32,
+          "context": "walking",
+          "noise_db": 59.7
+        },
+        {
+          "h3_index": "8929a1d7523ffff",
+          "als_score": 0.36,
+          "context": "stationary",
+          "noise_db": 62.5
+        },
+        {
+          "h3_index": "8929a1d7533ffff",
+          "als_score": 0.35,
+          "context": "stationary",
+          "noise_db": 69.9
+        },
+        {
+          "h3_index": "8929a1d7507ffff",
+          "als_score": 0.31,
+          "context": "walking",
+          "noise_db": 73.9
+        },
+        {
+          "h3_index": "8929a1d7503ffff",
+          "als_score": 0.32,
+          "context": "transit_like",
+          "noise_db": 59.6
+        }
+      ]
+    },
+    {
+      "label": "12:00 PM",
+      "time_index": 6,
+      "hour": 12,
+      "tiles": [
+        {
+          "h3_index": "8929a1d7577ffff",
+          "als_score": 0.81,
+          "context": "stationary",
+          "noise_db": 95
+        },
+        {
+          "h3_index": "8929a1d7573ffff",
+          "als_score": 0.34,
+          "context": "transit_like",
+          "noise_db": 63.4
+        },
+        {
+          "h3_index": "8929a1d7563ffff",
+          "als_score": 0.35,
+          "context": "stationary",
+          "noise_db": 69.5
+        },
+        {
+          "h3_index": "8929a1d7567ffff",
+          "als_score": 0.42,
+          "context": "walking",
+          "noise_db": 65.7
+        },
+        {
+          "h3_index": "8929a1d752bffff",
+          "als_score": 0.77,
+          "context": "walking",
+          "noise_db": 92
+        },
+        {
+          "h3_index": "8929a1d753bffff",
+          "als_score": 0.38,
+          "context": "walking",
+          "noise_db": 66.6
+        },
+        {
+          "h3_index": "8929a1d750fffff",
+          "als_score": 0.36,
+          "context": "walking",
+          "noise_db": 74.9
+        },
+        {
+          "h3_index": "8929a1d750bffff",
+          "als_score": 0.39,
+          "context": "transit_like",
+          "noise_db": 66.7
+        },
+        {
+          "h3_index": "8929a1d7547ffff",
+          "als_score": 0.37,
+          "context": "walking",
+          "noise_db": 61.4
+        },
+        {
+          "h3_index": "8929a1d757bffff",
+          "als_score": 0.84,
+          "context": "stationary",
+          "noise_db": 84.4
+        },
+        {
+          "h3_index": "8929a1d756bffff",
+          "als_score": 0.37,
+          "context": "stationary",
+          "noise_db": 65.7
+        },
+        {
+          "h3_index": "8929a1d756fffff",
+          "als_score": 0.34,
+          "context": "walking",
+          "noise_db": 59.9
+        },
+        {
+          "h3_index": "8929a1d719bffff",
+          "als_score": 0.34,
+          "context": "stationary",
+          "noise_db": 69.2
+        },
+        {
+          "h3_index": "8929a1d7193ffff",
+          "als_score": 0.36,
+          "context": "walking",
+          "noise_db": 62.4
+        },
+        {
+          "h3_index": "8929a1d752fffff",
+          "als_score": 0.33,
+          "context": "stationary",
+          "noise_db": 62.3
+        },
+        {
+          "h3_index": "8929a1d7523ffff",
+          "als_score": 0.38,
+          "context": "stationary",
+          "noise_db": 74.8
+        },
+        {
+          "h3_index": "8929a1d7533ffff",
+          "als_score": 0.34,
+          "context": "transit_like",
+          "noise_db": 60.1
+        },
+        {
+          "h3_index": "8929a1d7507ffff",
+          "als_score": 0.34,
+          "context": "stationary",
+          "noise_db": 71.2
+        },
+        {
+          "h3_index": "8929a1d7503ffff",
+          "als_score": 0.41,
+          "context": "transit_like",
+          "noise_db": 67.7
+        }
+      ]
+    },
+    {
+      "label": "1:00 PM",
+      "time_index": 7,
+      "hour": 13,
+      "tiles": [
+        {
+          "h3_index": "8929a1d7577ffff",
+          "als_score": 0.77,
+          "context": "transit_like",
+          "noise_db": 83.1
+        },
+        {
+          "h3_index": "8929a1d7573ffff",
+          "als_score": 0.43,
+          "context": "stationary",
+          "noise_db": 75.1
+        },
+        {
+          "h3_index": "8929a1d7563ffff",
+          "als_score": 0.45,
+          "context": "transit_like",
+          "noise_db": 76.1
+        },
+        {
+          "h3_index": "8929a1d7567ffff",
+          "als_score": 0.36,
+          "context": "transit_like",
+          "noise_db": 60
+        },
+        {
+          "h3_index": "8929a1d752bffff",
+          "als_score": 0.85,
+          "context": "stationary",
+          "noise_db": 92.3
+        },
+        {
+          "h3_index": "8929a1d753bffff",
+          "als_score": 0.44,
+          "context": "walking",
+          "noise_db": 63.5
+        },
+        {
+          "h3_index": "8929a1d750fffff",
+          "als_score": 0.35,
+          "context": "stationary",
+          "noise_db": 70.8
+        },
+        {
+          "h3_index": "8929a1d750bffff",
+          "als_score": 0.41,
+          "context": "walking",
+          "noise_db": 71
+        },
+        {
+          "h3_index": "8929a1d7547ffff",
+          "als_score": 0.37,
+          "context": "walking",
+          "noise_db": 64.4
+        },
+        {
+          "h3_index": "8929a1d757bffff",
+          "als_score": 0.83,
+          "context": "stationary",
+          "noise_db": 94.2
+        },
+        {
+          "h3_index": "8929a1d756bffff",
+          "als_score": 0.41,
+          "context": "transit_like",
+          "noise_db": 64.3
+        },
+        {
+          "h3_index": "8929a1d756fffff",
+          "als_score": 0.38,
+          "context": "stationary",
+          "noise_db": 65.4
+        },
+        {
+          "h3_index": "8929a1d719bffff",
+          "als_score": 0.42,
+          "context": "stationary",
+          "noise_db": 71.5
+        },
+        {
+          "h3_index": "8929a1d7193ffff",
+          "als_score": 0.38,
+          "context": "walking",
+          "noise_db": 77.7
+        },
+        {
+          "h3_index": "8929a1d752fffff",
+          "als_score": 0.38,
+          "context": "transit_like",
+          "noise_db": 63.6
+        },
+        {
+          "h3_index": "8929a1d7523ffff",
+          "als_score": 0.41,
+          "context": "stationary",
+          "noise_db": 71.4
+        },
+        {
+          "h3_index": "8929a1d7533ffff",
+          "als_score": 0.45,
+          "context": "walking",
+          "noise_db": 61.9
+        },
+        {
+          "h3_index": "8929a1d7507ffff",
+          "als_score": 0.37,
+          "context": "stationary",
+          "noise_db": 71.1
+        },
+        {
+          "h3_index": "8929a1d7503ffff",
+          "als_score": 0.41,
+          "context": "walking",
+          "noise_db": 65.2
+        }
+      ]
+    },
+    {
+      "label": "2:00 PM",
+      "time_index": 8,
+      "hour": 14,
+      "tiles": [
+        {
+          "h3_index": "8929a1d7577ffff",
+          "als_score": 0.91,
+          "context": "walking",
+          "noise_db": 89.9
+        },
+        {
+          "h3_index": "8929a1d7573ffff",
+          "als_score": 0.46,
+          "context": "stationary",
+          "noise_db": 69
+        },
+        {
+          "h3_index": "8929a1d7563ffff",
+          "als_score": 0.47,
+          "context": "walking",
+          "noise_db": 62.6
+        },
+        {
+          "h3_index": "8929a1d7567ffff",
+          "als_score": 0.46,
+          "context": "stationary",
+          "noise_db": 76.7
+        },
+        {
+          "h3_index": "8929a1d752bffff",
+          "als_score": 0.86,
+          "context": "transit_like",
+          "noise_db": 95
+        },
+        {
+          "h3_index": "8929a1d753bffff",
+          "als_score": 0.43,
+          "context": "transit_like",
+          "noise_db": 70.9
+        },
+        {
+          "h3_index": "8929a1d750fffff",
+          "als_score": 0.51,
+          "context": "walking",
+          "noise_db": 72.8
+        },
+        {
+          "h3_index": "8929a1d750bffff",
+          "als_score": 0.52,
+          "context": "walking",
+          "noise_db": 68.7
+        },
+        {
+          "h3_index": "8929a1d7547ffff",
+          "als_score": 0.48,
+          "context": "walking",
+          "noise_db": 77.7
+        },
+        {
+          "h3_index": "8929a1d757bffff",
+          "als_score": 0.88,
+          "context": "transit_like",
+          "noise_db": 86.3
+        },
+        {
+          "h3_index": "8929a1d756bffff",
+          "als_score": 0.46,
+          "context": "stationary",
+          "noise_db": 63
+        },
+        {
+          "h3_index": "8929a1d756fffff",
+          "als_score": 0.51,
+          "context": "stationary",
+          "noise_db": 72.4
+        },
+        {
+          "h3_index": "8929a1d719bffff",
+          "als_score": 0.44,
+          "context": "walking",
+          "noise_db": 70.9
+        },
+        {
+          "h3_index": "8929a1d7193ffff",
+          "als_score": 0.43,
+          "context": "walking",
+          "noise_db": 74.9
+        },
+        {
+          "h3_index": "8929a1d752fffff",
+          "als_score": 0.48,
+          "context": "transit_like",
+          "noise_db": 67.8
+        },
+        {
+          "h3_index": "8929a1d7523ffff",
+          "als_score": 0.47,
+          "context": "stationary",
+          "noise_db": 77.6
+        },
+        {
+          "h3_index": "8929a1d7533ffff",
+          "als_score": 0.5,
+          "context": "transit_like",
+          "noise_db": 78.1
+        },
+        {
+          "h3_index": "8929a1d7507ffff",
+          "als_score": 0.46,
+          "context": "transit_like",
+          "noise_db": 62.9
+        },
+        {
+          "h3_index": "8929a1d7503ffff",
+          "als_score": 0.51,
+          "context": "stationary",
+          "noise_db": 75.4
+        }
+      ]
+    },
+    {
+      "label": "3:00 PM",
+      "time_index": 9,
+      "hour": 15,
+      "tiles": [
+        {
+          "h3_index": "8929a1d7577ffff",
+          "als_score": 0.9,
+          "context": "walking",
+          "noise_db": 95
+        },
+        {
+          "h3_index": "8929a1d7573ffff",
+          "als_score": 0.46,
+          "context": "transit_like",
+          "noise_db": 65.8
+        },
+        {
+          "h3_index": "8929a1d7563ffff",
+          "als_score": 0.46,
+          "context": "stationary",
+          "noise_db": 66.5
+        },
+        {
+          "h3_index": "8929a1d7567ffff",
+          "als_score": 0.49,
+          "context": "stationary",
+          "noise_db": 63.1
+        },
+        {
+          "h3_index": "8929a1d752bffff",
+          "als_score": 0.83,
+          "context": "stationary",
+          "noise_db": 90.8
+        },
+        {
+          "h3_index": "8929a1d753bffff",
+          "als_score": 0.43,
+          "context": "walking",
+          "noise_db": 79
+        },
+        {
+          "h3_index": "8929a1d750fffff",
+          "als_score": 0.41,
+          "context": "transit_like",
+          "noise_db": 74.1
+        },
+        {
+          "h3_index": "8929a1d750bffff",
+          "als_score": 0.44,
+          "context": "transit_like",
+          "noise_db": 64.8
+        },
+        {
+          "h3_index": "8929a1d7547ffff",
+          "als_score": 0.5,
+          "context": "stationary",
+          "noise_db": 61.9
+        },
+        {
+          "h3_index": "8929a1d757bffff",
+          "als_score": 0.88,
+          "context": "stationary",
+          "noise_db": 94.3
+        },
+        {
+          "h3_index": "8929a1d756bffff",
+          "als_score": 0.42,
+          "context": "walking",
+          "noise_db": 62.7
+        },
+        {
+          "h3_index": "8929a1d756fffff",
+          "als_score": 0.4,
+          "context": "stationary",
+          "noise_db": 65.5
+        },
+        {
+          "h3_index": "8929a1d719bffff",
+          "als_score": 0.46,
+          "context": "stationary",
+          "noise_db": 73.1
+        },
+        {
+          "h3_index": "8929a1d7193ffff",
+          "als_score": 0.41,
+          "context": "walking",
+          "noise_db": 74
+        },
+        {
+          "h3_index": "8929a1d752fffff",
+          "als_score": 0.42,
+          "context": "transit_like",
+          "noise_db": 71
+        },
+        {
+          "h3_index": "8929a1d7523ffff",
+          "als_score": 0.47,
+          "context": "walking",
+          "noise_db": 74.1
+        },
+        {
+          "h3_index": "8929a1d7533ffff",
+          "als_score": 0.47,
+          "context": "transit_like",
+          "noise_db": 73.6
+        },
+        {
+          "h3_index": "8929a1d7507ffff",
+          "als_score": 0.45,
+          "context": "transit_like",
+          "noise_db": 66.9
+        },
+        {
+          "h3_index": "8929a1d7503ffff",
+          "als_score": 0.47,
+          "context": "stationary",
+          "noise_db": 64.3
+        }
+      ]
+    },
+    {
+      "label": "4:00 PM",
+      "time_index": 10,
+      "hour": 16,
+      "tiles": [
+        {
+          "h3_index": "8929a1d7577ffff",
+          "als_score": 0.79,
+          "context": "stationary",
+          "noise_db": 89.7
+        },
+        {
+          "h3_index": "8929a1d7573ffff",
+          "als_score": 0.38,
+          "context": "walking",
+          "noise_db": 71.4
+        },
+        {
+          "h3_index": "8929a1d7563ffff",
+          "als_score": 0.39,
+          "context": "walking",
+          "noise_db": 68.4
+        },
+        {
+          "h3_index": "8929a1d7567ffff",
+          "als_score": 0.41,
+          "context": "walking",
+          "noise_db": 60.7
+        },
+        {
+          "h3_index": "8929a1d752bffff",
+          "als_score": 0.85,
+          "context": "stationary",
+          "noise_db": 88.3
+        },
+        {
+          "h3_index": "8929a1d753bffff",
+          "als_score": 0.42,
+          "context": "stationary",
+          "noise_db": 67.9
+        },
+        {
+          "h3_index": "8929a1d750fffff",
+          "als_score": 0.38,
+          "context": "walking",
+          "noise_db": 69.8
+        },
+        {
+          "h3_index": "8929a1d750bffff",
+          "als_score": 0.41,
+          "context": "walking",
+          "noise_db": 61.1
+        },
+        {
+          "h3_index": "8929a1d7547ffff",
+          "als_score": 0.42,
+          "context": "stationary",
+          "noise_db": 76.2
+        },
+        {
+          "h3_index": "8929a1d757bffff",
+          "als_score": 0.84,
+          "context": "transit_like",
+          "noise_db": 91
+        },
+        {
+          "h3_index": "8929a1d756bffff",
+          "als_score": 0.38,
+          "context": "walking",
+          "noise_db": 63.6
+        },
+        {
+          "h3_index": "8929a1d756fffff",
+          "als_score": 0.46,
+          "context": "stationary",
+          "noise_db": 71.4
+        },
+        {
+          "h3_index": "8929a1d719bffff",
+          "als_score": 0.42,
+          "context": "walking",
+          "noise_db": 77.8
+        },
+        {
+          "h3_index": "8929a1d7193ffff",
+          "als_score": 0.39,
+          "context": "transit_like",
+          "noise_db": 66.4
+        },
+        {
+          "h3_index": "8929a1d752fffff",
+          "als_score": 0.44,
+          "context": "stationary",
+          "noise_db": 70.3
+        },
+        {
+          "h3_index": "8929a1d7523ffff",
+          "als_score": 0.47,
+          "context": "walking",
+          "noise_db": 75.2
+        },
+        {
+          "h3_index": "8929a1d7533ffff",
+          "als_score": 0.41,
+          "context": "transit_like",
+          "noise_db": 63.5
+        },
+        {
+          "h3_index": "8929a1d7507ffff",
+          "als_score": 0.43,
+          "context": "stationary",
+          "noise_db": 71.6
+        },
+        {
+          "h3_index": "8929a1d7503ffff",
+          "als_score": 0.46,
+          "context": "walking",
+          "noise_db": 78
+        }
+      ]
+    },
+    {
+      "label": "5:00 PM",
+      "time_index": 11,
+      "hour": 17,
+      "tiles": [
+        {
+          "h3_index": "8929a1d7577ffff",
+          "als_score": 0.78,
+          "context": "transit_like",
+          "noise_db": 88.8
+        },
+        {
+          "h3_index": "8929a1d7573ffff",
+          "als_score": 0.4,
+          "context": "walking",
+          "noise_db": 62.4
+        },
+        {
+          "h3_index": "8929a1d7563ffff",
+          "als_score": 0.43,
+          "context": "stationary",
+          "noise_db": 74.6
+        },
+        {
+          "h3_index": "8929a1d7567ffff",
+          "als_score": 0.39,
+          "context": "transit_like",
+          "noise_db": 64.9
+        },
+        {
+          "h3_index": "8929a1d752bffff",
+          "als_score": 0.78,
+          "context": "stationary",
+          "noise_db": 90.7
+        },
+        {
+          "h3_index": "8929a1d753bffff",
+          "als_score": 0.43,
+          "context": "walking",
+          "noise_db": 67.2
+        },
+        {
+          "h3_index": "8929a1d750fffff",
+          "als_score": 0.38,
+          "context": "walking",
+          "noise_db": 62.6
+        },
+        {
+          "h3_index": "8929a1d750bffff",
+          "als_score": 0.4,
+          "context": "stationary",
+          "noise_db": 71.1
+        },
+        {
+          "h3_index": "8929a1d7547ffff",
+          "als_score": 0.39,
+          "context": "walking",
+          "noise_db": 70.2
+        },
+        {
+          "h3_index": "8929a1d757bffff",
+          "als_score": 0.78,
+          "context": "walking",
+          "noise_db": 91.3
+        },
+        {
+          "h3_index": "8929a1d756bffff",
+          "als_score": 0.41,
+          "context": "walking",
+          "noise_db": 75.2
+        },
+        {
+          "h3_index": "8929a1d756fffff",
+          "als_score": 0.41,
+          "context": "transit_like",
+          "noise_db": 69.2
+        },
+        {
+          "h3_index": "8929a1d719bffff",
+          "als_score": 0.4,
+          "context": "walking",
+          "noise_db": 63.3
+        },
+        {
+          "h3_index": "8929a1d7193ffff",
+          "als_score": 0.44,
+          "context": "stationary",
+          "noise_db": 60
+        },
+        {
+          "h3_index": "8929a1d752fffff",
+          "als_score": 0.4,
+          "context": "stationary",
+          "noise_db": 65
+        },
+        {
+          "h3_index": "8929a1d7523ffff",
+          "als_score": 0.37,
+          "context": "stationary",
+          "noise_db": 76.2
+        },
+        {
+          "h3_index": "8929a1d7533ffff",
+          "als_score": 0.35,
+          "context": "transit_like",
+          "noise_db": 66.4
+        },
+        {
+          "h3_index": "8929a1d7507ffff",
+          "als_score": 0.38,
+          "context": "walking",
+          "noise_db": 73.9
+        },
+        {
+          "h3_index": "8929a1d7503ffff",
+          "als_score": 0.44,
+          "context": "transit_like",
+          "noise_db": 64.4
+        }
+      ]
+    },
+    {
+      "label": "6:00 PM",
+      "time_index": 12,
+      "hour": 18,
+      "tiles": [
+        {
+          "h3_index": "8929a1d7577ffff",
+          "als_score": 0.82,
+          "context": "transit_like",
+          "noise_db": 85.6
+        },
+        {
+          "h3_index": "8929a1d7573ffff",
+          "als_score": 0.42,
+          "context": "stationary",
+          "noise_db": 70.3
+        },
+        {
+          "h3_index": "8929a1d7563ffff",
+          "als_score": 0.41,
+          "context": "walking",
+          "noise_db": 66.8
+        },
+        {
+          "h3_index": "8929a1d7567ffff",
+          "als_score": 0.35,
+          "context": "walking",
+          "noise_db": 68.6
+        },
+        {
+          "h3_index": "8929a1d752bffff",
+          "als_score": 0.81,
+          "context": "walking",
+          "noise_db": 92.5
+        },
+        {
+          "h3_index": "8929a1d753bffff",
+          "als_score": 0.37,
+          "context": "walking",
+          "noise_db": 60.5
+        },
+        {
+          "h3_index": "8929a1d750fffff",
+          "als_score": 0.38,
+          "context": "stationary",
+          "noise_db": 70.2
+        },
+        {
+          "h3_index": "8929a1d750bffff",
+          "als_score": 0.39,
+          "context": "walking",
+          "noise_db": 64
+        },
+        {
+          "h3_index": "8929a1d7547ffff",
+          "als_score": 0.33,
+          "context": "stationary",
+          "noise_db": 70.6
+        },
+        {
+          "h3_index": "8929a1d757bffff",
+          "als_score": 0.81,
+          "context": "walking",
+          "noise_db": 83
+        },
+        {
+          "h3_index": "8929a1d756bffff",
+          "als_score": 0.35,
+          "context": "stationary",
+          "noise_db": 73.8
+        },
+        {
+          "h3_index": "8929a1d756fffff",
+          "als_score": 0.39,
+          "context": "transit_like",
+          "noise_db": 76.1
+        },
+        {
+          "h3_index": "8929a1d719bffff",
+          "als_score": 0.34,
+          "context": "transit_like",
+          "noise_db": 76.7
+        },
+        {
+          "h3_index": "8929a1d7193ffff",
+          "als_score": 0.41,
+          "context": "transit_like",
+          "noise_db": 67.1
+        },
+        {
+          "h3_index": "8929a1d752fffff",
+          "als_score": 0.42,
+          "context": "walking",
+          "noise_db": 62.8
+        },
+        {
+          "h3_index": "8929a1d7523ffff",
+          "als_score": 0.42,
+          "context": "stationary",
+          "noise_db": 67.6
+        },
+        {
+          "h3_index": "8929a1d7533ffff",
+          "als_score": 0.37,
+          "context": "walking",
+          "noise_db": 75.4
+        },
+        {
+          "h3_index": "8929a1d7507ffff",
+          "als_score": 0.35,
+          "context": "transit_like",
+          "noise_db": 70
+        },
+        {
+          "h3_index": "8929a1d7503ffff",
+          "als_score": 0.37,
+          "context": "walking",
+          "noise_db": 75.5
+        }
+      ]
+    },
+    {
+      "label": "7:00 PM",
+      "time_index": 13,
+      "hour": 19,
+      "tiles": [
+        {
+          "h3_index": "8929a1d7577ffff",
+          "als_score": 0.75,
+          "context": "transit_like",
+          "noise_db": 87.7
+        },
+        {
+          "h3_index": "8929a1d7573ffff",
+          "als_score": 0.29,
+          "context": "walking",
+          "noise_db": 73.6
+        },
+        {
+          "h3_index": "8929a1d7563ffff",
+          "als_score": 0.37,
+          "context": "transit_like",
+          "noise_db": 58.5
+        },
+        {
+          "h3_index": "8929a1d7567ffff",
+          "als_score": 0.32,
+          "context": "stationary",
+          "noise_db": 71.4
+        },
+        {
+          "h3_index": "8929a1d752bffff",
+          "als_score": 0.8,
+          "context": "transit_like",
+          "noise_db": 84.8
+        },
+        {
+          "h3_index": "8929a1d753bffff",
+          "als_score": 0.28,
+          "context": "stationary",
+          "noise_db": 75.2
+        },
+        {
+          "h3_index": "8929a1d750fffff",
+          "als_score": 0.35,
+          "context": "transit_like",
+          "noise_db": 69.4
+        },
+        {
+          "h3_index": "8929a1d750bffff",
+          "als_score": 0.3,
+          "context": "walking",
+          "noise_db": 67.8
+        },
+        {
+          "h3_index": "8929a1d7547ffff",
+          "als_score": 0.37,
+          "context": "walking",
+          "noise_db": 67.3
+        },
+        {
+          "h3_index": "8929a1d757bffff",
+          "als_score": 0.77,
+          "context": "walking",
+          "noise_db": 89.8
+        },
+        {
+          "h3_index": "8929a1d756bffff",
+          "als_score": 0.33,
+          "context": "walking",
+          "noise_db": 70.2
+        },
+        {
+          "h3_index": "8929a1d756fffff",
+          "als_score": 0.33,
+          "context": "transit_like",
+          "noise_db": 61.4
+        },
+        {
+          "h3_index": "8929a1d719bffff",
+          "als_score": 0.33,
+          "context": "stationary",
+          "noise_db": 64.6
+        },
+        {
+          "h3_index": "8929a1d7193ffff",
+          "als_score": 0.34,
+          "context": "walking",
+          "noise_db": 68.8
+        },
+        {
+          "h3_index": "8929a1d752fffff",
+          "als_score": 0.3,
+          "context": "walking",
+          "noise_db": 65.2
+        },
+        {
+          "h3_index": "8929a1d7523ffff",
+          "als_score": 0.31,
+          "context": "walking",
+          "noise_db": 60.8
+        },
+        {
+          "h3_index": "8929a1d7533ffff",
+          "als_score": 0.34,
+          "context": "stationary",
+          "noise_db": 61.6
+        },
+        {
+          "h3_index": "8929a1d7507ffff",
+          "als_score": 0.32,
+          "context": "stationary",
+          "noise_db": 68.9
+        },
+        {
+          "h3_index": "8929a1d7503ffff",
+          "als_score": 0.29,
+          "context": "walking",
+          "noise_db": 70.2
+        }
+      ]
+    },
+    {
+      "label": "8:00 PM",
+      "time_index": 14,
+      "hour": 20,
+      "tiles": [
+        {
+          "h3_index": "8929a1d7577ffff",
+          "als_score": 0.73,
+          "context": "walking",
+          "noise_db": 79.8
+        },
+        {
+          "h3_index": "8929a1d7573ffff",
+          "als_score": 0.24,
+          "context": "stationary",
+          "noise_db": 70.9
+        },
+        {
+          "h3_index": "8929a1d7563ffff",
+          "als_score": 0.26,
+          "context": "transit_like",
+          "noise_db": 62.6
+        },
+        {
+          "h3_index": "8929a1d7567ffff",
+          "als_score": 0.23,
+          "context": "walking",
+          "noise_db": 67.3
+        },
+        {
+          "h3_index": "8929a1d752bffff",
+          "als_score": 0.75,
+          "context": "walking",
+          "noise_db": 80.1
+        },
+        {
+          "h3_index": "8929a1d753bffff",
+          "als_score": 0.26,
+          "context": "stationary",
+          "noise_db": 59.6
+        },
+        {
+          "h3_index": "8929a1d750fffff",
+          "als_score": 0.29,
+          "context": "stationary",
+          "noise_db": 74.2
+        },
+        {
+          "h3_index": "8929a1d750bffff",
+          "als_score": 0.24,
+          "context": "transit_like",
+          "noise_db": 58.4
+        },
+        {
+          "h3_index": "8929a1d7547ffff",
+          "als_score": 0.24,
+          "context": "stationary",
+          "noise_db": 69.6
+        },
+        {
+          "h3_index": "8929a1d757bffff",
+          "als_score": 0.77,
+          "context": "transit_like",
+          "noise_db": 85.9
+        },
+        {
+          "h3_index": "8929a1d756bffff",
+          "als_score": 0.24,
+          "context": "walking",
+          "noise_db": 58.4
+        },
+        {
+          "h3_index": "8929a1d756fffff",
+          "als_score": 0.3,
+          "context": "stationary",
+          "noise_db": 62.8
+        },
+        {
+          "h3_index": "8929a1d719bffff",
+          "als_score": 0.27,
+          "context": "walking",
+          "noise_db": 62.3
+        },
+        {
+          "h3_index": "8929a1d7193ffff",
+          "als_score": 0.24,
+          "context": "walking",
+          "noise_db": 61.7
+        },
+        {
+          "h3_index": "8929a1d752fffff",
+          "als_score": 0.26,
+          "context": "stationary",
+          "noise_db": 62.8
+        },
+        {
+          "h3_index": "8929a1d7523ffff",
+          "als_score": 0.26,
+          "context": "walking",
+          "noise_db": 70.1
+        },
+        {
+          "h3_index": "8929a1d7533ffff",
+          "als_score": 0.26,
+          "context": "transit_like",
+          "noise_db": 59.6
+        },
+        {
+          "h3_index": "8929a1d7507ffff",
+          "als_score": 0.26,
+          "context": "stationary",
+          "noise_db": 65.8
+        },
+        {
+          "h3_index": "8929a1d7503ffff",
+          "als_score": 0.3,
+          "context": "walking",
+          "noise_db": 59.3
+        }
+      ]
+    },
+    {
+      "label": "9:00 PM",
+      "time_index": 15,
+      "hour": 21,
+      "tiles": [
+        {
+          "h3_index": "8929a1d7577ffff",
+          "als_score": 0.68,
+          "context": "walking",
+          "noise_db": 79.1
+        },
+        {
+          "h3_index": "8929a1d7573ffff",
+          "als_score": 0.19,
+          "context": "stationary",
+          "noise_db": 61.3
+        },
+        {
+          "h3_index": "8929a1d7563ffff",
+          "als_score": 0.23,
+          "context": "walking",
+          "noise_db": 68.7
+        },
+        {
+          "h3_index": "8929a1d7567ffff",
+          "als_score": 0.19,
+          "context": "transit_like",
+          "noise_db": 66.1
+        },
+        {
+          "h3_index": "8929a1d752bffff",
+          "als_score": 0.67,
+          "context": "walking",
+          "noise_db": 90.9
+        },
+        {
+          "h3_index": "8929a1d753bffff",
+          "als_score": 0.25,
+          "context": "transit_like",
+          "noise_db": 60.6
+        },
+        {
+          "h3_index": "8929a1d750fffff",
+          "als_score": 0.24,
+          "context": "stationary",
+          "noise_db": 63.8
+        },
+        {
+          "h3_index": "8929a1d750bffff",
+          "als_score": 0.25,
+          "context": "walking",
+          "noise_db": 68.4
+        },
+        {
+          "h3_index": "8929a1d7547ffff",
+          "als_score": 0.21,
+          "context": "transit_like",
+          "noise_db": 64.6
+        },
+        {
+          "h3_index": "8929a1d757bffff",
+          "als_score": 0.68,
+          "context": "walking",
+          "noise_db": 87.4
+        },
+        {
+          "h3_index": "8929a1d756bffff",
+          "als_score": 0.25,
+          "context": "walking",
+          "noise_db": 69.9
+        },
+        {
+          "h3_index": "8929a1d756fffff",
+          "als_score": 0.23,
+          "context": "transit_like",
+          "noise_db": 63.4
+        },
+        {
+          "h3_index": "8929a1d719bffff",
+          "als_score": 0.23,
+          "context": "walking",
+          "noise_db": 61.9
+        },
+        {
+          "h3_index": "8929a1d7193ffff",
+          "als_score": 0.26,
+          "context": "walking",
+          "noise_db": 71
+        },
+        {
+          "h3_index": "8929a1d752fffff",
+          "als_score": 0.22,
+          "context": "transit_like",
+          "noise_db": 66.3
+        },
+        {
+          "h3_index": "8929a1d7523ffff",
+          "als_score": 0.21,
+          "context": "walking",
+          "noise_db": 68.7
+        },
+        {
+          "h3_index": "8929a1d7533ffff",
+          "als_score": 0.26,
+          "context": "transit_like",
+          "noise_db": 68.5
+        },
+        {
+          "h3_index": "8929a1d7507ffff",
+          "als_score": 0.24,
+          "context": "transit_like",
+          "noise_db": 63.8
+        },
+        {
+          "h3_index": "8929a1d7503ffff",
+          "als_score": 0.25,
+          "context": "walking",
+          "noise_db": 57.7
+        }
+      ]
+    },
+    {
+      "label": "10:00 PM",
+      "time_index": 16,
+      "hour": 22,
+      "tiles": [
+        {
+          "h3_index": "8929a1d7577ffff",
+          "als_score": 0.67,
+          "context": "walking",
+          "noise_db": 75.8
+        },
+        {
+          "h3_index": "8929a1d7573ffff",
+          "als_score": 0.22,
+          "context": "stationary",
+          "noise_db": 56.1
+        },
+        {
+          "h3_index": "8929a1d7563ffff",
+          "als_score": 0.18,
+          "context": "stationary",
+          "noise_db": 67.1
+        },
+        {
+          "h3_index": "8929a1d7567ffff",
+          "als_score": 0.13,
+          "context": "transit_like",
+          "noise_db": 62.9
+        },
+        {
+          "h3_index": "8929a1d752bffff",
+          "als_score": 0.61,
+          "context": "walking",
+          "noise_db": 79.4
+        },
+        {
+          "h3_index": "8929a1d753bffff",
+          "als_score": 0.2,
+          "context": "stationary",
+          "noise_db": 67.6
+        },
+        {
+          "h3_index": "8929a1d750fffff",
+          "als_score": 0.18,
+          "context": "transit_like",
+          "noise_db": 67.6
+        },
+        {
+          "h3_index": "8929a1d750bffff",
+          "als_score": 0.15,
+          "context": "transit_like",
+          "noise_db": 56.1
+        },
+        {
+          "h3_index": "8929a1d7547ffff",
+          "als_score": 0.2,
+          "context": "stationary",
+          "noise_db": 56.5
+        },
+        {
+          "h3_index": "8929a1d757bffff",
+          "als_score": 0.67,
+          "context": "stationary",
+          "noise_db": 79.3
+        },
+        {
+          "h3_index": "8929a1d756bffff",
+          "als_score": 0.14,
+          "context": "stationary",
+          "noise_db": 68
+        },
+        {
+          "h3_index": "8929a1d756fffff",
+          "als_score": 0.14,
+          "context": "transit_like",
+          "noise_db": 53.6
+        },
+        {
+          "h3_index": "8929a1d719bffff",
+          "als_score": 0.15,
+          "context": "stationary",
+          "noise_db": 70.5
+        },
+        {
+          "h3_index": "8929a1d7193ffff",
+          "als_score": 0.21,
+          "context": "transit_like",
+          "noise_db": 65.5
+        },
+        {
+          "h3_index": "8929a1d752fffff",
+          "als_score": 0.13,
+          "context": "walking",
+          "noise_db": 62.9
+        },
+        {
+          "h3_index": "8929a1d7523ffff",
+          "als_score": 0.22,
+          "context": "walking",
+          "noise_db": 62.7
+        },
+        {
+          "h3_index": "8929a1d7533ffff",
+          "als_score": 0.19,
+          "context": "walking",
+          "noise_db": 67
+        },
+        {
+          "h3_index": "8929a1d7507ffff",
+          "als_score": 0.18,
+          "context": "transit_like",
+          "noise_db": 70.8
+        },
+        {
+          "h3_index": "8929a1d7503ffff",
+          "als_score": 0.18,
+          "context": "transit_like",
+          "noise_db": 62.5
+        }
+      ]
+    }
+  ],
+  "hotspots": [
+    {
+      "h3_index": "8929a1d7577ffff",
+      "stressors": [
+        "heat",
+        "noise"
+      ],
+      "severity": "high",
+      "als_score": 0.84,
+      "noise_db": 82,
+      "context": "stationary",
+      "location_label": "5th & Grand Ave"
+    },
+    {
+      "h3_index": "8929a1d752bffff",
+      "stressors": [
+        "poor_crossing",
+        "congestion"
+      ],
+      "severity": "high",
+      "als_score": 0.79,
+      "noise_db": 76.5,
+      "context": "stationary",
+      "location_label": "Figueroa & 7th St"
+    },
+    {
+      "h3_index": "8929a1d757bffff",
+      "stressors": [
+        "heat",
+        "poor_transit_flow"
+      ],
+      "severity": "medium",
+      "als_score": 0.68,
+      "noise_db": 69,
+      "context": "walking",
+      "location_label": "Hope St Corridor"
+    }
+  ],
+  "agents": [
+    {
+      "id": "ingestion",
+      "label": "Ingestion Agent",
+      "status": "active",
+      "message": "Receiving 47 packets/min"
+    },
+    {
+      "id": "mapping",
+      "label": "Mapping Agent",
+      "status": "active",
+      "message": "3 red zones detected"
+    },
+    {
+      "id": "diagnosis",
+      "label": "Diagnosis Agent",
+      "status": "idle",
+      "message": "Waiting for hotspot query"
+    },
+    {
+      "id": "simulation",
+      "label": "Simulation Agent",
+      "status": "idle",
+      "message": "Ready"
+    },
+    {
+      "id": "planner",
+      "label": "Planner Agent",
+      "status": "idle",
+      "message": "Ready"
+    },
+    {
+      "id": "narrator",
+      "label": "Narrator Agent",
+      "status": "idle",
+      "message": "Ready"
+    }
+  ],
+  "interventions": [
+    {
+      "id": "shade_canopy",
+      "label": "Shade Canopy",
+      "icon": "🌿",
+      "predicted_als_delta": -0.24,
+      "estimated_cost_usd": 8500,
+      "relief_coefficient": 0.0000282,
+      "description": "Install shade sails along 5th St reducing surface temp by 4°C"
+    },
+    {
+      "id": "longer_walk_signal",
+      "label": "Longer Walk Signal",
+      "icon": "🚦",
+      "predicted_als_delta": -0.14,
+      "estimated_cost_usd": 1200,
+      "relief_coefficient": 0.0001167,
+      "description": "Extend pedestrian crossing time by 15s at 5th & Grand"
+    },
+    {
+      "id": "parklet",
+      "label": "Parklet",
+      "icon": "🪑",
+      "predicted_als_delta": -0.18,
+      "estimated_cost_usd": 12000,
+      "relief_coefficient": 0.000015,
+      "description": "Install resting parklet with seating and greenery"
+    },
+    {
+      "id": "pedestrian_bridge",
+      "label": "Pedestrian Bridge",
+      "icon": "🌉",
+      "predicted_als_delta": -0.31,
+      "estimated_cost_usd": 95000,
+      "relief_coefficient": 0.00000326,
+      "description": "Grade-separated crossing eliminating vehicle conflict zone"
+    }
+  ]
+}
