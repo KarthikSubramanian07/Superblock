@@ -1,0 +1,18 @@
+{
+  "model_version": "als-regressor-v1",
+  "regressor_name": "RandomForestRegressor",
+  "feature_names": [
+    "hrv_rmssd",
+    "hrv_sdnn",
+    "hrv_pnn50",
+    "hr_mean",
+    "hr_variance",
+    "skin_temp_delta",
+    "ambient_noise_db",
+    "accel_intensity_mean"
+  ],
+  "test_subject_ids": [
+    "s2",
+    "s6"
+  ]
+}

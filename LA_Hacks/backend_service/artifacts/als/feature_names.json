@@ -1,0 +1,10 @@
+[
+  "hrv_rmssd",
+  "hrv_sdnn",
+  "hrv_pnn50",
+  "hr_mean",
+  "hr_variance",
+  "skin_temp_delta",
+  "ambient_noise_db",
+  "accel_intensity_mean"
+]
