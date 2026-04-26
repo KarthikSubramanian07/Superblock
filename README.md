@@ -23,6 +23,8 @@
 ### 🤖 Fetch.ai (Agentverse & ASI:One)
 *   **Multi-Agent Orchestration**: A 6-agent reasoning chain discoverable via the **Almanac**.
 *   **ASI:One Compatibility**: Fully compatible with the ASI:One Chat Protocol. Ask: *"What's the best $10k fix for the heat island in DTLA?"*
+*   **Agent Address**: `agent1qfdrae3ezj3d6tghhu9q4fwglzkqr7cmkhg8lffqdfurm52hkc7xz2a5cgr`
+*   **Agent Profile**: https://agentverse.ai/agents/details/agent1qfdrae3ezj3d6tghhu9q4fwglzkqr7cmkhg8lffqdfurm52hkc7xz2a5cgr
 
 ### 🆔 World ID (Proof of Human)
 *   **Sybil Resistance**: Uses World ID MiniKit to ensure every data packet comes from a verified unique human.

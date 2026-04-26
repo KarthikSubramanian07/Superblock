@@ -557,6 +557,24 @@ def get_agent_planning_request(h3_index: str) -> AgentPlanningRequestResponse:
     return AgentPlanningRequestResponse(**request_payload)
 
 
+@app.post("/agents/orchestrate/internal", response_model=AgentWorkflowResponse)
+def orchestrate_agent_flow_internal(
+    payload: AgentWorkflowRequest,
+) -> AgentWorkflowResponse:
+    flow = build_agent_orchestration_flow(
+        edge_packet_store.get_packets(),
+        h3_index=payload.h3_index,
+    )
+    if flow is None:
+        detail = (
+            f"Unknown h3_index: {payload.h3_index}"
+            if payload.h3_index
+            else "No hotspots available to orchestrate."
+        )
+        raise HTTPException(status_code=404, detail=detail)
+    return AgentWorkflowResponse(**flow)
+
+
 @app.post("/agents/orchestrate", response_model=AgentWorkflowResponse)
 def orchestrate_agent_flow(
     payload: AgentWorkflowRequest,
