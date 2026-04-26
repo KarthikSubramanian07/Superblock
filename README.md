@@ -15,17 +15,27 @@
 *   **Interventions**: AI-driven simulations for Shade Canopies, Vertical Gardens, and Cool Pavement with predicted **Biological Relief Coefficients**.
 
 ### 📱 ZETIC (On-Device AI) — NPU-First
-*   **Melange SDK**: Core ALS (Adjusted Life Stress) inference runs natively on the **Apple Neural Engine (NPU)**.
-*   **Performance**: **137x speedup** over CPU (0.02ms vs 2.74ms).
-*   **Privacy Shield**: 100% of raw biometric data stays on-device. Only anonymized stress scores leave the NPU.
-*   **Energy Efficiency**: NPU-native inference saves **~25mJ per cycle** vs. cloud-heavy approaches.
+*   **Melange SDK Integration**: Model deployed to ZETIC Melange platform (`winnerkarthik/superblock-stressnet v1`).
+*   **REST API Integration**: Edge node uses ZETIC REST API for inference with CPU fallback.
+*   **Note**: Full on-device Melange SDK requires mobile app (iOS/Android) for on-device NPU inference. Current implementation uses REST API from backend for hackathon demo.
+*   **Performance**: Model optimized for NPU deployment with <50ms latency benchmarks.
 
 ### 🤖 Fetch.ai (Agentverse & ASI:One)
 *   **Multi-Agent Orchestration**: A 6-agent reasoning chain discoverable via the **Almanac**.
 *   **ASI:One Compatibility**: Fully compatible with the ASI:One Chat Protocol. Ask: *"What's the best $10k fix for the heat island in DTLA?"*
 
 ### 🆔 World ID (Proof of Human)
-*   **Sybil Resistance**: Uses World ID (IDKit) to ensure every data packet comes from a verified unique human. This prevents "Bot Spikes" from manipulating city infrastructure budgets.
+*   **Sybil Resistance**: Uses World ID MiniKit to ensure every data packet comes from a verified unique human.
+*   **Why It Matters**:
+    1. Prevents bot/sybil attacks on citizen sensor data - ensures each data point comes from a real human
+    2. Fair resource allocation - prevents gaming of intervention prioritization
+    3. Trust in public infrastructure - citizens can trust data driving city decisions comes from real humans
+    4. Democratic participation - enables verified citizen feedback loop for urban planning
+
+### 🔌 Arista Networks (High-Performance Networking)
+*   **Data Routing**: Multi-agent orchestration routes citizen sensor data through specialized agents (Ingestion → Mapping → Diagnosis → Simulation → Planner → Narrator).
+*   **Real-Time Networking**: WebSocket + REST fallback ensures low-latency data flow from edge devices to city intelligence backend.
+*   **Resource Connection**: Connects people to resources by routing stress data to appropriate interventions (shade, cooling, traffic flow).
 
 ---
 
