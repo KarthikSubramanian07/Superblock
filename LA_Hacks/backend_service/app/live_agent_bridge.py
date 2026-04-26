@@ -134,7 +134,10 @@ def run_live_agent_workflow(
     planner_module = _load_agent_module("planner_agent")
     narrator_module = _load_agent_module("narrator_agent")
 
-    if hasattr(simulation_module, "query_asi_one"):
+    import os
+    has_asi_key = bool(os.getenv("ASI_ONE_API_KEY"))
+
+    if not has_asi_key and hasattr(simulation_module, "query_asi_one"):
         simulation_module.query_asi_one = lambda prompt: "offline-simulation"
     # Reset the mapping module's in-memory twin for deterministic runs.
     if hasattr(mapping_module, "tile_windows"):
@@ -180,7 +183,7 @@ def run_live_agent_workflow(
     simulation_scenarios = simulation_module.run_simulation_request(simulation_request)
     planning_request = {"scenarios": simulation_scenarios}
     ranked_plan = planner_module.run_planning_request(planning_request)
-    if hasattr(narrator_module, "query_asi_one"):
+    if not has_asi_key and hasattr(narrator_module, "query_asi_one"):
         narrator_module.query_asi_one = lambda prompt: _offline_narrative_from_plan(
             selected_h3_index,
             diagnosis_result,
