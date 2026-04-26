@@ -37,6 +37,7 @@ from app.model_loader import (
     smooth_probabilities,
 )
 from app.live_agent_bridge import run_live_agent_workflow
+from app.mongo_store import get_mongo_store
 from app.schemas import (
     ALSModelInfoResponse,
     ALSPredictionRequest,
@@ -101,6 +102,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Connect to MongoDB Atlas on startup
+mongo = get_mongo_store()
 
 logger = logging.getLogger(__name__)
 
@@ -293,6 +297,9 @@ def ingest_edge_packets(
         latest_timestamp.isoformat(),
     )
 
+    # Persist to MongoDB Atlas for durable storage
+    mongo.persist_packets(serialized_packets)
+
     return EdgeTelemetryIngestionResponse(
         accepted_packets=len(payload.packets),
         stored_packets=stored_packets,
@@ -301,6 +308,12 @@ def ingest_edge_packets(
         ingestion_mode="privacy_safe_edge_packets",
         official_contract=OFFICIAL_INGESTION_PATH,
     )
+
+
+@app.get("/mongo/stats")
+def mongo_stats():
+    """Return MongoDB Atlas collection statistics."""
+    return get_mongo_store().get_stats()
 
 
 @app.get("/map/tiles", response_model=MapTilesResponse)

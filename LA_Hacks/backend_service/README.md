@@ -53,6 +53,16 @@ python3 scripts/asi1_superblock_skill.py
 ```
 *Note: Copy the `Agent Address` printed in the terminal to register the agent on the Agentverse Explorer!*
 
+## MongoDB Atlas — Durable Telemetry Storage
+
+All privacy-safe edge packets are persisted to **MongoDB Atlas** (free tier) for durable, cloud-native storage. This ensures biometric stress telemetry survives server restarts and can be queried historically for longitudinal urban health analysis.
+
+- **Database:** `superblock`
+- **Collections:** `edge_packets`, `tile_snapshots`, `interventions`
+- **Endpoint:** `GET /mongo/stats` — returns live collection counts
+
+Every call to `POST /ingest/edge-packets` writes to both the in-memory tile store (for real-time map updates) and MongoDB Atlas (for historical persistence).
+
 ## Dataset
 
 This implementation is built around the UCI WISDM Smartphone and Smartwatch Activity and Biometrics Dataset:
