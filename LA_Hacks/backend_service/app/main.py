@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import Depends, FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.agent_integration import (
@@ -38,6 +38,7 @@ from app.model_loader import (
 )
 from app.live_agent_bridge import run_live_agent_workflow
 from app.mongo_store import get_mongo_store
+from app.auth import get_auth0_user
 from app.schemas import (
     ALSModelInfoResponse,
     ALSPredictionRequest,
@@ -445,7 +446,10 @@ def get_agent_planning_request(h3_index: str) -> AgentPlanningRequestResponse:
 
 
 @app.post("/agents/orchestrate", response_model=AgentWorkflowResponse)
-def orchestrate_agent_flow(payload: AgentWorkflowRequest) -> AgentWorkflowResponse:
+def orchestrate_agent_flow(
+    payload: AgentWorkflowRequest,
+    auth: dict = Depends(get_auth0_user)
+) -> AgentWorkflowResponse:
     flow = build_agent_orchestration_flow(
         edge_packet_store.get_packets(),
         h3_index=payload.h3_index,
@@ -479,6 +483,7 @@ def orchestrate_live_agent_flow(payload: AgentWorkflowRequest) -> AgentLiveWorkf
 @app.post("/simulate/intervention", response_model=SimulationResponse)
 def simulate_intervention_endpoint(
     payload: SimulationRequest,
+    auth: dict = Depends(get_auth0_user)
 ) -> SimulationResponse:
     result = simulate_intervention(
         edge_packet_store.get_packets(),

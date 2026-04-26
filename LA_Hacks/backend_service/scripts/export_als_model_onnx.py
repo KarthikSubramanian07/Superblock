@@ -54,13 +54,20 @@ def main() -> None:
     model = joblib.load(model_path)
     feature_count = len(ALS_FEATURE_NAMES)
 
-    # Define the input signature for the ONNX model (Float tensor of shape [batch_size, feature_count])
-    initial_types = [("float_input", FloatTensorType([None, feature_count]))]
+    import onnx
+    
+    # Define the input signature with FIXED shape [1, 8]
+    # NPU compilers often fail on dynamic [None, 8] shapes.
+    initial_types = [("input", FloatTensorType([1, feature_count]))]
+    
     onnx_model = convert_sklearn(
         model,
         initial_types=initial_types,
-        target_opset=17,
+        target_opset=11, # Baseline for mobile NPU support
     )
+
+    # Validate the model before saving
+    onnx.checker.check_model(onnx_model)
 
     output_onnx.parent.mkdir(parents=True, exist_ok=True)
     output_onnx.write_bytes(onnx_model.SerializeToString())
