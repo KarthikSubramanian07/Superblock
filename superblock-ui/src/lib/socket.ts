@@ -1,6 +1,6 @@
 import type { Tile } from '@/types'
 
-const WS_URL = (import.meta.env.VITE_WS_URL as string | undefined) ?? 'ws://localhost:8000/ws/tiles'
+const WS_URL = (import.meta.env.VITE_WS_URL as string | undefined) ?? 'ws://localhost:8000/ws/map/tiles'
 
 export interface TileSocket {
   close: () => void

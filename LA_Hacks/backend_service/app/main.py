@@ -4,6 +4,7 @@ import asyncio
 import logging
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.agent_integration import (
     build_agent_orchestration_flow,
@@ -92,6 +93,15 @@ from app.settings import get_settings
 from training.als_constants import ALS_FEATURE_NAMES
 
 app = FastAPI(title="The Living City Context Classifier", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 logger = logging.getLogger(__name__)
 
 OFFICIAL_INGESTION_PATH = "/ingest/edge-packets"

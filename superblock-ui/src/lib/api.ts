@@ -2,13 +2,13 @@ import type { Tile, Hotspot, Agent, SimResult, Intervention, DiagnosisResult, In
 
 const BASE     = (import.meta.env.VITE_API_BASE_URL      as string | undefined) ?? 'http://localhost:8000'
 const P_HEALTH   = (import.meta.env.VITE_API_PATH_HEALTH   as string | undefined) ?? '/health'
-const P_TILES    = (import.meta.env.VITE_API_PATH_TILES    as string | undefined) ?? '/tiles'
-const P_HOTSPOTS = (import.meta.env.VITE_API_PATH_HOTSPOTS as string | undefined) ?? '/hotspots'
+const P_TILES    = (import.meta.env.VITE_API_PATH_TILES    as string | undefined) ?? '/map/tiles'
+const P_HOTSPOTS = (import.meta.env.VITE_API_PATH_HOTSPOTS as string | undefined) ?? '/agents/hotspots'
 const P_AGENTS   = (import.meta.env.VITE_API_PATH_AGENTS   as string | undefined) ?? '/agents'
-const P_SIMULATE = (import.meta.env.VITE_API_PATH_SIMULATE as string | undefined) ?? '/simulate'
+const P_SIMULATE = (import.meta.env.VITE_API_PATH_SIMULATE as string | undefined) ?? '/simulate/intervention'
 const P_PLANNER_INTERVENTIONS = (import.meta.env.VITE_API_PATH_PLANNER_INTERVENTIONS as string | undefined) ?? '/planner/interventions'
-const P_DIAGNOSIS = (import.meta.env.VITE_API_PATH_DIAGNOSIS as string | undefined) ?? '/diagnosis'
-const P_INGESTION_STATUS = (import.meta.env.VITE_API_PATH_INGESTION_STATUS as string | undefined) ?? '/ingestion/status'
+const P_DIAGNOSIS = (import.meta.env.VITE_API_PATH_DIAGNOSIS as string | undefined) ?? '/agents/diagnosis/red-zone-alerts'
+const P_INGESTION_STATUS = (import.meta.env.VITE_API_PATH_INGESTION_STATUS as string | undefined) ?? '/demo/status'
 
 async function get<T>(path: string, timeoutMs = 3000): Promise<T | null> {
   try {

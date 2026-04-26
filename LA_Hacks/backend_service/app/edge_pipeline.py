@@ -63,6 +63,9 @@ def aggregate_packets_to_tiles(packets: list[dict[str, object]]) -> list[dict[st
                 "dominant_context": dominant_context,
                 "noise_db": round(avg_noise, 2),
                 "status": "red_zone" if avg_als >= RED_ZONE_THRESHOLD else "blue_zone",
+                # Compatibility fields for UI
+                "als_score": round(avg_als, 4),
+                "context": dominant_context,
             }
         )
 
@@ -128,6 +131,12 @@ def build_hotspot_detail(
             "transit_like": context_counter.get("transit_like", 0),
         },
         "recent_scores": [float(packet["als_score"]) for packet in matching[-10:]],
+        # Compatibility fields for UI
+        "location_label": f"H3:{h3_index[:12]}",
+        "als_score": tile["avg_als"],
+        "context": tile["dominant_context"],
+        "stressors": ["heat", "noise"] if tile["avg_als"] >= 0.7 else ["urban_stress"],
+        "severity": "high" if tile["avg_als"] >= 0.7 else "medium" if tile["avg_als"] >= 0.5 else "low",
     }
 
 

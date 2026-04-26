@@ -274,6 +274,9 @@ class MapTileResponse(BaseModel):
     dominant_context: EdgeContext
     noise_db: float = Field(ge=0.0, le=140.0)
     status: ZoneStatus
+    # Compatibility fields for UI
+    als_score: float = Field(default=0.0, ge=0.0, le=1.0)
+    context: str = ""
 
 
 class MapTilesResponse(BaseModel):
@@ -303,6 +306,12 @@ class HotspotDetailResponse(BaseModel):
     latest_timestamp: datetime
     context_counts: Dict[EdgeContext, int]
     recent_scores: List[float]
+    # Compatibility fields for UI
+    location_label: str = "Downtown LA"
+    als_score: float = Field(default=0.0, ge=0.0, le=1.0)
+    context: str = ""
+    stressors: List[str] = ["heat", "noise"]
+    severity: str = "high"
 
 
 class AgentHotspotResponse(BaseModel):
@@ -316,6 +325,12 @@ class AgentHotspotResponse(BaseModel):
     unique_user_count: int
     latest_timestamp: datetime
     context_counts: Dict[EdgeContext, int]
+    # Compatibility fields for UI
+    location_label: str = "Downtown LA"
+    als_score: float = Field(default=0.0, ge=0.0, le=1.0)
+    context: str = ""
+    stressors: List[str] = ["heat", "noise"]
+    severity: str = "high"
 
 
 class AgentHotspotsResponse(BaseModel):
@@ -370,6 +385,13 @@ class AgentRedZoneAlertResponse(BaseModel):
     heat_flag: bool
     gait_quality: str
     duration_minutes: float
+    # Compatibility fields for UI
+    summary: str = ""
+    primary_stressor: str = "Urban stress"
+    stressors: List[str] = []
+    als_score: float = 0.0
+    severity: str = "medium"
+    recommended_action: str = ""
 
 
 class AgentRedZoneAlertsResponse(BaseModel):

@@ -59,6 +59,13 @@ def build_red_zone_alerts_for_agents(
                     float(hotspot["avg_als"]),
                 ),
                 "duration_minutes": float(max(5, hotspot["packet_count"])),
+                # Compatibility fields for UI
+                "summary": f"Red zone detected at {hotspot['h3_index'][:12]} with ALS {hotspot['avg_als']}.",
+                "primary_stressor": "Heat exposure" if hotspot["avg_als"] >= 0.78 else "Urban stress",
+                "stressors": hotspot["stressors"],
+                "als_score": hotspot["avg_als"],
+                "severity": hotspot["severity"],
+                "recommended_action": "Intervention recommended based on signal profile." if hotspot["avg_als"] >= 0.7 else "Monitor zone.",
             }
         )
     return alerts
