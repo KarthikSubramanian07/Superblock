@@ -23,6 +23,11 @@ export default function Header({ isDemoMode, isLive, isConnecting, onToggleDemo 
         <span style={{ color: '#94a3b8', fontSize: '0.7rem' }}>Urban Nervous System</span>
       </div>
 
+      <div className="flex items-center gap-2 px-2 py-0.5 rounded-md ml-4" style={{ background: '#f5f3ff', border: '1px solid #ddd6fe' }}>
+        <span style={{ color: '#7c3aed', fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.05em' }}>ZETIC NPU</span>
+        <span className="flex h-1.5 w-1.5 rounded-full bg-violet-500 animate-pulse" />
+      </div>
+
       <div className="flex-1" />
 
       {/* Four-state badge: DEMO · CONNECTING… · OFFLINE · LIVE */}
