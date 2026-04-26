@@ -6,7 +6,7 @@ import requests
 from pydantic import BaseModel, Field
 from uagents import Agent, Context, Protocol
 
-from config import AGENT_PORTS, AGENT_SEEDS, ASI_ONE_API_KEY, ASI_ONE_ENDPOINT, MODEL
+from config import AGENT_PORTS, AGENT_SEEDS, ASI_ONE_API_KEY, ASI_ONE_ENDPOINT, MODEL, endpoint_for
 
 
 class DiagnosisResult(BaseModel):
@@ -33,7 +33,7 @@ simulation_agent = Agent(
     name="simulation_agent",
     seed=AGENT_SEEDS["simulation"],
     port=AGENT_PORTS["simulation"],
-    endpoint=[f"http://127.0.0.1:{AGENT_PORTS['simulation']}/submit"],
+    endpoint=[endpoint_for("simulation")],
 )
 
 simulation_proto = Protocol("simulation")

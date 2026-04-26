@@ -6,7 +6,7 @@ import requests
 from pydantic import BaseModel, Field
 from uagents import Agent, Context, Protocol
 
-from config import AGENT_PORTS, AGENT_SEEDS, ASI_ONE_API_KEY, ASI_ONE_ENDPOINT, MODEL
+from config import AGENT_PORTS, AGENT_SEEDS, ASI_ONE_API_KEY, ASI_ONE_ENDPOINT, MODEL, endpoint_for
 
 
 class RankedPlan(BaseModel):
@@ -32,7 +32,7 @@ narrator_agent = Agent(
     name="narrator_agent",
     seed=AGENT_SEEDS["narrator"],
     port=AGENT_PORTS["narrator"],
-    endpoint=[f"http://127.0.0.1:{AGENT_PORTS['narrator']}/submit"],
+    endpoint=[endpoint_for("narrator")],
 )
 
 narrator_proto = Protocol("narration")

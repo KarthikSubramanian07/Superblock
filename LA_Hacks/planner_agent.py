@@ -1,7 +1,7 @@
-from uagents import Agent, Context, Protocol, Model
+from uagents import Agent, Context, Protocol
 from pydantic import BaseModel, Field
 from typing import List
-from config import AGENT_SEEDS, AGENT_PORTS
+from config import AGENT_SEEDS, AGENT_PORTS, endpoint_for
 
 class SimulationScenario(BaseModel):
     scenario_name: str
@@ -24,7 +24,7 @@ planner_agent = Agent(
     name="planner_agent",
     seed=AGENT_SEEDS["planner"],
     port=AGENT_PORTS["planner"],
-    endpoint=[f"http://127.0.0.1:{AGENT_PORTS['planner']}/submit"]
+    endpoint=[endpoint_for("planner")]
 )
 
 planner_proto = Protocol("planning")

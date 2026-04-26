@@ -16,6 +16,7 @@ import requests
 from uagents import Agent, Context, Protocol
 from pydantic import BaseModel, Field
 from typing import List, Literal, Optional
+from config import AGENT_SEEDS, AGENT_PORTS, SIMULATION_AGENT_ADDRESS, endpoint_for
 try:
     from dotenv import load_dotenv
 except ImportError:  # pragma: no cover
@@ -23,29 +24,6 @@ except ImportError:  # pragma: no cover
         return None
 
 load_dotenv()
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Config
-# ─────────────────────────────────────────────────────────────────────────────
-AGENT_SEEDS = {
-    "ingestion":  "ingestion-agent-seed-la-hacks-2026",
-    "mapping":    "mapping-agent-seed-la-hacks-2026",
-    "diagnosis":  "diagnosis-agent-seed-la-hacks-2026",
-    "simulation": "simulation-agent-seed-la-hacks-2026",
-    "planner":    "planner-agent-seed-la-hacks-2026",
-    "narrator":   "narrator-agent-seed-la-hacks-2026",
-}
-AGENT_PORTS = {
-    "ingestion":  8000,
-    "mapping":    8001,
-    "diagnosis":  8002,
-    "simulation": 8003,
-    "planner":    8004,
-    "narrator":   8005,
-}
-
-# Paste Simulation Agent address after running simulation_agent.py
-SIMULATION_AGENT_ADDRESS = "agent1q_PASTE_SIMULATION_ADDRESS_HERE"
 
 # ASI:One / Fetch.ai API — set in .env
 ASI_ONE_API_KEY  = os.getenv("ASI_ONE_API_KEY", "")
@@ -309,7 +287,7 @@ diagnosis_agent = Agent(
     name="diagnosis_agent",
     seed=AGENT_SEEDS["diagnosis"],
     port=AGENT_PORTS["diagnosis"],
-    endpoint=[f"http://127.0.0.1:{AGENT_PORTS['diagnosis']}/submit"],
+    endpoint=[endpoint_for("diagnosis")],
 )
 
 diagnosis_proto = Protocol("diagnosis")
@@ -368,7 +346,7 @@ async def handle_diagnosis(ctx: Context, sender: str, msg: RedZoneAlert):
     )
 
     # Step 4 — Forward to Simulation Agent
-    if SIMULATION_AGENT_ADDRESS != "agent1q_PASTE_SIMULATION_ADDRESS_HERE":
+    if SIMULATION_AGENT_ADDRESS:
         await ctx.send(SIMULATION_AGENT_ADDRESS, result)
         ctx.logger.info("📤 Forwarded to Simulation Agent")
     else:
@@ -433,3 +411,9 @@ async def on_startup(ctx: Context):
     ctx.logger.info(f"📍 Address    : {diagnosis_agent.address}")
     ctx.logger.info(f"🔌 Port       : {AGENT_PORTS['diagnosis']}")
     ctx.logger.info(f"🤖 Simulation : {SIMULATION_AGENT_ADDRESS[:30]}")
+
+
+if __name__ == "__main__":
+    diagnosis_agent.include(diagnosis_proto, publish_manifest=True)
+    diagnosis_agent.include(chat_proto, publish_manifest=True)
+    diagnosis_agent.run()

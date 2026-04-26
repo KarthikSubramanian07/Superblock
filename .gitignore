@@ -24,3 +24,14 @@ Thumbs.db
 
 # Vite
 *.local
+
+# Python
+__pycache__/
+*.pyc
+
+# Local agent runtime artifacts
+LA_Hacks/.env
+LA_Hacks/logs/
+LA_Hacks/uagents_core.log
+LA_Hacks/agent_addresses.txt
+superblock-ui/.env

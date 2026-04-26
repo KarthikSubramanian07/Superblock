@@ -2,6 +2,7 @@ import type { ActiveTab } from '@/types'
 import AgentPanel from '@/components/panels/AgentPanel'
 import HotspotPanel from '@/components/panels/HotspotPanel'
 import SimPanel from '@/components/panels/SimPanel'
+import SponsorPanel from '@/components/panels/SponsorPanel'
 
 interface SidebarProps {
   activeTab: ActiveTab
@@ -11,7 +12,8 @@ interface SidebarProps {
 const TABS: { id: ActiveTab; label: string }[] = [
   { id: 'agents', label: 'Agents' },
   { id: 'hotspot', label: 'Hotspot' },
-  { id: 'simulation', label: 'Simulation' },
+  { id: 'simulation', label: 'Simulate' },
+  { id: 'sponsors', label: '🏆 Prizes' },
 ]
 
 export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
@@ -61,6 +63,37 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
         {activeTab === 'agents' && <AgentPanel />}
         {activeTab === 'hotspot' && <HotspotPanel />}
         {activeTab === 'simulation' && <SimPanel />}
+        {activeTab === 'sponsors' && <SponsorPanel />}
+      </div>
+
+      {/* Climate Impact Footer - Sustain the Spark */}
+      <div
+        className="flex-shrink-0 px-4 py-3"
+        style={{
+          background: 'linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%)',
+          borderTop: '1px solid #bbf7d0',
+        }}
+      >
+        <div className="flex items-center justify-between mb-2">
+          <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#166534', letterSpacing: '0.05em' }}>
+            🌱 SUSTAIN THE SPARK
+          </span>
+          <span style={{ fontSize: '0.6rem', color: '#16a34a', fontWeight: 600 }}>Climate Impact</span>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="text-center">
+            <div style={{ fontSize: '1rem', fontWeight: 800, color: '#16a34a' }}>25mJ</div>
+            <div style={{ fontSize: '0.55rem', color: '#4ade80' }}>Energy Saved</div>
+          </div>
+          <div className="text-center">
+            <div style={{ fontSize: '1rem', fontWeight: 800, color: '#16a34a' }}>137x</div>
+            <div style={{ fontSize: '0.55rem', color: '#4ade80' }}>NPU Efficiency</div>
+          </div>
+          <div className="text-center">
+            <div style={{ fontSize: '1rem', fontWeight: 800, color: '#16a34a' }}>0%</div>
+            <div style={{ fontSize: '0.55rem', color: '#4ade80' }}>Data Leaked</div>
+          </div>
+        </div>
       </div>
       <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }`}</style>
     </aside>

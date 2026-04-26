@@ -13,31 +13,7 @@ Responsibilities:
 from uagents import Agent, Context, Protocol
 from pydantic import BaseModel, Field
 from typing import Optional, Literal
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Config
-# ─────────────────────────────────────────────────────────────────────────────
-
-AGENT_SEEDS = {
-    "ingestion":  "ingestion-agent-seed-la-hacks-2026",
-    "mapping":    "mapping-agent-seed-la-hacks-2026",
-    "diagnosis":  "diagnosis-agent-seed-la-hacks-2026",
-    "simulation": "simulation-agent-seed-la-hacks-2026",
-    "planner":    "planner-agent-seed-la-hacks-2026",
-    "narrator":   "narrator-agent-seed-la-hacks-2026",
-}
-
-AGENT_PORTS = {
-    "ingestion":  8000,
-    "mapping":    8001,
-    "diagnosis":  8002,
-    "simulation": 8003,
-    "planner":    8004,
-    "narrator":   8005,
-}
-
-# Paste the Mapping Agent address here after running mapping_agent.py first
-MAPPING_AGENT_ADDRESS = "agent1q_PASTE_MAPPING_ADDRESS_HERE"
+from config import AGENT_SEEDS, AGENT_PORTS, MAPPING_AGENT_ADDRESS, endpoint_for
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Data Models
@@ -99,7 +75,7 @@ ingestion_agent = Agent(
     name="ingestion_agent",
     seed=AGENT_SEEDS["ingestion"],
     port=AGENT_PORTS["ingestion"],
-    endpoint=[f"http://127.0.0.1:{AGENT_PORTS['ingestion']}/submit"],
+    endpoint=[endpoint_for("ingestion")],
 )
 
 ingestion_proto = Protocol("ingestion")
@@ -220,13 +196,13 @@ async def handle_ingestion(ctx: Context, sender: str, msg: IngestionRequest):
     )
 
     # Step 4 — Route to Mapping Agent
-    if MAPPING_AGENT_ADDRESS != "agent1q_PASTE_MAPPING_ADDRESS_HERE":
+    if MAPPING_AGENT_ADDRESS:
         await ctx.send(MAPPING_AGENT_ADDRESS, clean_packet)
         ctx.logger.info(f"📤 Forwarded to Mapping Agent → {MAPPING_AGENT_ADDRESS[:20]}...")
     else:
         ctx.logger.warning(
             "⚠️  MAPPING_AGENT_ADDRESS not set — packet validated but not forwarded. "
-            "Paste the Mapping Agent address into ingestion_agent.py."
+            "Set MAPPING_AGENT_ADDRESS in environment for distributed agent routing."
         )
 
     # Step 5 — Acknowledge back to sender

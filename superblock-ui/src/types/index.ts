@@ -60,4 +60,4 @@ export interface SimResult {
   percent_reduction: number
 }
 
-export type ActiveTab = 'agents' | 'hotspot' | 'simulation'
+export type ActiveTab = 'agents' | 'hotspot' | 'simulation' | 'sponsors'

@@ -17,31 +17,7 @@ from pydantic import BaseModel, Field
 from typing import List, Literal, Optional
 from datetime import datetime, timezone, timedelta
 from collections import defaultdict
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Config
-# ─────────────────────────────────────────────────────────────────────────────
-
-AGENT_SEEDS = {
-    "ingestion":  "ingestion-agent-seed-la-hacks-2026",
-    "mapping":    "mapping-agent-seed-la-hacks-2026",
-    "diagnosis":  "diagnosis-agent-seed-la-hacks-2026",
-    "simulation": "simulation-agent-seed-la-hacks-2026",
-    "planner":    "planner-agent-seed-la-hacks-2026",
-    "narrator":   "narrator-agent-seed-la-hacks-2026",
-}
-
-AGENT_PORTS = {
-    "ingestion":  8000,
-    "mapping":    8001,
-    "diagnosis":  8002,
-    "simulation": 8003,
-    "planner":    8004,
-    "narrator":   8005,
-}
-
-# Paste Diagnosis Agent address after running diagnosis_agent.py
-DIAGNOSIS_AGENT_ADDRESS = "agent1q_PASTE_DIAGNOSIS_ADDRESS_HERE"
+from config import AGENT_SEEDS, AGENT_PORTS, DIAGNOSIS_AGENT_ADDRESS, endpoint_for
 
 # Red Zone thresholds
 RED_ZONE_ALS_THRESHOLD   = 0.65   # Tile avg ALS must exceed this
@@ -212,7 +188,7 @@ mapping_agent = Agent(
     name="mapping_agent",
     seed=AGENT_SEEDS["mapping"],
     port=AGENT_PORTS["mapping"],
-    endpoint=[f"http://127.0.0.1:{AGENT_PORTS['mapping']}/submit"],
+    endpoint=[endpoint_for("mapping")],
 )
 
 mapping_proto = Protocol("mapping")
@@ -276,7 +252,7 @@ async def handle_validated_packet(ctx: Context, sender: str, msg: ValidatedPacke
                 duration_minutes=     round(duration_min, 1),
             )
 
-            if DIAGNOSIS_AGENT_ADDRESS != "agent1q_PASTE_DIAGNOSIS_ADDRESS_HERE":
+            if DIAGNOSIS_AGENT_ADDRESS:
                 await ctx.send(DIAGNOSIS_AGENT_ADDRESS, alert)
                 red_zone_alerted[tile] = True
                 ctx.logger.info(f"📤 RedZoneAlert forwarded → Diagnosis Agent")
