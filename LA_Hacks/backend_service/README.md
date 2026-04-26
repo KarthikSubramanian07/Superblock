@@ -1,12 +1,14 @@
-# FastAPI Context + ALS Models
+# SuperBlock: Climate Intelligence & Urban Nervous System
 
-![tag:innovationlab](https://img.shields.io/badge/innovationlab-3D8BD3)
-![tag:hackathon](https://img.shields.io/badge/hackathon-5F43F1)
+> **Sustain the Spark Entry**: Transforming human physiological feedback into a real-time diagnostic engine for Urban Heat Island (UHI) mitigation and grid optimization.
 
-This project implements the first two modeling layers for The Living City:
+## The Vision: Sentient Cities for a Cooling Planet
 
-- Model 1: a development-ready context classifier trained on WISDM smartwatch accelerometer data
-- Model 2: an ALS regressor trained from prepared physiology features and served through FastAPI
+SuperBlock is the first **Urban Nervous System** that uses decentralized, NPU-accelerated biometrics to automate the cooling of our planet's cities. By treating human stress as a high-fidelity proxy for the **Urban Heat Island effect**, we enable:
+
+1.  **Precision Cooling**: Identifying "Red Zones" where climate-driven heat is causing biological damage.
+2.  **Grid Optimization**: Reducing peak HVAC energy demand by strategically deploying nature-based cooling (Vertical Gardens, Shade) where it provides maximum relief.
+3.  **Zero-Knowledge Resilience**: Protecting citizen privacy via Zetic NPU and World ID, ensuring that the city's climate response is built on trust.
 
 ## What it does
 
