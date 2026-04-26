@@ -65,6 +65,12 @@ def main() -> None:
         target_opset=17,
     )
 
+    # Apply ONNX Simplification for NPU optimization
+    from onnxsim import simplify
+    onnx_model, check = simplify(onnx_model)
+    if not check:
+        print("[WARNING] ONNX Simplification check failed")
+
     output_onnx.parent.mkdir(parents=True, exist_ok=True)
     output_onnx.write_bytes(onnx_model.SerializeToString())
     np.save(output_sample, sample.to_numpy(dtype=np.float32))

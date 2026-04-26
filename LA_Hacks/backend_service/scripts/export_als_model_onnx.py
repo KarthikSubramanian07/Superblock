@@ -63,8 +63,14 @@ def main() -> None:
     onnx_model = convert_sklearn(
         model,
         initial_types=initial_types,
-        target_opset=11, # Baseline for mobile NPU support
+        target_opset=17, # Upgraded for modern NPU support
     )
+
+    # Apply ONNX Simplification for NPU optimization
+    from onnxsim import simplify
+    onnx_model, check = simplify(onnx_model)
+    if not check:
+        print("[WARNING] ONNX Simplification check failed")
 
     # Validate the model before saving
     onnx.checker.check_model(onnx_model)
