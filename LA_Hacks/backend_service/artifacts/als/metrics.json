@@ -1,9 +1,9 @@
 {
   "model_version": "als-regressor-v1",
-  "regressor_name": "RandomForestRegressor",
-  "mae": 0.06325416666666574,
-  "rmse": 0.065874031723855,
-  "r2": 0.9517845771604949,
+  "regressor_name": "MLPRegressor",
+  "mae": 0.55,
+  "rmse": 0.6264982043070834,
+  "r2": -3.3611111111111107,
   "train_rows": 144,
   "test_rows": 48,
   "split_strategy": "subject_wise_group_shuffle_split",

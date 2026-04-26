@@ -7,7 +7,7 @@ from typing import Any
 import joblib
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.neural_network import MLPRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import GroupShuffleSplit
 
@@ -26,23 +26,18 @@ except (ImportError, OSError):  # pragma: no cover
 
 
 def build_als_regressor(random_state: int = 42) -> tuple[Any, str]:
-    if LGBMRegressor is not None:
-        regressor = LGBMRegressor(
-            n_estimators=250,
-            learning_rate=0.05,
-            num_leaves=31,
-            subsample=0.9,
-            colsample_bytree=0.9,
-            random_state=random_state,
-        )
-        return regressor, "LightGBMRegressor"
-
-    regressor = RandomForestRegressor(
-        n_estimators=300,
+    # Neural Network (MLP) is used instead of Trees for NPU compatibility.
+    # NPUs are optimized for Matrix Multiplication (Gemm) and Activations (Relu),
+    # which are exactly what an MLP uses.
+    regressor = MLPRegressor(
+        hidden_layer_sizes=(16, 8),
+        activation="relu",
+        solver="adam",
+        max_iter=500,
         random_state=random_state,
-        n_jobs=-1,
+        early_stopping=True,
     )
-    return regressor, "RandomForestRegressor"
+    return regressor, "MLPRegressor"
 
 
 def _resolve_target_series(prepared_features: pd.DataFrame) -> pd.Series:

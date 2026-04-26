@@ -1,6 +1,6 @@
 {
   "model_version": "als-regressor-v1",
-  "regressor_name": "RandomForestRegressor",
+  "regressor_name": "MLPRegressor",
   "feature_names": [
     "hrv_rmssd",
     "hrv_sdnn",
