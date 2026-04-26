@@ -7,8 +7,11 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import jwt
 from urllib.request import urlopen
 
-AUTH0_DOMAIN = os.getenv("AUTH0_DOMAIN", "dev-8wve8p5a0k2nvnf6.us.auth0.com")
-AUTH0_AUDIENCE = os.getenv("AUTH0_AUDIENCE", f"https://{AUTH0_DOMAIN}/api/v2/")
+from app.settings import get_settings
+
+settings = get_settings()
+AUTH0_DOMAIN = settings.auth0_domain
+AUTH0_AUDIENCE = settings.auth0_audience
 ALGORITHMS = ["RS256"]
 
 class Auth0Error(Exception):

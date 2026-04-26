@@ -135,7 +135,8 @@ def run_live_agent_workflow(
     narrator_module = _load_agent_module("narrator_agent")
 
     import os
-    has_asi_key = bool(os.getenv("ASI_ONE_API_KEY"))
+    from config import ASI_ONE_API_KEY
+    has_asi_key = bool(os.getenv("ASI_ONE_API_KEY")) or (ASI_ONE_API_KEY != "your-key-here")
 
     if not has_asi_key and hasattr(simulation_module, "query_asi_one"):
         simulation_module.query_asi_one = lambda prompt: "offline-simulation"

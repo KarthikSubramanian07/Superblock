@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from functools import lru_cache
 from pathlib import Path
 
@@ -21,6 +22,13 @@ class Settings(BaseModel):
     als_metrics_path: Path = als_artifacts_dir / "metrics.json"
     als_model_version: str = "als-regressor-v1"
     agent_system_dir: Path | None = None
+
+    # Auth0 Configuration
+    auth0_domain: str = os.getenv("AUTH0_DOMAIN", "dev-8wve8p5a0k2nvnf6.us.auth0.com")
+    auth0_audience: str = os.getenv("AUTH0_AUDIENCE", f"https://{auth0_domain}/api/v2/")
+
+    # AI Configuration
+    asi_one_api_key: str = os.getenv("ASI_ONE_API_KEY", "your-key-here")
 
 
 @lru_cache(maxsize=1)

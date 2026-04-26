@@ -2,6 +2,10 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from fastapi import Depends, FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -465,7 +469,10 @@ def orchestrate_agent_flow(
 
 
 @app.post("/agents/orchestrate/live", response_model=AgentLiveWorkflowResponse)
-def orchestrate_live_agent_flow(payload: AgentWorkflowRequest) -> AgentLiveWorkflowResponse:
+def orchestrate_live_agent_flow(
+    payload: AgentWorkflowRequest,
+    auth: dict = Depends(get_auth0_user)
+) -> AgentLiveWorkflowResponse:
     flow = run_live_agent_workflow(
         edge_packet_store.get_packets(),
         h3_index=payload.h3_index,
