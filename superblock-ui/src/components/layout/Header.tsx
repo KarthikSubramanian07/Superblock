@@ -1,4 +1,6 @@
+import { IDKitRequestWidget, type IDKitResult, type IDKitErrorCodes, useIDKitRequest, type Preset } from '@worldcoin/idkit'
 import { useStore } from '@/store/useStore'
+import { useState } from 'react'
 
 interface HeaderProps {
   isDemoMode: boolean
@@ -10,11 +12,23 @@ interface HeaderProps {
 export default function Header({ isDemoMode, isLive, isConnecting, onToggleDemo }: HeaderProps) {
   const isHumanVerified = useStore(s => s.isHumanVerified)
   const setHumanVerified = useStore(s => s.setHumanVerified)
+  const [isOpen, setIsOpen] = useState(false)
 
-  const handleWorldIDVerify = () => {
-    // Demo mode for hackathon judges - World ID MiniKit requires World App environment
-    console.log('World ID Demo Verification - Proof of Human for Citizen Sensor Data')
+  const config = {
+    app_id: 'app_staging_5c60c91f_superblock',
+    action: 'verify_citizen_sensor',
+    preset: 'device' as Preset,
+  }
+
+  const { open } = useIDKitRequest(config)
+
+  const handleVerify = (result: IDKitResult) => {
+    console.log('✅ World ID verified:', result)
     setHumanVerified(true)
+  }
+
+  const handleError = (error: IDKitErrorCodes) => {
+    console.error('❌ World ID verification failed:', error)
   }
 
   // Why World ID matters for SuperBlock:
@@ -52,16 +66,25 @@ export default function Header({ isDemoMode, isLive, isConnecting, onToggleDemo 
           <span style={{ fontSize: '0.7rem' }}>🆔</span>
         </div>
       ) : (
-        <button
-          onClick={handleWorldIDVerify}
-          style={{
-            fontSize: '0.65rem', fontWeight: 700, padding: '4px 12px',
-            borderRadius: '6px', background: '#000', color: '#fff',
-            cursor: 'pointer', border: 'none',
-          }}
-        >
-          Verify with World ID
-        </button>
+        <>
+          <button
+            onClick={() => open()}
+            style={{
+              fontSize: '0.65rem', fontWeight: 700, padding: '4px 12px',
+              borderRadius: '6px', background: '#000', color: '#fff',
+              cursor: 'pointer', border: 'none',
+            }}
+          >
+            Verify with World ID
+          </button>
+          <IDKitRequestWidget
+            open={isOpen}
+            onOpenChange={setIsOpen}
+            onSuccess={handleVerify}
+            onError={handleError}
+            {...config}
+          />
+        </>
       )}
 
       <div className="flex-1" />
