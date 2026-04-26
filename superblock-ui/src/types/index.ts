@@ -60,4 +60,24 @@ export interface SimResult {
   percent_reduction: number
 }
 
+export interface AgentLiveWorkflowResponse {
+  selected_h3_index: string
+  agent_execution_mode: string
+  agent_call_order: string[]
+  ranked_plan: {
+    ranked_interventions?: Array<{
+      scenario_name?: string
+      intervention_id?: string
+      description?: string
+      implementation_cost?: number
+    }>
+  }
+  narrative_report?: {
+    executive_summary?: string
+    technical_analysis?: string
+    recommendations?: string
+    next_steps?: string
+  }
+}
+
 export type ActiveTab = 'agents' | 'hotspot' | 'simulation' | 'sponsors'

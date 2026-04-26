@@ -4,6 +4,7 @@ import { useStore } from '@/store/useStore'
 import { AGENT_HELP } from '@/data/agentHelp'
 import { AGENT_MESSAGES } from '@/data/agentMessages'
 import type { Agent } from '@/types'
+import { runLivePipeline } from '@/lib/api'
 
 // Rotating messages per agent to simulate live activity
 function HelpIcon({ text }: { text?: string }) {
@@ -67,6 +68,20 @@ function HelpIcon({ text }: { text?: string }) {
   )
 }
 
+type Evidence = {
+  topHotspot: string
+  predictedIntervention: string
+  agentCallOrder: string[]
+  timestamp: string
+  coordinatorNarrative: string
+}
+
+const SPECIALIST_ORDER = ['ingestion', 'mapping', 'diagnosis', 'simulation', 'planner', 'narrator']
+
+function normalizeAgentId(id: string): string {
+  return id.replace(/_agent$/, '').trim().toLowerCase()
+}
+
 
 const STATUS_COLOR: Record<Agent['status'], string> = {
   active:     '#22c55e',
@@ -107,6 +122,13 @@ export default function AgentPanel() {
   const ingestionStatus = useStore(s => s.ingestionStatus)
   const isLive = useStore(s => s.isLive)
 
+  const [pipelineRunning, setPipelineRunning] = useState(false)
+  const [pipelineStepIndex, setPipelineStepIndex] = useState(-1)
+  const [pipelineOrder, setPipelineOrder] = useState<string[]>([])
+  const [pipelineError, setPipelineError] = useState<string | null>(null)
+  const [coordinatorStatus, setCoordinatorStatus] = useState<Agent['status']>('idle')
+  const [evidence, setEvidence] = useState<Evidence | null>(null)
+
   // Local display state — cycles messages for active agents every 3.5s
   const [display, setDisplay] = useState<Record<string, { message: string; status: Agent['status'] }>>(() =>
     Object.fromEntries(agents.map(a => [a.id, { message: a.message, status: a.status }]))
@@ -141,6 +163,7 @@ export default function AgentPanel() {
 
   // Cycle messages for active/processing agents
   useEffect(() => {
+    if (pipelineRunning) return
     const timer = setInterval(() => {
       setDisplay(prev => {
         const next = { ...prev }
@@ -159,7 +182,86 @@ export default function AgentPanel() {
       })
     }, 3500)
     return () => clearInterval(timer)
-  }, [agents])
+  }, [agents, pipelineRunning])
+
+  async function handleRunFullPipeline() {
+    setPipelineError(null)
+    setEvidence(null)
+    setPipelineRunning(true)
+    setPipelineStepIndex(-1)
+    setCoordinatorStatus('idle')
+
+    const response = await runLivePipeline(selectedHotspot?.h3_index ? { h3_index: selectedHotspot.h3_index } : undefined)
+
+    if (!response) {
+      setPipelineRunning(false)
+      setCoordinatorStatus('error')
+      setPipelineError('Unable to run pipeline. Check backend connectivity.')
+      return
+    }
+
+    const normalized = (response.agent_call_order ?? [])
+      .map(normalizeAgentId)
+      .filter((id, idx, arr) => SPECIALIST_ORDER.includes(id) && arr.indexOf(id) === idx)
+
+    const mergedOrder = [...normalized, ...SPECIALIST_ORDER.filter(id => !normalized.includes(id))]
+    setPipelineOrder(mergedOrder)
+
+    for (let i = 0; i < mergedOrder.length; i += 1) {
+      setPipelineStepIndex(i)
+      await new Promise(resolve => setTimeout(resolve, 500))
+    }
+
+    setCoordinatorStatus('processing')
+    await new Promise(resolve => setTimeout(resolve, 500))
+    setCoordinatorStatus('active')
+
+    const topIntervention = response.ranked_plan?.ranked_interventions?.[0]
+    const predictedIntervention =
+      topIntervention?.scenario_name
+      ?? topIntervention?.intervention_id
+      ?? 'No intervention returned'
+
+    const coordinatorNarrative =
+      response.narrative_report?.executive_summary
+      ?? response.narrative_report?.recommendations
+      ?? 'Coordinator completed full 6-agent workflow and generated narrative output.'
+
+    setEvidence({
+      topHotspot: response.selected_h3_index,
+      predictedIntervention,
+      agentCallOrder: [...mergedOrder.map(id => `${id}_agent`), 'coordinator_agent'],
+      timestamp: new Date().toISOString(),
+      coordinatorNarrative,
+    })
+
+    setPipelineRunning(false)
+  }
+
+  async function handleCopyEvidence() {
+    if (!evidence) return
+    const text = [
+      `Top Hotspot: ${evidence.topHotspot}`,
+      `Predicted Intervention: ${evidence.predictedIntervention}`,
+      `Agent Call Order: ${evidence.agentCallOrder.join(' -> ')}`,
+      `Timestamp: ${evidence.timestamp}`,
+      `Coordinator Narrative: ${evidence.coordinatorNarrative}`,
+    ].join('\n')
+    await navigator.clipboard.writeText(text)
+  }
+
+  function getPipelineState(agentId: string, fallback: { status: Agent['status']; message: string }) {
+    if (!pipelineOrder.length && !pipelineRunning) return fallback
+    const index = pipelineOrder.indexOf(agentId)
+    if (index === -1) return fallback
+    if (pipelineRunning && index === pipelineStepIndex) {
+      return { status: 'processing' as const, message: 'Executing full pipeline step…' }
+    }
+    if (index <= pipelineStepIndex) {
+      return { status: 'active' as const, message: 'Completed in full pipeline run' }
+    }
+    return { status: 'idle' as const, message: 'Queued for full pipeline run' }
+  }
 
   const activeCount = Object.values(display).filter(d => d.status === 'active' || d.status === 'processing').length
 
@@ -170,17 +272,51 @@ export default function AgentPanel() {
         <p style={{ color: '#94a3b8', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           Agent Pipeline
         </p>
-        <span style={{
-          fontSize: '0.65rem', color: '#22c55e', background: '#f0fdf4',
-          border: '1px solid #bbf7d0', borderRadius: '99px', padding: '1px 8px',
-        }}>
-          {activeCount} running
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleRunFullPipeline}
+            disabled={pipelineRunning}
+            style={{
+              fontSize: '0.65rem',
+              color: '#312e81',
+              background: pipelineRunning ? '#e2e8f0' : '#e0e7ff',
+              border: '1px solid #c7d2fe',
+              borderRadius: '99px',
+              padding: '2px 10px',
+              cursor: pipelineRunning ? 'not-allowed' : 'pointer',
+            }}
+          >
+            {pipelineRunning ? 'Running…' : 'Run Full Pipeline'}
+          </button>
+          <span style={{
+            fontSize: '0.65rem', color: '#22c55e', background: '#f0fdf4',
+            border: '1px solid #bbf7d0', borderRadius: '99px', padding: '1px 8px',
+          }}>
+            {activeCount} running
+          </span>
+        </div>
       </div>
+
+      {pipelineError && (
+        <div
+          style={{
+            fontSize: '0.68rem',
+            color: '#b91c1c',
+            background: '#fef2f2',
+            border: '1px solid #fecaca',
+            borderRadius: '8px',
+            padding: '8px 10px',
+            marginBottom: '6px',
+          }}
+        >
+          {pipelineError}
+        </div>
+      )}
 
       {/* Agent rows */}
       {agents.map((agent, i) => {
-        const d = display[agent.id] ?? { message: agent.message, status: agent.status }
+        const raw = display[agent.id] ?? { message: agent.message, status: agent.status }
+        const d = getPipelineState(agent.id, raw)
         return (
           <div
             key={agent.id}
@@ -227,6 +363,82 @@ export default function AgentPanel() {
           </div>
         )
       })}
+
+      <div
+        className="flex items-center gap-3 rounded-lg"
+        style={{
+          padding: '10px 12px',
+          background: '#ffffff',
+          border: '1px solid #e2e8f0',
+          opacity: coordinatorStatus === 'idle' ? 0.7 : 1,
+          transition: 'opacity 0.3s',
+        }}
+      >
+        <span style={{
+          width: '18px', height: '18px', borderRadius: '50%',
+          background: coordinatorStatus === 'idle' ? '#f1f5f9' : '#ede9fe',
+          color: coordinatorStatus === 'idle' ? '#94a3b8' : '#6366f1',
+          fontSize: '0.6rem', fontWeight: 700,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0,
+        }}>
+          C
+        </span>
+        <div className="flex-1 min-w-0">
+          <p style={{ fontSize: '0.8rem', color: '#334155', fontWeight: 500 }}>Coordinator Narrative</p>
+          <p style={{ fontSize: '0.7rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {coordinatorStatus === 'processing'
+              ? 'Synthesizing multi-agent output into final narrative…'
+              : coordinatorStatus === 'active'
+                ? 'Narrative synthesis complete'
+                : 'Idle'}
+          </p>
+        </div>
+        <div className="flex items-center gap-1.5" style={{ flexShrink: 0 }}>
+          <StatusDot status={coordinatorStatus} />
+          <span style={{ fontSize: '0.65rem', color: STATUS_COLOR[coordinatorStatus] }}>
+            {STATUS_LABEL[coordinatorStatus]}
+          </span>
+        </div>
+      </div>
+
+      {evidence && (
+        <div
+          style={{
+            marginTop: '8px',
+            background: '#f8fafc',
+            border: '1px solid #cbd5e1',
+            borderRadius: '10px',
+            padding: '10px',
+          }}
+        >
+          <div className="flex items-center justify-between" style={{ marginBottom: '6px' }}>
+            <p style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', letterSpacing: '0.04em' }}>
+              EVIDENCE PANEL
+            </p>
+            <button
+              onClick={handleCopyEvidence}
+              style={{
+                fontSize: '0.65rem',
+                color: '#1d4ed8',
+                background: '#eff6ff',
+                border: '1px solid #bfdbfe',
+                borderRadius: '6px',
+                padding: '2px 8px',
+                cursor: 'pointer',
+              }}
+            >
+              Copy
+            </button>
+          </div>
+          <div style={{ fontSize: '0.68rem', color: '#475569', lineHeight: 1.5 }}>
+            <div><strong>Top Hotspot:</strong> {evidence.topHotspot}</div>
+            <div><strong>Predicted Intervention:</strong> {evidence.predictedIntervention}</div>
+            <div><strong>Agent Call Order:</strong> {evidence.agentCallOrder.join(' → ')}</div>
+            <div><strong>Timestamp:</strong> {evidence.timestamp}</div>
+          </div>
+        </div>
+      )}
 
       {/* CSS keyframe for pulse animation */}
       <style>{`
