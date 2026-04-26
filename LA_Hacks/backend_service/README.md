@@ -1,5 +1,8 @@
 # FastAPI Context + ALS Models
 
+![tag:innovationlab](https://img.shields.io/badge/innovationlab-3D8BD3)
+![tag:hackathon](https://img.shields.io/badge/hackathon-5F43F1)
+
 This project implements the first two modeling layers for The Living City:
 
 - Model 1: a development-ready context classifier trained on WISDM smartwatch accelerometer data
@@ -17,6 +20,38 @@ This project implements the first two modeling layers for The Living City:
 - Trains a baseline classifier
 - Persists model artifacts for serving
 - Exposes prediction endpoints for precomputed motion features
+
+## Why ZETIC Melange? (Hackathon ZETIC Track Pitch)
+
+To meet the requirements for the **ZETIC On-Device AI** hackathon track, Superblock utilizes a **Macbook Edge Node Simulator** architecture to guarantee Zero-Knowledge Biometrics.
+
+1. **Model Name:** `StressNet-v1` (ALS Regressor trained on synthesized Apple Watch physiology data).
+2. **Target Hardware:** Apple Silicon Neural Engine (NPU) / Apple Watch.
+3. **Inference Strategy:** Rather than sending raw, highly sensitive biometric data (heart rate, HRV, skin temperature) to the cloud, the raw data stream is ingested *locally* by our Edge Node Python script (`zetic_mac_edge_node.py`) which leverages `onnxruntime` to perform inference on the Apple hardware locally.
+4. **Zero-Knowledge Biometrics:** $0\%$ of the user's raw health data is transmitted over the network. The local edge node only sends the anonymized, aggregated `ALS Score` (0.0 - 1.0) and the coarse `h3_index` location to the FastAPI backend relay.
+5. **Validation:** The backend enforces edge processing by assigning an `inference_engine` label (`ZETIC_Melange_NPU`) to every packet and logs the secure ingress of anonymized data.
+
+## OmegaClaw Skill Integration (Fetch.ai Hackathon Tracks 1 & 2)
+
+We have built a dedicated **ASI:One Compatible Chat Agent** (`asi1_superblock_skill.py`) that acts as a specialist skill for OmegaClaw.
+
+### What the capability does
+This skill allows OmegaClaw (or any ASI:One user) to instantly analyze the live biometric stress map of the city. When invoked, it orchestrates the Superblock backend (Diagnosis Agent → Simulation Agent → Planner Agent) to analyze the highest-priority red zone and return a concrete urban intervention plan (e.g., adding a shade canopy or extending a crosswalk) complete with expected stress reduction metrics and budget.
+
+### How OmegaClaw routes the request
+1. A user chats with OmegaClaw/ASI:One on Telegram or Agentverse.
+2. They ask a question like, "What are the current stress hotspots in the city and how can we fix them?"
+3. ASI:One discovers the `superblock-city-planner` agent on Agentverse based on its manifest and intent.
+4. ASI:One sends a `TextContent` message via the **Chat Protocol**.
+5. Our agent receives the message, queries the local FastAPI backend (`/agents/orchestrate`), formats the narrative summary, and replies directly to the user.
+
+### To Run the Agent
+```bash
+cd LA_Hacks/backend_service
+source .venv/bin/activate
+python3 scripts/asi1_superblock_skill.py
+```
+*Note: Copy the `Agent Address` printed in the terminal to register the agent on the Agentverse Explorer!*
 
 ## Dataset
 

@@ -251,6 +251,7 @@ class EdgeTelemetryPacket(BaseModel):
     als_score: float = Field(ge=0.0, le=1.0)
     context: EdgeContext
     noise_db: float = Field(default=0.0, ge=0.0, le=140.0)
+    inference_engine: str = Field(default="ZETIC_Melange_NPU")
 
 
 class EdgeTelemetryIngestionRequest(BaseModel):
