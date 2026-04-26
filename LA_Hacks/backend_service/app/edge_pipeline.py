@@ -56,6 +56,7 @@ def aggregate_packets_to_tiles(packets: list[dict[str, object]]) -> list[dict[st
         dominant_context = Counter(
             str(packet["context"]) for packet in tile_packets
         ).most_common(1)[0][0]
+        is_verified = any(packet.get("is_verified_human", False) for packet in tile_packets)
         tiles.append(
             {
                 "h3_index": h3_index,
@@ -63,6 +64,7 @@ def aggregate_packets_to_tiles(packets: list[dict[str, object]]) -> list[dict[st
                 "dominant_context": dominant_context,
                 "noise_db": round(avg_noise, 2),
                 "status": "red_zone" if avg_als >= RED_ZONE_THRESHOLD else "blue_zone",
+                "is_verified_human": is_verified,
                 # Compatibility fields for UI
                 "als_score": round(avg_als, 4),
                 "context": dominant_context,
@@ -137,6 +139,7 @@ def build_hotspot_detail(
         "context": tile["dominant_context"],
         "stressors": ["heat", "noise"] if tile["avg_als"] >= 0.7 else ["urban_stress"],
         "severity": "high" if tile["avg_als"] >= 0.7 else "medium" if tile["avg_als"] >= 0.5 else "low",
+        "is_verified_human": tile.get("is_verified_human", False),
     }
 
 

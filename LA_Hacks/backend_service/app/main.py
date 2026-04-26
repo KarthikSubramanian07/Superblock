@@ -178,7 +178,8 @@ def _latest_edge_timestamp(packets: list[dict[str, object]]) -> object | None:
 
 @app.post("/verify-human")
 async def verify_human(proof: WorldIDProof):
-    return await verify_world_id_proof(proof)
+    success = await verify_world_id_proof(proof.model_dump())
+    return {"success": success}
 
 @app.get("/health", response_model=HealthResponse)
 def healthcheck() -> HealthResponse:

@@ -7,6 +7,14 @@ from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator
 
 from app.feature_contract import validate_feature_payload
 
+class WorldIDProof(BaseModel):
+    merkle_root: Optional[str] = None
+    nullifier_hash: Optional[str] = None
+    proof: Optional[str] = None
+    verification_level: Optional[str] = "orb"
+    action: Optional[str] = "verify_citizen_sensor"
+    is_mock: bool = False
+
 
 class ContextPredictionRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -253,6 +261,7 @@ class EdgeTelemetryPacket(BaseModel):
     noise_db: float = Field(default=0.0, ge=0.0, le=140.0)
     inference_engine: str = Field(default="ZETIC_Melange_NPU")
     is_verified_human: bool = Field(default=False)
+    humanity_proof: Optional[WorldIDProof] = None
 
 
 class EdgeTelemetryIngestionRequest(BaseModel):
@@ -314,6 +323,7 @@ class HotspotDetailResponse(BaseModel):
     context: str = ""
     stressors: List[str] = ["heat", "noise"]
     severity: str = "high"
+    is_verified_human: bool = False
 
 
 class AgentHotspotResponse(BaseModel):

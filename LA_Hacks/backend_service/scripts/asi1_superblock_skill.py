@@ -68,19 +68,20 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
    for item in msg.content:
        if isinstance(item, StartSessionContent):
            ctx.logger.info(f"Session started with {sender}")
-           welcome_msg = create_text_chat("Hello! I am the Superblock City Planner agent. I can analyze the current stress hotspots in the city and propose interventions. How can I help you?")
+           welcome_msg = create_text_chat("Hello! I am the Superblock Climate Resilience Agent. I analyze Urban Heat Islands and energy grid hotspots. How can I help you cooling the city today?")
            await ctx.send(sender, welcome_msg)
       
        elif isinstance(item, TextContent):
            ctx.logger.info(f"Text message from {sender}: {item.text}")
            
-           # If the user asks for analysis, we orchestrate the backend agents
-           if "analyze" in item.text.lower() or "hotspot" in item.text.lower() or "stress" in item.text.lower() or "city" in item.text.lower():
-               ctx.logger.info("Triggering Superblock backend orchestration...")
+           # Triggers for Climate narrative
+           triggers = ["analyze", "hotspot", "stress", "city", "heat", "climate", "energy", "grid"]
+           if any(t in item.text.lower() for t in triggers):
+               ctx.logger.info("Triggering Superblock Climate Engine orchestration...")
                result_narrative = query_backend_orchestration()
                response_message = create_text_chat(result_narrative)
            else:
-               response_message = create_text_chat("I am the Superblock City Planner. Ask me to 'analyze current city hotspots' to run the diagnostic pipeline.")
+               response_message = create_text_chat("I am the Superblock Climate Resilience Agent. Ask me to 'analyze current heat islands' to run the diagnostic engine.")
                
            await ctx.send(sender, response_message)
 
