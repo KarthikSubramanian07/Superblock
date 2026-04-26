@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom'
 import { useStore } from '@/store/useStore'
 import { AGENT_HELP } from '@/data/agentHelp'
 import { AGENT_MESSAGES } from '@/data/agentMessages'
+import { runLiveOrchestration } from '@/lib/api'
+import type { NarrativeReport } from '@/lib/api'
 import type { Agent } from '@/types'
 
 // Rotating messages per agent to simulate live activity
@@ -106,6 +108,25 @@ export default function AgentPanel() {
   const diagnosisResult = useStore(s => s.diagnosisResult)
   const ingestionStatus = useStore(s => s.ingestionStatus)
   const isLive = useStore(s => s.isLive)
+  const selectedHexId = useStore(s => s.selectedHexId)
+
+  const [reportLoading, setReportLoading] = useState(false)
+  const [report, setReport] = useState<NarrativeReport | null>(null)
+  const [reportError, setReportError] = useState<string | null>(null)
+
+  async function handleGenerateReport() {
+    setReportLoading(true)
+    setReport(null)
+    setReportError(null)
+    const result = await runLiveOrchestration(selectedHexId ?? undefined)
+    setReportLoading(false)
+    if (result) {
+      setReport(result)
+      setDisplay(prev => ({ ...prev, narrator: { message: 'Report generated', status: 'active' } }))
+    } else {
+      setReportError('Report generation failed — no hotspot data or request timed out.')
+    }
+  }
 
   // Local display state — cycles messages for active agents every 3.5s
   const [display, setDisplay] = useState<Record<string, { message: string; status: Agent['status'] }>>(() =>
@@ -125,7 +146,7 @@ export default function AgentPanel() {
       // Ingestion agent: live mode shows real stats
       if (isLive && ingestionStatus) {
         next['ingestion'] = {
-          message: `Receiving ${ingestionStatus.packets_per_min} packets/min · ${ingestionStatus.sensors_online} sensors online`,
+          message: `${ingestionStatus.packets_per_min} packets ingested · ${ingestionStatus.sensors_online} sensors online`,
           status: ingestionStatus.status,
         }
       }
@@ -228,11 +249,71 @@ export default function AgentPanel() {
         )
       })}
 
+      {/* Generate Report button — live mode only */}
+      {isLive && (
+        <button
+          onClick={handleGenerateReport}
+          disabled={reportLoading}
+          style={{
+            marginTop: '4px', width: '100%', padding: '10px',
+            borderRadius: '8px', border: 'none', cursor: reportLoading ? 'not-allowed' : 'pointer',
+            background: reportLoading ? '#e2e8f0' : '#0f172a',
+            color: reportLoading ? '#94a3b8' : 'white',
+            fontSize: '0.8rem', fontWeight: 600,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+            transition: 'background 0.15s',
+          }}
+        >
+          {reportLoading ? (
+            <>
+              <span style={{
+                width: '13px', height: '13px', borderRadius: '50%',
+                border: '2px solid #94a3b8', borderTopColor: '#6366f1',
+                animation: 'spin 0.7s linear infinite', display: 'inline-block',
+              }} />
+              Running all agents…
+            </>
+          ) : '📋 Generate Narrator Report'}
+        </button>
+      )}
+
+      {reportError && (
+        <p style={{ fontSize: '0.72rem', color: '#dc2626', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 12px' }}>
+          {reportError}
+        </p>
+      )}
+
+      {/* Narrative report card */}
+      {report && (
+        <div style={{
+          marginTop: '4px', background: '#f8fafc', border: '1px solid #e2e8f0',
+          borderRadius: '10px', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '10px',
+        }}>
+          <p style={{ fontSize: '0.7rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            Narrator Report
+          </p>
+          {[
+            { label: 'Executive Summary', key: 'executive_summary', color: '#1d4ed8' },
+            { label: 'Technical Analysis', key: 'technical_analysis', color: '#7c3aed' },
+            { label: 'Recommendations',   key: 'recommendations',   color: '#16a34a' },
+            { label: 'Next Steps',        key: 'next_steps',        color: '#b45309' },
+          ].map(({ label, key, color }) => (
+            <div key={key}>
+              <p style={{ fontSize: '0.65rem', fontWeight: 700, color, marginBottom: '3px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {label}
+              </p>
+              <p style={{ fontSize: '0.72rem', color: '#475569', lineHeight: 1.5 }}>
+                {report[key as keyof NarrativeReport]}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* CSS keyframe for pulse animation */}
       <style>{`
-        @keyframes ping {
-          75%, 100% { transform: scale(2); opacity: 0; }
-        }
+        @keyframes ping { 75%, 100% { transform: scale(2); opacity: 0; } }
+        @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
     </div>
   )

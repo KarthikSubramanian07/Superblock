@@ -102,6 +102,15 @@ class MongoStore:
         except Exception:
             return []
 
+    def get_all_packets(self) -> list[dict[str, Any]]:
+        """Return all persisted packets from MongoDB (used to seed in-memory store on startup)."""
+        if not self._connected:
+            return []
+        try:
+            return list(self.db[PACKETS_COLLECTION].find({}, {"_id": 0}))
+        except Exception:
+            return []
+
     # ── Tile snapshot persistence ────────────────────────────────────────
 
     def persist_tile_snapshot(self, tiles: list[dict[str, Any]]) -> int:

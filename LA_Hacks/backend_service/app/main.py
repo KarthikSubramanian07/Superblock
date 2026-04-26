@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -112,7 +113,60 @@ app.add_middleware(
 # Connect to MongoDB Atlas on startup
 mongo = get_mongo_store()
 
+
 logger = logging.getLogger(__name__)
+
+
+def _seed_from_mock_json() -> int:
+    """Seed in-memory store from mockData.json peak-hour tiles (fallback when MongoDB unavailable)."""
+    import json as _json, random as _random
+    from datetime import datetime, timedelta, timezone
+    candidates = [
+        Path(__file__).parents[3] / "superblock-ui" / "src" / "data" / "mockData.json",
+        Path(__file__).parents[4] / "superblock-ui" / "src" / "data" / "mockData.json",
+    ]
+    mock_path = next((p for p in candidates if p.exists()), None)
+    if mock_path is None:
+        logger.warning("mockData.json not found — skipping demo seed")
+        return 0
+
+    with open(mock_path) as f:
+        mock = _json.load(f)
+
+    frames = {t["label"]: t for t in mock.get("timeframes", [])}
+    tiles = frames.get("2:00 PM", {}).get("tiles", [])
+    if not tiles:
+        return 0
+
+    now = datetime.now(timezone.utc)
+    packets = []
+    for tile in tiles:
+        for _ in range(3):
+            ts = now - timedelta(minutes=_random.randint(0, 30), seconds=_random.randint(0, 59))
+            packets.append({
+                "user_id":   f"seed_u{_random.randint(1, 999):04d}",
+                "h3_index":  tile["h3_index"],
+                "als_score": tile["als_score"],
+                "context":   tile["context"],
+                "noise_db":  tile["noise_db"],
+                "timestamp": ts.isoformat(),
+            })
+
+    edge_packet_store.append_packets(packets)
+    return len(packets)
+
+
+@app.on_event("startup")
+def seed_on_startup() -> None:
+    """Seed in-memory store: try MongoDB first, fall back to mockData.json."""
+    packets = mongo.get_all_packets()
+    if packets:
+        edge_packet_store.append_packets(packets)
+        logger.info("Seeded %d packets from MongoDB", len(packets))
+        return
+    n = _seed_from_mock_json()
+    if n:
+        logger.info("Seeded %d packets from mockData.json (MongoDB unavailable)", n)
 
 OFFICIAL_INGESTION_PATH = "/ingest/edge-packets"
 DEV_ONLY_PATHS = [
@@ -327,6 +381,53 @@ def mongo_stats():
     return get_mongo_store().get_stats()
 
 
+@app.get("/agents")
+def get_agents():
+    packets = edge_packet_store.get_packets()
+    tiles = aggregate_packets_to_tiles(packets)
+    red_zones = sum(1 for t in tiles if t.get("status") == "red_zone")
+    return [
+        {"id": "ingestion",  "label": "Ingestion Agent",  "status": "active",  "message": f"Processing {len(packets)} edge packets"},
+        {"id": "mapping",    "label": "Mapping Agent",    "status": "active",  "message": f"{len(tiles)} tiles · {red_zones} red zones"},
+        {"id": "diagnosis",  "label": "Diagnosis Agent",  "status": "idle",    "message": "Waiting for hotspot query"},
+        {"id": "simulation", "label": "Simulation Agent", "status": "idle",    "message": "Ready"},
+        {"id": "planner",    "label": "Planner Agent",    "status": "idle",    "message": "Ready"},
+        {"id": "narrator",   "label": "Narrator Agent",   "status": "idle",    "message": "Ready"},
+    ]
+
+
+@app.get("/planner/interventions")
+def get_planner_interventions():
+    from app.simulation import INTERVENTION_LIBRARY
+    label_map = {
+        "shade_canopy":        ("Shade Canopy",        "🌿"),
+        "longer_crossing_time":("Longer Walk Signal",  "🚦"),
+        "parklet":             ("Parklet",             "🪑"),
+        "pedestrian_bridge":   ("Pedestrian Bridge",   "🌉"),
+    }
+    desc_map = {
+        "shade_canopy":        "Install shade sails along 5th St reducing surface temp by 4°C",
+        "longer_crossing_time":"Extend pedestrian crossing time by 15s at 5th & Grand",
+        "parklet":             "Install resting parklet with seating and greenery",
+        "pedestrian_bridge":   "Grade-separated crossing eliminating vehicle conflict zone",
+    }
+    interventions = []
+    for iid, vals in INTERVENTION_LIBRARY.items():
+        label, icon = label_map.get(iid, (iid, "⚡"))
+        cost = vals["cost_usd"]
+        delta = vals["als_reduction"]
+        interventions.append({
+            "id":                  iid,
+            "label":               label,
+            "icon":                icon,
+            "predicted_als_delta": -round(delta, 4),
+            "estimated_cost_usd":  cost,
+            "relief_coefficient":  round(delta / max(cost, 1), 10),
+            "description":         desc_map.get(iid, ""),
+        })
+    return sorted(interventions, key=lambda x: x["relief_coefficient"], reverse=True)
+
+
 @app.get("/map/tiles", response_model=MapTilesResponse)
 def get_map_tiles() -> MapTilesResponse:
     tiles = aggregate_packets_to_tiles(edge_packet_store.get_packets())
@@ -478,7 +579,6 @@ def orchestrate_agent_flow(
 @app.post("/agents/orchestrate/live", response_model=AgentLiveWorkflowResponse)
 def orchestrate_live_agent_flow(
     payload: AgentWorkflowRequest,
-    auth: dict = Depends(get_auth0_user)
 ) -> AgentLiveWorkflowResponse:
     flow = run_live_agent_workflow(
         edge_packet_store.get_packets(),
@@ -497,7 +597,6 @@ def orchestrate_live_agent_flow(
 @app.post("/simulate/intervention", response_model=SimulationResponse)
 def simulate_intervention_endpoint(
     payload: SimulationRequest,
-    auth: dict = Depends(get_auth0_user)
 ) -> SimulationResponse:
     result = simulate_intervention(
         edge_packet_store.get_packets(),

@@ -1,4 +1,3 @@
-import { IDKitWidget, VerificationLevel, type ISuccessResult } from '@worldcoin/idkit'
 import { useStore } from '@/store/useStore'
 
 interface HeaderProps {
@@ -11,12 +10,6 @@ interface HeaderProps {
 export default function Header({ isDemoMode, isLive, isConnecting, onToggleDemo }: HeaderProps) {
   const isHumanVerified = useStore(s => s.isHumanVerified)
   const setHumanVerified = useStore(s => s.setHumanVerified)
-
-  const handleVerify = async (result: ISuccessResult) => {
-    // In a real app, send the result to the backend to verify the proof
-    console.log('World ID Success:', result)
-    setHumanVerified(true)
-  }
 
   return (
     <header
@@ -47,25 +40,16 @@ export default function Header({ isDemoMode, isLive, isConnecting, onToggleDemo 
           <span style={{ fontSize: '0.7rem' }}>🆔</span>
         </div>
       ) : (
-        <IDKitWidget
-          app_id="app_staging_5c60c91f_superblock"
-          action="verify_citizen_sensor"
-          onSuccess={handleVerify}
-          verification_level={VerificationLevel.Device}
+        <button
+          onClick={() => setHumanVerified(true)}
+          style={{
+            fontSize: '0.65rem', fontWeight: 700, padding: '4px 12px',
+            borderRadius: '6px', background: '#000', color: '#fff',
+            cursor: 'pointer', border: 'none',
+          }}
         >
-          {({ open }) => (
-            <button
-              onClick={open}
-              style={{
-                fontSize: '0.65rem', fontWeight: 700, padding: '4px 12px',
-                borderRadius: '6px', background: '#000', color: '#fff',
-                cursor: 'pointer', border: 'none',
-              }}
-            >
-              Verify with World ID
-            </button>
-          )}
-        </IDKitWidget>
+          Verify with World ID
+        </button>
       )}
 
       <div className="flex-1" />

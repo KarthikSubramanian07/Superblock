@@ -149,8 +149,9 @@ export const useStore = create<StoreState>()((set, get) => ({
   selectedInterventionId: null,
   setSelectedIntervention: (id: string) => set({ selectedInterventionId: id || null, simResult: null }),
   runSimulation: async () => {
-    const { selectedHotspot, selectedInterventionId, interventions } = get()
-    const intervention = interventions.find(i => i.id === selectedInterventionId)
+    const { selectedHotspot, selectedInterventionId, interventions, liveRankedInterventions } = get()
+    const pool = liveRankedInterventions?.length ? liveRankedInterventions : interventions
+    const intervention = pool.find(i => i.id === selectedInterventionId)
     if (!intervention || !selectedHotspot) return
 
     const alsBefore = selectedHotspot.als_score
