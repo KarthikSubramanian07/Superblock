@@ -40,7 +40,12 @@ class MongoStore:
     def connect(self) -> bool:
         """Attempt to connect to MongoDB Atlas. Returns True on success."""
         try:
-            self._client = MongoClient(self._uri, serverSelectionTimeoutMS=5000)
+            self._client = MongoClient(
+                self._uri,
+                serverSelectionTimeoutMS=5000,
+                tls=True,
+                tlsAllowInvalidCertificates=True,  # Hackathon demo: ignore SSL cert issues
+            )
             # Force a connection test
             self._client.admin.command("ping")
             self._connected = True

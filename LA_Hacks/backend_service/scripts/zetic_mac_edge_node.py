@@ -34,7 +34,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main():
     args = build_parser().parse_args()
-    
+
     print("\n" + "━" * 65)
     print(" ⚡ ZETIC MELANGE — CLIMATE INTELLIGENCE EDGE ENGINE (v1.2)")
     print(" 📍 Hardware Target : Apple Neural Engine (M-Series)")
@@ -42,12 +42,22 @@ def main():
     print(f" 🚀 Model Version   : {ZETIC_MODEL_VERSION}")
     print(f" ⏱  Benchmarked     : {ZETIC_VALIDATED_LATENCY} Latency (100% Deployable)")
     print("━" * 65)
-    
+
     # Load Model
+    # NOTE: For actual ZETIC Melange NPU deployment, use:
+    # from zetic_ai import MelangeClient
+    # client = MelangeClient(api_key=ZETIC_DEPLOYMENT_KEY)
+    # session = client.get_inference_session(model_id=ZETIC_MODEL_VERSION)
+    # For hackathon demo, we use ONNX Runtime as fallback
     try:
-        session = ort.InferenceSession(args.onnx_model, providers=["CPUExecutionProvider"])
+        session = ort.InferenceSession(
+            args.onnx_model,
+            providers=["CPUExecutionProvider"],  # CPU fallback for demo
+        )
         input_name = session.get_inputs()[0].name
-        print(f"✅ [SYSTEM] Local NPU Runtime Initialized (Key: {ZETIC_DEPLOYMENT_KEY[:12]}...)")
+        print(f"✅ [SYSTEM] Runtime Initialized (CPU fallback)")
+        print("⚠️  [ZETIC] For full NPU deployment, use Melange SDK: https://melange.zetic.ai/")
+        print("⚠️  [ZETIC] Current demo uses CPU - not eligible for ZETIC prize")
     except Exception as e:
         print(f"❌ [ERROR] Model failure: {e}")
         return
