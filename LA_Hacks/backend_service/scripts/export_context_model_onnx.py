@@ -58,7 +58,7 @@ def main() -> None:
         raise ValueError(f"Sample CSV is empty: {sample_csv}")
 
     sample = frame.iloc[[0]][feature_names].astype(np.float32)
-    initial_types = [("float_input", FloatTensorType([None, len(feature_names)]))]
+    initial_types = [("float_input", FloatTensorType([1, len(feature_names)]))]
     onnx_model = convert_sklearn(
         model,
         initial_types=initial_types,
