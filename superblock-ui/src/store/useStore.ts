@@ -14,6 +14,8 @@ interface StoreState {
   toggleDemoMode: () => void
   setIsLive: (live: boolean) => void
   setIsConnecting: (v: boolean) => void
+  isHumanVerified: boolean
+  setHumanVerified: (v: boolean) => void
 
   // Time (hour: 6–22)
   timeIndex: number
@@ -77,6 +79,8 @@ export const useStore = create<StoreState>()((set, get) => ({
     }
   },
   setIsConnecting: (v: boolean) => set({ isConnecting: v }),
+  isHumanVerified: false,
+  setHumanVerified: (v: boolean) => set({ isHumanVerified: v }),
 
   // Time
   timeIndex: INITIAL_HOUR,

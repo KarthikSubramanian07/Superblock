@@ -97,6 +97,7 @@ from app.session_state import (
 from app.simulation import simulate_intervention
 from app.settings import get_settings
 from training.als_constants import ALS_FEATURE_NAMES
+from app.world_id import verify_world_id_proof, WorldIDProof
 
 app = FastAPI(title="The Living City Context Classifier", version="1.0.0")
 
@@ -174,6 +175,10 @@ def _latest_edge_timestamp(packets: list[dict[str, object]]) -> object | None:
         return None
     return max(packet["timestamp"] for packet in packets)
 
+
+@app.post("/verify-human")
+async def verify_human(proof: WorldIDProof):
+    return await verify_world_id_proof(proof)
 
 @app.get("/health", response_model=HealthResponse)
 def healthcheck() -> HealthResponse:
@@ -346,6 +351,7 @@ def get_demo_status() -> DemoStatusResponse:
         hotspot_count=len(hotspots),
         latest_edge_timestamp=_latest_edge_timestamp(packets),
         red_zone_count=sum(1 for tile in tiles if tile["status"] == "red_zone"),
+        verified_human_packet_count=sum(1 for p in packets if p.get("is_verified_human", False)),
         dev_only_paths=DEV_ONLY_PATHS,
         frontend_endpoints=FRONTEND_ENDPOINTS,
         agent_endpoints=AGENT_ENDPOINTS,

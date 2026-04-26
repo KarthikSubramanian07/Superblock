@@ -252,6 +252,7 @@ class EdgeTelemetryPacket(BaseModel):
     context: EdgeContext
     noise_db: float = Field(default=0.0, ge=0.0, le=140.0)
     inference_engine: str = Field(default="ZETIC_Melange_NPU")
+    is_verified_human: bool = Field(default=False)
 
 
 class EdgeTelemetryIngestionRequest(BaseModel):
@@ -464,6 +465,7 @@ class DemoStatusResponse(BaseModel):
     hotspot_count: int
     latest_edge_timestamp: Optional[datetime] = None
     red_zone_count: int
+    verified_human_packet_count: int = 0
     dev_only_paths: List[str]
     frontend_endpoints: List[str]
     agent_endpoints: List[str]
@@ -486,3 +488,7 @@ class AppIngestionContractResponse(BaseModel):
     frontend_endpoints: List[str]
     agent_endpoints: List[str]
     example_payload: Dict[str, Any]
+
+class WorldIDVerifyResponse(BaseModel):
+    success: bool
+    human_id: str

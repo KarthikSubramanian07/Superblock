@@ -1,3 +1,6 @@
+import { IDKitWidget, VerificationLevel, type ISuccessResult } from '@worldcoin/idkit'
+import { useStore } from '@/store/useStore'
+
 interface HeaderProps {
   isDemoMode: boolean
   isLive: boolean
@@ -6,6 +9,15 @@ interface HeaderProps {
 }
 
 export default function Header({ isDemoMode, isLive, isConnecting, onToggleDemo }: HeaderProps) {
+  const isHumanVerified = useStore(s => s.isHumanVerified)
+  const setHumanVerified = useStore(s => s.setHumanVerified)
+
+  const handleVerify = async (result: ISuccessResult) => {
+    // In a real app, send the result to the backend to verify the proof
+    console.log('World ID Success:', result)
+    setHumanVerified(true)
+  }
+
   return (
     <header
       className="flex items-center px-5 gap-4 flex-shrink-0"
@@ -27,6 +39,34 @@ export default function Header({ isDemoMode, isLive, isConnecting, onToggleDemo 
         <span style={{ color: '#7c3aed', fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.05em' }}>ZETIC NPU</span>
         <span className="flex h-1.5 w-1.5 rounded-full bg-violet-500 animate-pulse" />
       </div>
+
+      {/* World ID Verification */}
+      {isHumanVerified ? (
+        <div className="flex items-center gap-2 px-2 py-0.5 rounded-md" style={{ background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
+          <span style={{ color: '#16a34a', fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.05em' }}>VERIFIED HUMAN</span>
+          <span style={{ fontSize: '0.7rem' }}>🆔</span>
+        </div>
+      ) : (
+        <IDKitWidget
+          app_id="app_staging_5c60c91f_superblock"
+          action="verify_citizen_sensor"
+          onSuccess={handleVerify}
+          verification_level={VerificationLevel.Device}
+        >
+          {({ open }) => (
+            <button
+              onClick={open}
+              style={{
+                fontSize: '0.65rem', fontWeight: 700, padding: '4px 12px',
+                borderRadius: '6px', background: '#000', color: '#fff',
+                cursor: 'pointer', border: 'none',
+              }}
+            >
+              Verify with World ID
+            </button>
+          )}
+        </IDKitWidget>
+      )}
 
       <div className="flex-1" />
 
@@ -62,7 +102,7 @@ export default function Header({ isDemoMode, isLive, isConnecting, onToggleDemo 
         </div>
       )}
 
-{/* Demo toggle */}
+      {/* Demo toggle */}
       <div className="flex items-center gap-2">
         <span style={{ color: '#94a3b8', fontSize: '0.7rem' }} className="hidden sm:block">Demo</span>
         <button
