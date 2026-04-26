@@ -21,7 +21,7 @@ logger = logging.getLogger("superblock.mongo")
 
 MONGO_URI = os.getenv(
     "MONGO_URI",
-    "mongodb+srv://superblock:superblock2007@superblock.qgtfujj.mongodb.net/?appName=superblock",
+    "mongodb+srv://superblock:ey4ssii0C0IwyqK4@superblock.qgtfujj.mongodb.net/?appName=superblock",
 )
 DB_NAME = "superblock"
 PACKETS_COLLECTION = "edge_packets"
