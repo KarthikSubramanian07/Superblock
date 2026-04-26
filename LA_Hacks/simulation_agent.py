@@ -2,7 +2,7 @@ from uagents import Agent, Context, Protocol, Model
 from pydantic import BaseModel, Field
 from typing import List, Dict
 import requests
-from config import AGENT_SEEDS, AGENT_PORTS, ASI_ONE_API_KEY, ASI_ONE_ENDPOINT, MODEL
+from config import AGENT_SEEDS, AGENT_PORTS, AGENT_ADDRESSES, ASI_ONE_API_KEY, ASI_ONE_ENDPOINT, MODEL
 
 class DiagnosisResult(BaseModel):
     failure_modes: List[dict]
@@ -25,7 +25,8 @@ simulation_agent = Agent(
     name="simulation_agent",
     seed=AGENT_SEEDS["simulation"],
     port=AGENT_PORTS["simulation"],
-    endpoint=[f"http://127.0.0.1:{AGENT_PORTS['simulation']}/submit"]
+    mailbox=True,
+    publish_agent_details=True,
 )
 
 simulation_proto = Protocol("simulation")
@@ -150,6 +151,7 @@ def run_simulation_request(payload: dict) -> List[dict]:
     results = [simulate_scenario(scenario, request.diagnosis.failure_modes) for scenario in scenarios]
     return [result.model_dump() for result in results]
 
+simulation_agent.include(simulation_proto, publish_manifest=True)
+
 if __name__ == "__main__":
-    simulation_agent.include(simulation_proto, publish_manifest=True)
     simulation_agent.run()

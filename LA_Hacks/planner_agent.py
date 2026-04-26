@@ -1,7 +1,7 @@
 from uagents import Agent, Context, Protocol, Model
 from pydantic import BaseModel, Field
 from typing import List
-from config import AGENT_SEEDS, AGENT_PORTS
+from config import AGENT_SEEDS, AGENT_PORTS, AGENT_ADDRESSES
 
 class SimulationScenario(BaseModel):
     scenario_name: str
@@ -24,7 +24,8 @@ planner_agent = Agent(
     name="planner_agent",
     seed=AGENT_SEEDS["planner"],
     port=AGENT_PORTS["planner"],
-    endpoint=[f"http://127.0.0.1:{AGENT_PORTS['planner']}/submit"]
+    mailbox=True,
+    publish_agent_details=True,
 )
 
 planner_proto = Protocol("planning")
@@ -130,6 +131,7 @@ def run_planning_request(payload: dict) -> dict:
     )
     return plan.model_dump()
 
+planner_agent.include(planner_proto, publish_manifest=True)
+
 if __name__ == "__main__":
-    planner_agent.include(planner_proto, publish_manifest=True)
     planner_agent.run()

@@ -1,8 +1,22 @@
+from datetime import datetime, timezone
+from uuid import uuid4
 from uagents import Agent, Context, Protocol, Model
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 import requests
-from config import AGENT_SEEDS, AGENT_PORTS, ASI_ONE_API_KEY, ASI_ONE_ENDPOINT, MODEL
+from config import AGENT_SEEDS, AGENT_PORTS, AGENT_ADDRESSES, ASI_ONE_API_KEY, ASI_ONE_ENDPOINT, MODEL
+
+try:
+    from uagents_core.contrib.protocols.chat import (
+        ChatMessage,
+        ChatAcknowledgement,
+        TextContent,
+        EndSessionContent,
+        chat_protocol_spec,
+    )
+    _CHAT_PROTOCOL_AVAILABLE = True
+except ImportError:
+    _CHAT_PROTOCOL_AVAILABLE = False
 
 class RankedPlan(BaseModel):
     ranked_interventions: List[dict]
@@ -24,26 +38,32 @@ narrator_agent = Agent(
     name="narrator_agent",
     seed=AGENT_SEEDS["narrator"],
     port=AGENT_PORTS["narrator"],
-    endpoint=[f"http://127.0.0.1:{AGENT_PORTS['narrator']}/submit"]
+    mailbox=True,
+    publish_agent_details=True,
 )
 
 narrator_proto = Protocol("narration")
 
+# Last cached pipeline output — populated by NarrationRequest handler, served via Chat Protocol.
+_latest_plan: Optional["RankedPlan"] = None
+_latest_report: Optional["NarrativeReport"] = None
+
 @narrator_proto.on_message(model=NarrationRequest)
 async def handle_narration(ctx: Context, sender: str, msg: NarrationRequest):
     """Translate reasoning chain for ASI:One Chat Protocol"""
+    global _latest_plan, _latest_report
     plan = msg.plan
-    
-    # Generate narrative using ASI:One
+
     narrative = generate_narrative(plan, msg.target_audience)
-    
+
     report = NarrativeReport(
         executive_summary=narrative["executive_summary"],
         technical_analysis=narrative["technical_analysis"],
         recommendations=narrative["recommendations"],
-        next_steps=narrative["next_steps"]
+        next_steps=narrative["next_steps"],
     )
-    
+    _latest_plan = plan
+    _latest_report = report
     ctx.logger.info("Narrative report generated successfully")
 
 def generate_narrative(plan: RankedPlan, audience: str) -> dict:
@@ -125,6 +145,130 @@ def run_narration_request(payload: dict) -> dict:
     )
     return report.model_dump()
 
+narrator_agent.include(narrator_proto, publish_manifest=True)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ASI:One Chat Protocol — entry point for ASI:One discoverability
+# ─────────────────────────────────────────────────────────────────────────────
+def _build_chat_response(question: str) -> str:
+    """Synthesize a stakeholder-facing answer from cached pipeline state."""
+    plan = _latest_plan
+    report = _latest_report
+
+    if plan is None or report is None:
+        context_block = (
+            "The Urban Nervous System is monitoring Downtown LA. "
+            "No Red Zones currently active — all tiles within nominal ALS range."
+        )
+    else:
+        top = plan.ranked_interventions[:3]
+        ranked_text = "\n".join(
+            f"  {i+1}. {item.get('scenario_name', '?')} — "
+            f"ALS reduction {item.get('als_reduction', 0):.1f}%, "
+            f"cost {item.get('implementation_cost', 0):.0f}, "
+            f"BRC {item.get('brc', 0):.2f}"
+            for i, item in enumerate(top)
+        )
+        context_block = (
+            f"Latest planner output (ranked by Biological Relief Coefficient):\n{ranked_text}\n\n"
+            f"Total budget: {plan.total_budget:.0f}\n"
+            f"Expected impact: {plan.expected_impact}\n\n"
+            f"Executive summary: {report.executive_summary}\n"
+        )
+
+    prompt = (
+        f"You are the Narrator Agent for the Urban Nervous System — a multi-agent "
+        f"system that turns Apple Watch biometric stress signals into ranked city-planning "
+        f"interventions. A stakeholder asked: \"{question}\"\n\n"
+        f"Context from the pipeline:\n{context_block}\n\n"
+        f"Answer in 2–4 paragraphs. Be specific about which intervention you recommend, "
+        f"the predicted ALS reduction, and the cost. Cite the Biological Relief Coefficient "
+        f"when ranking. End with a clear next-step call to action."
+    )
+
+    try:
+        response = requests.post(
+            ASI_ONE_ENDPOINT,
+            headers={
+                "Authorization": f"Bearer {ASI_ONE_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": MODEL,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": (
+                            "You are a planner-facing communicator. Translate multi-agent "
+                            "biometric stress analysis into clear, evidence-backed "
+                            "recommendations for city stakeholders."
+                        ),
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+                "max_tokens": 600,
+            },
+            timeout=15,
+        )
+        response.raise_for_status()
+        return response.json()["choices"][0]["message"]["content"]
+    except Exception as e:
+        return (
+            f"[Narrator Agent — ASI:One unavailable: {e}]\n\n"
+            f"Fallback summary based on cached pipeline state:\n{context_block}"
+        )
+
+
+if _CHAT_PROTOCOL_AVAILABLE:
+    chat_proto = Protocol(spec=chat_protocol_spec)
+
+    @chat_proto.on_message(model=ChatMessage)
+    async def handle_chat(ctx: Context, sender: str, msg: ChatMessage):
+        question = ""
+        for content in msg.content:
+            if isinstance(content, TextContent):
+                question = content.text
+                break
+
+        ctx.logger.info(f"💬 ASI:One query from {sender[:20]}…: {question[:80]}")
+
+        await ctx.send(
+            sender,
+            ChatAcknowledgement(
+                timestamp=datetime.now(timezone.utc),
+                acknowledged_msg_id=msg.msg_id,
+            ),
+        )
+
+        answer = _build_chat_response(question or "Summarize the current red zones.")
+
+        await ctx.send(
+            sender,
+            ChatMessage(
+                timestamp=datetime.now(timezone.utc),
+                msg_id=uuid4(),
+                content=[TextContent(type="text", text=answer), EndSessionContent(type="end-session")],
+            ),
+        )
+        ctx.logger.info("✅ Chat reply sent.")
+
+    @chat_proto.on_message(model=ChatAcknowledgement)
+    async def handle_ack(ctx: Context, sender: str, msg: ChatAcknowledgement):
+        ctx.logger.debug(f"ACK from {sender[:20]}… for {msg.acknowledged_msg_id}")
+
+    narrator_agent.include(chat_proto, publish_manifest=True)
+
+
+@narrator_agent.on_event("startup")
+async def on_startup(ctx: Context):
+    ctx.logger.info("━" * 55)
+    ctx.logger.info("📣 Urban Nervous System — Narrator Agent")
+    ctx.logger.info(f"📍 Address  : {narrator_agent.address}")
+    ctx.logger.info(f"🔌 Port     : {AGENT_PORTS['narrator']}")
+    ctx.logger.info(f"💬 ASI:One  : {'enabled' if _CHAT_PROTOCOL_AVAILABLE else 'unavailable (uagents_core missing)'}")
+    ctx.logger.info("━" * 55)
+
+
 if __name__ == "__main__":
-    narrator_agent.include(narrator_proto, publish_manifest=True)
     narrator_agent.run()

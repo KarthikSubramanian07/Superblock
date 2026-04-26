@@ -18,30 +18,7 @@ from typing import List, Literal, Optional
 from datetime import datetime, timezone, timedelta
 from collections import defaultdict
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Config
-# ─────────────────────────────────────────────────────────────────────────────
-
-AGENT_SEEDS = {
-    "ingestion":  "ingestion-agent-seed-la-hacks-2026",
-    "mapping":    "mapping-agent-seed-la-hacks-2026",
-    "diagnosis":  "diagnosis-agent-seed-la-hacks-2026",
-    "simulation": "simulation-agent-seed-la-hacks-2026",
-    "planner":    "planner-agent-seed-la-hacks-2026",
-    "narrator":   "narrator-agent-seed-la-hacks-2026",
-}
-
-AGENT_PORTS = {
-    "ingestion":  8000,
-    "mapping":    8001,
-    "diagnosis":  8002,
-    "simulation": 8003,
-    "planner":    8004,
-    "narrator":   8005,
-}
-
-# Paste Diagnosis Agent address after running diagnosis_agent.py
-DIAGNOSIS_AGENT_ADDRESS = "agent1q_PASTE_DIAGNOSIS_ADDRESS_HERE"
+from config import AGENT_SEEDS, AGENT_PORTS, AGENT_ADDRESSES
 
 # Red Zone thresholds
 RED_ZONE_ALS_THRESHOLD   = 0.65   # Tile avg ALS must exceed this
@@ -212,7 +189,8 @@ mapping_agent = Agent(
     name="mapping_agent",
     seed=AGENT_SEEDS["mapping"],
     port=AGENT_PORTS["mapping"],
-    endpoint=[f"http://127.0.0.1:{AGENT_PORTS['mapping']}/submit"],
+    mailbox=True,
+    publish_agent_details=True,
 )
 
 mapping_proto = Protocol("mapping")
@@ -276,13 +254,14 @@ async def handle_validated_packet(ctx: Context, sender: str, msg: ValidatedPacke
                 duration_minutes=     round(duration_min, 1),
             )
 
-            if DIAGNOSIS_AGENT_ADDRESS != "agent1q_PASTE_DIAGNOSIS_ADDRESS_HERE":
-                await ctx.send(DIAGNOSIS_AGENT_ADDRESS, alert)
+            diagnosis_addr = AGENT_ADDRESSES.get("diagnosis", "")
+            if diagnosis_addr:
+                await ctx.send(diagnosis_addr, alert)
                 red_zone_alerted[tile] = True
                 ctx.logger.info(f"📤 RedZoneAlert forwarded → Diagnosis Agent")
             else:
                 ctx.logger.warning(
-                    "⚠️  DIAGNOSIS_AGENT_ADDRESS not set — "
+                    "⚠️  AGENT_ADDRESSES['diagnosis'] not set — "
                     "alert built but not forwarded."
                 )
 
@@ -353,7 +332,7 @@ async def on_startup(ctx: Context):
     ctx.logger.info("🗺  Urban Nervous System — Mapping Agent")
     ctx.logger.info(f"📍 Address   : {mapping_agent.address}")
     ctx.logger.info(f"🔌 Port      : {AGENT_PORTS['mapping']}")
-    ctx.logger.info(f"🔬 Diagnosis : {DIAGNOSIS_AGENT_ADDRESS[:30]}...")
+    ctx.logger.info(f"🔬 Diagnosis : {(AGENT_ADDRESSES.get('diagnosis') or '(unset)')[:30]}...")
     ctx.logger.info(f"🔴 Red Zone  : ALS > {RED_ZONE_ALS_THRESHOLD} "
                     f"sustained {RED_ZONE_DURATION_MIN} min")
     ctx.logger.info(f"📦 Tile window: last {TILE_WINDOW_SIZE} readings (~"
@@ -366,7 +345,8 @@ async def on_startup(ctx: Context):
 # Register & Run
 # ─────────────────────────────────────────────────────────────────────────────
 
+mapping_agent.include(mapping_proto, publish_manifest=True)
+
 if __name__ == "__main__":
-    mapping_agent.include(mapping_proto, publish_manifest=True)
     mapping_agent.run()
-    
+

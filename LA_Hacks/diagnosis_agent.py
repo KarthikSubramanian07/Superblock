@@ -25,32 +25,16 @@ except ImportError:  # pragma: no cover
 load_dotenv()
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Config
+# Config (centralized in config.py)
 # ─────────────────────────────────────────────────────────────────────────────
-AGENT_SEEDS = {
-    "ingestion":  "ingestion-agent-seed-la-hacks-2026",
-    "mapping":    "mapping-agent-seed-la-hacks-2026",
-    "diagnosis":  "diagnosis-agent-seed-la-hacks-2026",
-    "simulation": "simulation-agent-seed-la-hacks-2026",
-    "planner":    "planner-agent-seed-la-hacks-2026",
-    "narrator":   "narrator-agent-seed-la-hacks-2026",
-}
-AGENT_PORTS = {
-    "ingestion":  8000,
-    "mapping":    8001,
-    "diagnosis":  8002,
-    "simulation": 8003,
-    "planner":    8004,
-    "narrator":   8005,
-}
-
-# Paste Simulation Agent address after running simulation_agent.py
-SIMULATION_AGENT_ADDRESS = "agent1q_PASTE_SIMULATION_ADDRESS_HERE"
-
-# ASI:One / Fetch.ai API — set in .env
-ASI_ONE_API_KEY  = os.getenv("ASI_ONE_API_KEY", "")
-ASI_ONE_ENDPOINT = os.getenv("ASI_ONE_ENDPOINT", "https://api.asi1.ai/v1/chat/completions")
-ASI_ONE_MODEL    = os.getenv("ASI_ONE_MODEL", "asi1-mini")
+from config import (
+    AGENT_SEEDS,
+    AGENT_PORTS,
+    AGENT_ADDRESSES,
+    ASI_ONE_API_KEY,
+    ASI_ONE_ENDPOINT,
+    ASI_ONE_MODEL,
+)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Data Models
@@ -309,7 +293,8 @@ diagnosis_agent = Agent(
     name="diagnosis_agent",
     seed=AGENT_SEEDS["diagnosis"],
     port=AGENT_PORTS["diagnosis"],
-    endpoint=[f"http://127.0.0.1:{AGENT_PORTS['diagnosis']}/submit"],
+    mailbox=True,
+    publish_agent_details=True,
 )
 
 diagnosis_proto = Protocol("diagnosis")
@@ -368,12 +353,13 @@ async def handle_diagnosis(ctx: Context, sender: str, msg: RedZoneAlert):
     )
 
     # Step 4 — Forward to Simulation Agent
-    if SIMULATION_AGENT_ADDRESS != "agent1q_PASTE_SIMULATION_ADDRESS_HERE":
-        await ctx.send(SIMULATION_AGENT_ADDRESS, result)
+    sim_addr = AGENT_ADDRESSES.get("simulation", "")
+    if sim_addr:
+        await ctx.send(sim_addr, result)
         ctx.logger.info("📤 Forwarded to Simulation Agent")
     else:
         ctx.logger.warning(
-            "⚠️  SIMULATION_AGENT_ADDRESS not set — diagnosis complete but not forwarded."
+            "⚠️  AGENT_ADDRESSES['simulation'] not set — diagnosis complete but not forwarded."
         )
 
 
@@ -432,4 +418,16 @@ async def on_startup(ctx: Context):
     ctx.logger.info("🔬 Urban Nervous System — Diagnosis Agent")
     ctx.logger.info(f"📍 Address    : {diagnosis_agent.address}")
     ctx.logger.info(f"🔌 Port       : {AGENT_PORTS['diagnosis']}")
-    ctx.logger.info(f"🤖 Simulation : {SIMULATION_AGENT_ADDRESS[:30]}")
+    ctx.logger.info(f"🤖 Simulation : {(AGENT_ADDRESSES.get('simulation') or '(unset)')[:30]}")
+    ctx.logger.info("⏳ Waiting for Red Zone alerts...")
+    ctx.logger.info("━" * 55)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Register & Run
+# ─────────────────────────────────────────────────────────────────────────────
+diagnosis_agent.include(diagnosis_proto, publish_manifest=True)
+diagnosis_agent.include(chat_proto, publish_manifest=True)
+
+if __name__ == "__main__":
+    diagnosis_agent.run()
