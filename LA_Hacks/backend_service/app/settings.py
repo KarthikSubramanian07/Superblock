@@ -24,11 +24,11 @@ class Settings(BaseModel):
     agent_system_dir: Path | None = None
 
     # Auth0 Configuration
-    auth0_domain: str = os.getenv("AUTH0_DOMAIN", "dev-8wve8p5a0k2nvnf6.us.auth0.com")
-    auth0_audience: str = os.getenv("AUTH0_AUDIENCE", f"https://{auth0_domain}/api/v2/")
+    auth0_domain: str = os.getenv("AUTH0_DOMAIN", "")
+    auth0_audience: str = os.getenv("AUTH0_AUDIENCE", "")
 
     # AI Configuration
-    asi_one_api_key: str = os.getenv("ASI_ONE_API_KEY", "your-key-here")
+    asi_one_api_key: str = os.getenv("ASI_ONE_API_KEY", "")
 
 
 @lru_cache(maxsize=1)
