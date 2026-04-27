@@ -1,7 +1,11 @@
 import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).parent / "backend_service" / ".env.local", override=True)
 
 # ASI:One Configuration
-ASI_ONE_API_KEY = "sk_f61da147c7b243f1bdc371d4cd5ef46b4d6184d043a243099a82e44c98a027de"
+ASI_ONE_API_KEY = os.getenv("ASI_ONE_API_KEY", "")
 ASI_ONE_ENDPOINT = "https://api.asi1.ai/v1/chat/completions"
 MODEL = "asi1"
 

@@ -19,10 +19,7 @@ from pymongo.errors import ConnectionFailure, OperationFailure
 
 logger = logging.getLogger("superblock.mongo")
 
-MONGO_URI = os.getenv(
-    "MONGO_URI",
-    "mongodb+srv://superblock:ey4ssii0C0IwyqK4@superblock.qgtfujj.mongodb.net/?appName=superblock",
-)
+MONGO_URI = os.getenv("MONGO_URI", "")
 DB_NAME = "superblock"
 PACKETS_COLLECTION = "edge_packets"
 TILES_COLLECTION = "tile_snapshots"

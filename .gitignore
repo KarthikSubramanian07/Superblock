@@ -35,3 +35,14 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 .coverage
+
+# Hackathon docs and utility scripts — local only
+DIONYSUS_Architecture_Diagram.md
+DIONYSUS_Pipeline_Optimization.md
+DIONYSUS_Technical_Assessment.md
+HACKATHON_QA.md
+SuperBlock_3Min_Pitch_Script.md
+SuperBlock_Hackathon_QA.md
+SuperBlock_Live_Pitch_Script.md
+LA_Hacks/backend_service/scripts/clear_demo_data.py
+LA_Hacks/backend_service/scripts/test_agent.py
