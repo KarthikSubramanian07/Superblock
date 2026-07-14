@@ -15,7 +15,7 @@ optional_bearer = HTTPBearer(auto_error=False)
 
 
 def demo_mode_enabled() -> bool:
-    return os.getenv("DEMO_MODE", "true").strip().lower() in {"1", "true", "yes", "on"}
+    return os.getenv("DEMO_MODE", "false").strip().lower() in {"1", "true", "yes", "on"}
 
 
 def require_write_access(
@@ -24,8 +24,8 @@ def require_write_access(
     """
     Gate write/control routes.
 
-    - DEMO_MODE=true (default): allow unauthenticated local/demo use.
-    - DEMO_MODE=false: require a valid Auth0 bearer token when Auth0 is configured;
+    - DEMO_MODE=true (explicit opt-in): allow unauthenticated local/demo use.
+    - DEMO_MODE=false (default): require a valid Auth0 bearer token when Auth0 is configured;
       otherwise reject (misconfigured production).
     """
     if demo_mode_enabled():

@@ -11,7 +11,7 @@ WORLD_ID_STAGING_URL = "https://developer.worldcoin.org/api/v1/verify/app_stagin
 
 
 def _demo_mode() -> bool:
-    return os.getenv("DEMO_MODE", "true").strip().lower() in {"1", "true", "yes", "on"}
+    return os.getenv("DEMO_MODE", "false").strip().lower() in {"1", "true", "yes", "on"}
 
 
 class WorldIDProof(BaseModel):
@@ -27,10 +27,10 @@ async def verify_world_id_proof(proof: dict) -> bool:
     """
     Verifies a World ID proof via the Worldcoin Developer Portal.
 
-    Demo mode (DEMO_MODE=true, default for local hackathon):
+    Demo mode (DEMO_MODE=true, opt-in for local hackathon / CI):
       allows explicit is_mock proofs only.
-    Production (DEMO_MODE=false):
-      fail-closed — missing/invalid proofs and API errors reject.
+    Production default (DEMO_MODE unset or false):
+      fail-closed; missing/invalid proofs and API errors reject.
     """
     if not proof:
         return False
