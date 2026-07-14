@@ -30,6 +30,23 @@ class Settings(BaseModel):
     # AI Configuration
     asi_one_api_key: str = os.getenv("ASI_ONE_API_KEY", "")
 
+    # Security / ops
+    demo_mode: bool = os.getenv("DEMO_MODE", "true").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+    allowed_origins: list[str] = [
+        origin.strip()
+        for origin in os.getenv(
+            "ALLOWED_ORIGINS",
+            "http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173",
+        ).split(",")
+        if origin.strip()
+    ]
+    max_edge_packets: int = int(os.getenv("MAX_EDGE_PACKETS", "50000"))
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

@@ -44,7 +44,6 @@ from app.model_loader import (
 )
 from app.live_agent_bridge import run_live_agent_workflow
 from app.mongo_store import get_mongo_store
-from app.auth import get_auth0_user
 from app.schemas import (
     ALSModelInfoResponse,
     ALSPredictionRequest,
@@ -98,15 +97,20 @@ from app.session_state import (
 )
 from app.simulation import simulate_intervention
 from app.settings import get_settings
+from app.security import demo_mode_enabled, require_write_access
 from training.als_constants import ALS_FEATURE_NAMES
 from app.world_id import verify_world_id_proof, WorldIDProof
 
 app = FastAPI(title="The Living City Context Classifier", version="1.0.0")
 
+_settings = get_settings()
+_cors_origins = _settings.allowed_origins
+# Safari/Chrome reject credentials with wildcard; never combine "*" with credentials.
+_allow_credentials = "*" not in _cors_origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=_cors_origins if _cors_origins else ["http://localhost:5173"],
+    allow_credentials=_allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -234,7 +238,7 @@ def _latest_edge_timestamp(packets: list[dict[str, object]]) -> object | None:
 @app.post("/verify-human")
 async def verify_human(proof: WorldIDProof):
     success = await verify_world_id_proof(proof.model_dump())
-    return {"success": success}
+    return {"success": success, "demo_mode": demo_mode_enabled()}
 
 @app.get("/health", response_model=HealthResponse)
 def healthcheck() -> HealthResponse:
@@ -322,6 +326,7 @@ def als_model_info() -> ALSModelInfoResponse:
 @app.post("/ingest/watch-events", response_model=WatchEventsIngestionResponse)
 def ingest_watch_events(
     payload: WatchEventsIngestionRequest,
+    _auth: dict = Depends(require_write_access),
 ) -> WatchEventsIngestionResponse:
     serialized_events = [event.model_dump(mode="json") for event in payload.events]
     stored_events = watch_event_store.append_events(payload.user_id, serialized_events)
@@ -349,10 +354,32 @@ def get_watch_events(user_id: str) -> WatchUserEventsResponse:
 
 
 @app.post("/ingest/edge-packets", response_model=EdgeTelemetryIngestionResponse)
-def ingest_edge_packets(
+async def ingest_edge_packets(
     payload: EdgeTelemetryIngestionRequest,
+    _auth: dict = Depends(require_write_access),
 ) -> EdgeTelemetryIngestionResponse:
-    serialized_packets = [packet.model_dump(mode="json") for packet in payload.packets]
+    serialized_packets: list[dict] = []
+    for packet in payload.packets:
+        data = packet.model_dump(mode="json")
+        # Never trust client-asserted humanity; only set after server verification.
+        data.pop("is_verified_human", None)
+        proof = data.pop("humanity_proof", None)
+        verified = False
+        if proof:
+            verified = await verify_world_id_proof(proof)
+            if not verified and not demo_mode_enabled():
+                raise HTTPException(
+                    status_code=401,
+                    detail="Invalid World ID proof",
+                )
+        elif not demo_mode_enabled():
+            raise HTTPException(
+                status_code=401,
+                detail="World ID proof required when DEMO_MODE=false",
+            )
+        data["is_verified_human"] = verified
+        serialized_packets.append(data)
+
     stored_packets = edge_packet_store.append_packets(serialized_packets)
     unique_tiles = len({packet.h3_index for packet in payload.packets})
     latest_timestamp = max(packet.timestamp for packet in payload.packets)
@@ -462,7 +489,9 @@ def get_demo_status() -> DemoStatusResponse:
 
 
 @app.post("/demo/reset", response_model=DemoResetResponse)
-def reset_demo_state() -> DemoResetResponse:
+def reset_demo_state(
+    _auth: dict = Depends(require_write_access),
+) -> DemoResetResponse:
     cleared_edge_packets = edge_packet_store.total_packets()
     cleared_watch_events = watch_event_store.total_events()
     cleared_context_sessions = session_smoother_store.clear_all()
@@ -561,6 +590,7 @@ def get_agent_planning_request(h3_index: str) -> AgentPlanningRequestResponse:
 @app.post("/agents/orchestrate/internal", response_model=AgentWorkflowResponse)
 def orchestrate_agent_flow_internal(
     payload: AgentWorkflowRequest,
+    _auth: dict = Depends(require_write_access),
 ) -> AgentWorkflowResponse:
     flow = build_agent_orchestration_flow(
         edge_packet_store.get_packets(),
@@ -579,7 +609,7 @@ def orchestrate_agent_flow_internal(
 @app.post("/agents/orchestrate", response_model=AgentWorkflowResponse)
 def orchestrate_agent_flow(
     payload: AgentWorkflowRequest,
-    auth: dict = Depends(get_auth0_user)
+    _auth: dict = Depends(require_write_access),
 ) -> AgentWorkflowResponse:
     flow = build_agent_orchestration_flow(
         edge_packet_store.get_packets(),
@@ -598,6 +628,7 @@ def orchestrate_agent_flow(
 @app.post("/agents/orchestrate/live", response_model=AgentLiveWorkflowResponse)
 def orchestrate_live_agent_flow(
     payload: AgentWorkflowRequest,
+    _auth: dict = Depends(require_write_access),
 ) -> AgentLiveWorkflowResponse:
     flow = run_live_agent_workflow(
         edge_packet_store.get_packets(),

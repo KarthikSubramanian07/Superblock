@@ -1,4 +1,10 @@
-import { IDKitRequestWidget, type IDKitResult, type IDKitErrorCodes, useIDKitRequest, type Preset } from '@worldcoin/idkit'
+import {
+  IDKitRequestWidget,
+  type IDKitErrorCodes,
+  type IDKitRequestHookConfig,
+  type IDKitResult,
+  useIDKitRequest,
+} from '@worldcoin/idkit'
 import { useStore } from '@/store/useStore'
 import { useState } from 'react'
 
@@ -13,22 +19,68 @@ export default function Header({ isDemoMode, isLive, isConnecting, onToggleDemo 
   const isHumanVerified = useStore(s => s.isHumanVerified)
   const setHumanVerified = useStore(s => s.setHumanVerified)
   const [isOpen, setIsOpen] = useState(false)
+  const [verifying, setVerifying] = useState(false)
 
+  // IDKit v4 requires a signed RP context from a backend. Until that bridge exists,
+  // keep a typed cast so the hackathon UI still builds and can open the widget shell.
   const config = {
     app_id: 'app_staging_5c60c91f_superblock',
     action: 'verify_citizen_sensor',
-    preset: 'device' as Preset,
-  }
+    preset: 'device',
+    allow_legacy_proofs: true,
+    environment: 'staging',
+    rp_context: {
+      rp_id: 'rp_demo_superblock',
+      nonce: 'demo-nonce',
+      created_at: 1_700_000_000,
+      expires_at: 2_000_000_000,
+      signature: 'demo-unsigned',
+    },
+  } as unknown as IDKitRequestHookConfig
 
   const { open } = useIDKitRequest(config)
 
-  const handleVerify = (result: IDKitResult) => {
-    console.log('✅ World ID verified:', result)
-    setHumanVerified(true)
+  const postVerification = async (payload: Record<string, unknown>) => {
+    const base = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? 'http://localhost:8000'
+    const res = await fetch(`${base}/verify-human`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    const body = (await res.json()) as { success?: boolean }
+    return res.ok && Boolean(body.success)
+  }
+
+  const handleVerify = async (result: IDKitResult) => {
+    setVerifying(true)
+    try {
+      const ok = await postVerification(result as unknown as Record<string, unknown>)
+      if (ok) {
+        setHumanVerified(true)
+        return
+      }
+      console.error('World ID server verification failed')
+    } catch (err) {
+      console.error('World ID server verification error', err)
+    } finally {
+      setVerifying(false)
+    }
+  }
+
+  const handleDemoVerify = async () => {
+    setVerifying(true)
+    try {
+      const ok = await postVerification({ is_mock: true })
+      if (ok) setHumanVerified(true)
+    } catch (err) {
+      console.error('Demo World ID verification error', err)
+    } finally {
+      setVerifying(false)
+    }
   }
 
   const handleError = (error: IDKitErrorCodes) => {
-    console.error('❌ World ID verification failed:', error)
+    console.error('World ID verification failed:', error)
   }
 
   // Why World ID matters for SuperBlock:
@@ -69,14 +121,28 @@ export default function Header({ isDemoMode, isLive, isConnecting, onToggleDemo 
         <>
           <button
             onClick={() => open()}
+            disabled={verifying}
             style={{
               fontSize: '0.65rem', fontWeight: 700, padding: '4px 12px',
               borderRadius: '6px', background: '#000', color: '#fff',
-              cursor: 'pointer', border: 'none',
+              cursor: verifying ? 'wait' : 'pointer', border: 'none',
             }}
           >
             Verify with World ID
           </button>
+          {isDemoMode && (
+            <button
+              onClick={() => { void handleDemoVerify() }}
+              disabled={verifying}
+              style={{
+                fontSize: '0.65rem', fontWeight: 700, padding: '4px 12px',
+                borderRadius: '6px', background: '#334155', color: '#fff',
+                cursor: verifying ? 'wait' : 'pointer', border: 'none',
+              }}
+            >
+              Demo verify
+            </button>
+          )}
           <IDKitRequestWidget
             open={isOpen}
             onOpenChange={setIsOpen}

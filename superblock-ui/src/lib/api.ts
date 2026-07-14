@@ -30,7 +30,8 @@ export async function checkHealth(): Promise<boolean> {
   }
 }
 
-export async function fetchLiveTiles(_hour: number): Promise<Tile[] | null> {
+export async function fetchLiveTiles(_hour?: number): Promise<Tile[] | null> {
+  void _hour
   const data = await get<Tile[] | { tiles: Tile[] }>(`${P_TILES}`)
   if (!data) return null
   const raw = Array.isArray(data) ? data : (data as { tiles: Tile[] }).tiles ?? null

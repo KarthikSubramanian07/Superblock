@@ -1,6 +1,3 @@
-import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
-
 from datetime import datetime
 from uuid import uuid4
 import os
@@ -16,15 +13,21 @@ from uagents_core.contrib.protocols.chat import (
    chat_protocol_spec,
 )
 
-# Replace this with your own seed or use environment variable
-SEED = os.getenv("AGENT_SEED", "superblock-asi1-skill-agent-seed-v1")
-PORT = 8003
+# Prefer AGENT_SEED from the environment. Using a fixed default makes the
+# agent private key reproducible — override before any public Agentverse deploy.
+SEED = os.getenv("AGENT_SEED")
+if not SEED:
+    raise SystemExit("Set AGENT_SEED in the environment before starting the skill agent")
+PORT = int(os.getenv("AGENT_PORT", "8003"))
+AGENT_ENDPOINT = os.getenv("AGENT_ENDPOINT", "").strip()
+if not AGENT_ENDPOINT:
+    raise SystemExit("Set AGENT_ENDPOINT (public HTTPS /submit URL) before starting the skill agent")
 
 agent = Agent(
     name="superblock-city-planner",
     seed=SEED,
     port=PORT,
-    endpoint=["https://decrease-wow-competing-province.trycloudflare.com/submit"]
+    endpoint=[AGENT_ENDPOINT],
 )
 
 # Initialize the chat protocol with the standard chat spec

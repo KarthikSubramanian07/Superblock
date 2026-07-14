@@ -100,14 +100,18 @@ watch_event_store = EventStore()
 
 
 class EdgePacketStore:
-    def __init__(self) -> None:
+    def __init__(self, max_packets: int = 50_000) -> None:
         self._lock = Lock()
         self._packets: list[dict[str, object]] = []
         self._version = 0
+        self._max_packets = max(1, max_packets)
 
     def append_packets(self, packets: list[dict[str, object]]) -> int:
         with self._lock:
             self._packets.extend(deepcopy(packets))
+            overflow = len(self._packets) - self._max_packets
+            if overflow > 0:
+                del self._packets[:overflow]
             self._version += 1
             return len(self._packets)
 

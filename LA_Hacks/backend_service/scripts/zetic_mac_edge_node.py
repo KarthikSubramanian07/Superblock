@@ -18,7 +18,7 @@ ZETIC_MODEL_ID = "dev_a0a34b8ed1a24f8a8c2889342902f744"
 ZETIC_MODEL_NAME = "winnerkarthik/superblock-stressnet"
 ZETIC_MODEL_VERSION = "v1"
 ZETIC_API_BASE = "https://melange.zetic.ai/api/v1"
-ZETIC_DEPLOYMENT_KEY = os.getenv("ZETIC_DEPLOYMENT_KEY", "ztc_live_5c60c91f_demo_key")
+ZETIC_DEPLOYMENT_KEY = os.getenv("ZETIC_DEPLOYMENT_KEY", "")
 
 ALS_FEATURE_NAMES = [
     "hrv_rmssd", "hrv_sdnn", "hrv_pnn50", "hr_mean",
@@ -45,11 +45,12 @@ def main():
     print("━" * 65)
 
     # Use ZETIC REST API for inference (deployed model)
-    use_zetic_api = True
+    use_zetic_api = bool(ZETIC_DEPLOYMENT_KEY)
     if use_zetic_api:
         print("✅ [ZETIC] Using deployed model via REST API")
         print(f"✅ [ZETIC] Model deployed at: {ZETIC_API_BASE}/models/{ZETIC_MODEL_NAME}/inference")
     else:
+        print("⚠️  [ZETIC] ZETIC_DEPLOYMENT_KEY not set — using local ONNX CPU fallback")
         # Fallback to ONNX Runtime
         try:
             session = ort.InferenceSession(
