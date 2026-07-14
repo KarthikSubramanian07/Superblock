@@ -24,16 +24,18 @@ except ImportError:  # pragma: no cover
 
 load_dotenv()
 
+from agent_secrets import resolve_agent_seed
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Config
 # ─────────────────────────────────────────────────────────────────────────────
 AGENT_SEEDS = {
-    "ingestion":  "ingestion-agent-seed-la-hacks-2026",
-    "mapping":    "mapping-agent-seed-la-hacks-2026",
-    "diagnosis":  "diagnosis-agent-seed-la-hacks-2026",
-    "simulation": "simulation-agent-seed-la-hacks-2026",
-    "planner":    "planner-agent-seed-la-hacks-2026",
-    "narrator":   "narrator-agent-seed-la-hacks-2026",
+    "ingestion": resolve_agent_seed("ingestion", demo_fallback="demo-ingestion-seed"),
+    "mapping": resolve_agent_seed("mapping", demo_fallback="demo-mapping-seed"),
+    "diagnosis": resolve_agent_seed("diagnosis", demo_fallback="demo-diagnosis-seed"),
+    "simulation": resolve_agent_seed("simulation", demo_fallback="demo-simulation-seed"),
+    "planner": resolve_agent_seed("planner", demo_fallback="demo-planner-seed"),
+    "narrator": resolve_agent_seed("narrator", demo_fallback="demo-narrator-seed"),
 }
 AGENT_PORTS = {
     "ingestion":  8000,

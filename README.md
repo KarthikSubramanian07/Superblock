@@ -28,7 +28,7 @@
 
 ### 🆔 World ID (Proof of Human)
 *   **Intent**: Use World ID so ingest can prefer verified unique humans.
-*   **Hackathon note**: Demo mode accepts mock proofs; turn `DEMO_MODE=false` for fail-closed verification before public use.
+*   **Hackathon note**: Opt in with `DEMO_MODE=true` to accept mock proofs. Default is fail-closed.
 *   **Why It Matters**:
     1. Prevents bot/sybil attacks on citizen sensor data - ensures each data point comes from a real human
     2. Fair resource allocation - prevents gaming of intervention prioritization
@@ -49,8 +49,10 @@
 - [**ASI:One Skill**](./LA_Hacks/backend_service/scripts/asi1_superblock_skill.py): Discoverable chat agent for Agentverse.
 
 ### Demo vs production security
-Local runs default to `DEMO_MODE=true` (open write routes for judges). Set `DEMO_MODE=false`, configure Auth0, and require real World ID proofs before any public deployment. Rotate any credentials that ever appeared in git history (ASI / Mongo / agent seeds).
-
+Default is production posture (`DEMO_MODE` unset/`false`): write routes need Auth0, World ID rejects mocks.
+For local hackathon/CI set `DEMO_MODE=true`. Rotate any credentials that ever appeared in git history
+(ASI / Mongo / agent seeds) using the checklist in [SECURITY.md](./SECURITY.md).
+GitHub secret scanning and push protection are enabled on this repo.
 ---
 
 ## 🛠️ Built With

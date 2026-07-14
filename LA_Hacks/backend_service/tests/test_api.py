@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -49,6 +50,7 @@ def make_valid_feature_payload() -> dict[str, float]:
 
 class ApiTests(unittest.TestCase):
     def setUp(self) -> None:
+        os.environ["DEMO_MODE"] = "true"
         self.temp_dir = tempfile.TemporaryDirectory()
         self.artifacts_dir = Path(self.temp_dir.name) / "artifacts"
         train_classifier(make_prepared_frame(), artifacts_dir=self.artifacts_dir)

@@ -31,7 +31,7 @@ class Settings(BaseModel):
     asi_one_api_key: str = os.getenv("ASI_ONE_API_KEY", "")
 
     # Security / ops
-    demo_mode: bool = os.getenv("DEMO_MODE", "true").strip().lower() in {
+    demo_mode: bool = os.getenv("DEMO_MODE", "false").strip().lower() in {
         "1",
         "true",
         "yes",
