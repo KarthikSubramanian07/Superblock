@@ -125,9 +125,10 @@ app.post('/simulate', (req, res) => {
   res.json(response)
 })
 
-// Start HTTP server
-const server = app.listen(PORT, () => {
-  console.log(`Mock server running on http://localhost:${PORT}`)
+// Start HTTP server (localhost-only; demo mock, not for public bind)
+const HOST = process.env.HOST || '127.0.0.1'
+const server = app.listen(PORT, HOST, () => {
+  console.log(`Mock server running on http://${HOST}:${PORT}`)
   console.log(`  GET  /health`)
   console.log(`  GET  /tiles`)
   console.log(`  GET  /hotspots`)
@@ -138,9 +139,17 @@ const server = app.listen(PORT, () => {
   console.log(`  POST /simulate`)
 })
 
-// WebSocket for /ws/tiles (basic echo for testing)
+// WebSocket for /ws/tiles (accept JSON only)
 const wss = new WebSocket.Server({ server, path: '/ws/tiles' })
 wss.on('connection', (ws) => {
   console.log('WS client connected')
-  ws.on('message', (message) => ws.send(message))  // Echo for now
+  ws.on('message', (message) => {
+    try {
+      const text = message.toString()
+      JSON.parse(text)
+      ws.send(text)
+    } catch {
+      ws.send(JSON.stringify({ error: 'expected JSON message' }))
+    }
+  })
 })
