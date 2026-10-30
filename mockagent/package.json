@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "cors": "^2.8.6",
-    "express": "^4.22.2",
+    "express": "^4.22.3",
     "ws": "^8.21.0"
   }
 }
