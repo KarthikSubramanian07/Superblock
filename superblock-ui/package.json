@@ -39,6 +39,14 @@
     "globals": "^17.5.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
-    "vite": "^8.1.4"
+    "vite": "^8.3.5"
+  },
+  "overrides": {
+    "@loaders.gl/compression": {
+      "fflate": ">=0.7.5 <0.8"
+    },
+    "texture-compressor": {
+      "image-size": ">=2.0.3 <3"
+    }
   }
 }
