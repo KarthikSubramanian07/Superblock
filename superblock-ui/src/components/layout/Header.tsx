@@ -83,11 +83,13 @@ export default function Header({ isDemoMode, isLive, isConnecting, onToggleDemo 
     console.error('World ID verification failed:', error)
   }
 
-  // Why World ID matters for SuperBlock:
-  // 1. Prevents bot/sybil attacks on citizen sensor data - ensures each data point comes from a real human
-  // 2. Fair resource allocation - prevents gaming of intervention prioritization
-  // 3. Trust in public infrastructure - citizens can trust data driving city decisions comes from real humans
-  // 4. Democratic participation - enables verified citizen feedback loop for urban planning
+  const connectionLabel = isDemoMode
+    ? 'Demo'
+    : isConnecting
+      ? 'Connecting'
+      : isLive
+        ? 'Live'
+        : 'Demo (offline)'
 
   return (
     <header
@@ -99,32 +101,41 @@ export default function Header({ isDemoMode, isLive, isConnecting, onToggleDemo 
       }}
     >
       {/* Wordmark */}
-      <div className="flex items-baseline gap-2">
-        <span style={{ color: '#0f172a', fontWeight: 700, fontSize: '1.1rem', letterSpacing: '-0.02em' }}>
+      <div className="flex items-baseline gap-2 min-w-0">
+        <h1 style={{ color: '#0f172a', fontWeight: 700, fontSize: '1.1rem', letterSpacing: '-0.02em', margin: 0 }}>
           SuperBlock
-        </span>
-        <span style={{ color: '#94a3b8', fontSize: '0.7rem' }}>Urban Nervous System</span>
+        </h1>
+        <span style={{ color: '#64748b', fontSize: '0.7rem' }} className="hidden sm:inline">Urban Nervous System</span>
       </div>
 
-      <div className="flex items-center gap-2 px-2 py-0.5 rounded-md ml-4" style={{ background: '#f5f3ff', border: '1px solid #ddd6fe' }}>
-        <span style={{ color: '#7c3aed', fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.05em' }}>ZETIC NPU</span>
-        <span className="flex h-1.5 w-1.5 rounded-full bg-violet-500 animate-pulse" />
+      <div
+        className="flex items-center gap-2 px-2 py-0.5 rounded-md ml-2 sm:ml-4"
+        style={{ background: '#f5f3ff', border: '1px solid #ddd6fe' }}
+        aria-label="ZETIC NPU available"
+      >
+        <span style={{ color: '#6d28d9', fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.05em' }}>ZETIC NPU</span>
+        <span className="flex h-1.5 w-1.5 rounded-full bg-violet-500" aria-hidden="true" />
       </div>
 
       {/* World ID Verification */}
       {isHumanVerified ? (
-        <div className="flex items-center gap-2 px-2 py-0.5 rounded-md" style={{ background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
-          <span style={{ color: '#16a34a', fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.05em' }}>VERIFIED HUMAN</span>
-          <span style={{ fontSize: '0.7rem' }}>🆔</span>
+        <div
+          className="flex items-center gap-2 px-2 py-0.5 rounded-md"
+          style={{ background: '#f0fdf4', border: '1px solid #bbf7d0' }}
+          role="status"
+        >
+          <span style={{ color: '#15803d', fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.05em' }}>VERIFIED HUMAN</span>
+          <span style={{ fontSize: '0.7rem' }} aria-hidden="true">🆔</span>
         </div>
       ) : (
         <>
           <button
+            type="button"
             onClick={() => open()}
             disabled={verifying}
             style={{
-              fontSize: '0.65rem', fontWeight: 700, padding: '4px 12px',
-              borderRadius: '6px', background: '#000', color: '#fff',
+              fontSize: '0.7rem', fontWeight: 700, padding: '6px 12px',
+              minHeight: 32, borderRadius: '6px', background: '#000', color: '#fff',
               cursor: verifying ? 'wait' : 'pointer', border: 'none',
             }}
           >
@@ -132,11 +143,12 @@ export default function Header({ isDemoMode, isLive, isConnecting, onToggleDemo 
           </button>
           {isDemoMode && (
             <button
+              type="button"
               onClick={() => { void handleDemoVerify() }}
               disabled={verifying}
               style={{
-                fontSize: '0.65rem', fontWeight: 700, padding: '4px 12px',
-                borderRadius: '6px', background: '#334155', color: '#fff',
+                fontSize: '0.7rem', fontWeight: 700, padding: '6px 12px',
+                minHeight: 32, borderRadius: '6px', background: '#334155', color: '#fff',
                 cursor: verifying ? 'wait' : 'pointer', border: 'none',
               }}
             >
@@ -156,56 +168,96 @@ export default function Header({ isDemoMode, isLive, isConnecting, onToggleDemo 
       <div className="flex-1" />
 
       {/* Four-state badge: DEMO · CONNECTING… · OFFLINE · LIVE */}
-      {isDemoMode ? (
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full" style={{ background: '#fffbeb', border: '1px solid #fde68a' }}>
-          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b', display: 'inline-block' }} />
-          <span style={{ color: '#b45309', fontSize: '0.7rem', fontWeight: 600 }}>DEMO</span>
-        </div>
-      ) : isConnecting ? (
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full" style={{ background: '#eff6ff', border: '1px solid #bfdbfe' }}>
-          <span style={{
-            width: '8px', height: '8px', borderRadius: '50%',
-            border: '2px solid #93c5fd', borderTopColor: '#3b82f6',
-            display: 'inline-block', animation: 'spin 0.8s linear infinite',
-          }} />
-          <span style={{ color: '#1d4ed8', fontSize: '0.7rem', fontWeight: 600 }}>CONNECTING…</span>
-          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-        </div>
-      ) : isLive ? (
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full" style={{ background: '#f0fdf4', border: '1px solid #bbf7d0' }}>
-          <span className="relative flex" style={{ width: '8px', height: '8px' }}>
-            <span className="animate-ping absolute inline-flex rounded-full" style={{ width: '100%', height: '100%', background: '#4ade80', opacity: 0.75 }} />
-            <span className="relative inline-flex rounded-full" style={{ width: '8px', height: '8px', background: '#16a34a' }} />
-          </span>
-          <span style={{ color: '#15803d', fontSize: '0.7rem', fontWeight: 600 }}>LIVE</span>
-        </div>
-      ) : (
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full" style={{ background: '#f8fafc', border: '1px solid #cbd5e1' }}>
-          <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#94a3b8', display: 'inline-block' }} />
-          <span style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>DEMO</span>
-          <span style={{ color: '#94a3b8', fontSize: '0.65rem' }}>(offline)</span>
-        </div>
-      )}
+      <div
+        className="flex items-center gap-2 px-3 py-1 rounded-full"
+        style={{
+          background: isDemoMode
+            ? '#fffbeb'
+            : isConnecting
+              ? '#eff6ff'
+              : isLive
+                ? '#f0fdf4'
+                : '#f8fafc',
+          border: `1px solid ${
+            isDemoMode
+              ? '#fde68a'
+              : isConnecting
+                ? '#bfdbfe'
+                : isLive
+                  ? '#bbf7d0'
+                  : '#cbd5e1'
+          }`,
+        }}
+        role="status"
+        aria-label={`Connection status: ${connectionLabel}`}
+      >
+        <span
+          aria-hidden="true"
+          style={{
+            width: isConnecting || isLive ? '8px' : '6px',
+            height: isConnecting || isLive ? '8px' : '6px',
+            borderRadius: '50%',
+            background: isDemoMode
+              ? '#d97706'
+              : isConnecting
+                ? '#2563eb'
+                : isLive
+                  ? '#15803d'
+                  : '#64748b',
+            display: 'inline-block',
+            ...(isConnecting
+              ? {
+                  border: '2px solid #93c5fd',
+                  borderTopColor: '#3b82f6',
+                  background: 'transparent',
+                  animation: 'spin 0.8s linear infinite',
+                }
+              : {}),
+          }}
+        />
+        <span style={{
+          color: isDemoMode
+            ? '#92400e'
+            : isConnecting
+              ? '#1d4ed8'
+              : isLive
+                ? '#166534'
+                : '#475569',
+          fontSize: '0.7rem',
+          fontWeight: 600,
+        }}>
+          {isDemoMode ? 'DEMO' : isConnecting ? 'CONNECTING…' : isLive ? 'LIVE' : 'DEMO'}
+        </span>
+        {!isDemoMode && !isConnecting && !isLive && (
+          <span style={{ color: '#64748b', fontSize: '0.65rem' }}>(offline)</span>
+        )}
+        {isConnecting && <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>}
+      </div>
 
       {/* Demo toggle */}
       <div className="flex items-center gap-2">
-        <span style={{ color: '#94a3b8', fontSize: '0.7rem' }} className="hidden sm:block">Demo</span>
+        <span style={{ color: '#64748b', fontSize: '0.7rem' }} className="hidden sm:block" aria-hidden="true">Demo</span>
         <button
+          type="button"
           onClick={onToggleDemo}
-          className="relative inline-flex items-center rounded-full transition-colors focus:outline-none"
+          className="relative inline-flex items-center rounded-full transition-colors"
           style={{
-            width: '36px',
-            height: '20px',
-            background: isDemoMode ? '#f59e0b' : '#cbd5e1',
+            width: '44px',
+            height: '28px',
+            minWidth: '44px',
+            minHeight: '28px',
+            background: isDemoMode ? '#d97706' : '#94a3b8',
           }}
-          aria-label="Toggle demo mode"
+          aria-label={isDemoMode ? 'Demo mode on' : 'Demo mode off'}
+          aria-pressed={isDemoMode}
         >
           <span
             className="inline-block rounded-full bg-white shadow transition-transform"
+            aria-hidden="true"
             style={{
-              width: '16px',
-              height: '16px',
-              transform: isDemoMode ? 'translateX(18px)' : 'translateX(2px)',
+              width: '20px',
+              height: '20px',
+              transform: isDemoMode ? 'translateX(22px)' : 'translateX(4px)',
             }}
           />
         </button>

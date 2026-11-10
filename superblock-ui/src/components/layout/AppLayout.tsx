@@ -20,6 +20,9 @@ export default function AppLayout() {
   const timeIndex      = useStore(s => s.timeIndex)
   const setTimeIndex   = useStore(s => s.setTimeIndex)
   const setSelectedHex = useStore(s => s.setSelectedHex)
+  const selectedHotspot = useStore(s => s.selectedHotspot)
+  const simRunning     = useStore(s => s.simRunning)
+  const simResult      = useStore(s => s.simResult)
 
   // Auto-open the most critical hotspot on first load so judges see the full UI immediately
   const didInit = useRef(false)
@@ -34,11 +37,32 @@ export default function AppLayout() {
     }
   }, [setSelectedHex])
 
+  const statusParts: string[] = []
+  if (isDemoMode) statusParts.push('Demo mode on')
+  else if (isConnecting) statusParts.push('Connecting to live data')
+  else if (isLive) statusParts.push('Live data connected')
+  else statusParts.push('Offline demo data')
+  if (selectedHotspot) statusParts.push(`Hotspot selected: ${selectedHotspot.location_label}`)
+  if (simRunning) statusParts.push('Simulation running')
+  if (simResult) {
+    statusParts.push(
+      `Simulation complete: stress reduced from ${Math.round(simResult.als_before * 100)}% to ${Math.round(simResult.als_after * 100)}%`,
+    )
+  }
+
   return (
-    <div className="flex flex-col h-screen overflow-hidden" style={{ background: '#f1f4f9', color: '#0f172a' }}>
+    <div className="app-shell">
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {statusParts.join('. ')}
+      </div>
       <Header isDemoMode={isDemoMode} isLive={isLive} isConnecting={isConnecting} onToggleDemo={toggleDemoMode} />
-      <main className="flex flex-1 overflow-hidden">
-        <MapView />
+      <main id="main-content" className="app-main" tabIndex={-1}>
+        <div className="map-pane">
+          <MapView />
+        </div>
         <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
       </main>
       <TimeSlider value={timeIndex} onChange={setTimeIndex} />
