@@ -150,7 +150,11 @@ export default function MapView() {
       aria-label="Urban stress map"
     >
       <p id="map-summary" className="sr-only">{mapSummary}</p>
-      <div aria-hidden="true" style={{ width: '100%', height: '100%' }}>
+      <div
+        style={{ width: '100%', height: '100%' }}
+        role="img"
+        aria-labelledby="map-summary"
+      >
         <DeckGL
           initialViewState={INITIAL_VIEW_STATE}
           controller={true}
