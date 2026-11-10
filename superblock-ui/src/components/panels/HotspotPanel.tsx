@@ -17,20 +17,22 @@ const CONTEXT_META: Record<string, { icon: string; label: string }> = {
 }
 
 const SEVERITY_STYLE: Record<string, { bg: string; color: string }> = {
-  high:   { bg: '#fef2f2', color: '#dc2626' },
-  medium: { bg: '#fff7ed', color: '#ea580c' },
-  low:    { bg: '#f0fdf4', color: '#16a34a' },
+  high:   { bg: '#fef2f2', color: '#b91c1c' },
+  medium: { bg: '#fff7ed', color: '#c2410c' },
+  low:    { bg: '#f0fdf4', color: '#15803d' },
 }
 
 function AlsBar({ score }: { score: number }) {
   const pct = Math.round(score * 100)
-  const color = score < 0.3 ? '#78d28c' : score < 0.5 ? '#ffd03c' : score < 0.7 ? '#ff9137' : '#e14b4b'
+  // Bar fill keeps the map legend hues; label text uses darker AA-safe tokens.
+  const barColor = score < 0.3 ? '#78d28c' : score < 0.5 ? '#ffd03c' : score < 0.7 ? '#ff9137' : '#e14b4b'
+  const textColor = score < 0.3 ? '#15803d' : score < 0.5 ? '#a16207' : score < 0.7 ? '#c2410c' : '#b91c1c'
   const level = alsToLabel(score)
   return (
     <div>
       <div className="flex justify-between" style={{ marginBottom: '5px' }}>
         <span style={{ fontSize: '0.7rem', color: '#64748b' }}>ALS Score</span>
-        <span style={{ fontSize: '0.7rem', fontWeight: 700, color }}>
+        <span style={{ fontSize: '0.7rem', fontWeight: 700, color: textColor }}>
           {pct}% ({level})
         </span>
       </div>
@@ -42,7 +44,7 @@ function AlsBar({ score }: { score: number }) {
         aria-valuenow={pct}
         style={{ height: '7px', background: '#f1f5f9', borderRadius: '99px', overflow: 'hidden' }}
       >
-        <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: '99px', transition: 'width 0.4s ease' }} />
+        <div style={{ width: `${pct}%`, height: '100%', background: barColor, borderRadius: '99px', transition: 'width 0.4s ease' }} />
       </div>
     </div>
   )
@@ -101,12 +103,12 @@ export default function HotspotPanel() {
     const tile = tiles.find(t => t.h3_index === selectedHexId)
     return (
       <div className="p-4 flex flex-col gap-4">
-        <p style={{ color: '#94a3b8', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <p style={{ color: '#64748b', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           Zone Info
         </p>
         <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '16px' }}>
           {tile ? <AlsBar score={tile.als_score} /> : null}
-          <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '12px', textAlign: 'center' }}>
+          <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '12px', textAlign: 'center' }}>
             No hotspot profile for this zone.
             <br />Try clicking a red or orange area.
           </p>
@@ -122,7 +124,7 @@ export default function HotspotPanel() {
 
   return (
     <div className="p-4 flex flex-col gap-3">
-      <p style={{ color: '#94a3b8', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+      <p style={{ color: '#64748b', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
         Hotspot Detail
       </p>
 

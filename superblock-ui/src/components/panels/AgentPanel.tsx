@@ -247,7 +247,7 @@ export default function AgentPanel() {
             <span style={{
               width: '18px', height: '18px', borderRadius: '50%',
               background: d.status === 'idle' ? '#f1f5f9' : '#ede9fe',
-              color: d.status === 'idle' ? '#94a3b8' : '#6366f1',
+              color: d.status === 'idle' ? '#64748b' : '#6366f1',
               fontSize: '0.6rem', fontWeight: 700,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               flexShrink: 0,
@@ -287,7 +287,7 @@ export default function AgentPanel() {
             marginTop: '4px', width: '100%', padding: '10px',
             borderRadius: '8px', border: 'none', cursor: reportLoading ? 'not-allowed' : 'pointer',
             background: reportLoading ? '#e2e8f0' : '#0f172a',
-            color: reportLoading ? '#94a3b8' : 'white',
+            color: reportLoading ? '#64748b' : 'white',
             fontSize: '0.8rem', fontWeight: 600,
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
             transition: 'background 0.15s',
@@ -307,7 +307,7 @@ export default function AgentPanel() {
       )}
 
       {reportError && (
-        <p style={{ fontSize: '0.72rem', color: '#dc2626', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 12px' }}>
+        <p style={{ fontSize: '0.72rem', color: '#b91c1c', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 12px' }}>
           {reportError}
         </p>
       )}

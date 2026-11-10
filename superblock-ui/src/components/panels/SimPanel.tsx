@@ -29,7 +29,7 @@ function InterventionChart() {
       <p style={{ fontSize: '0.72rem', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
         Cost vs. Impact
       </p>
-      <p style={{ fontSize: '0.65rem', color: '#94a3b8', marginBottom: '12px' }}>
+      <p style={{ fontSize: '0.65rem', color: '#64748b', marginBottom: '12px' }}>
         Ranked by relief per dollar (best → worst)
       </p>
       <div role="img" aria-label={data.map(d => `${d.name}: ${d.impact}% ALS reduction, cost ${d.cost}`).join('. ')}>
@@ -90,14 +90,14 @@ function InterventionCard({
         <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#0f172a', flex: 1 }}>{item.label}</span>
         <span style={{
           fontSize: '0.7rem', fontWeight: 700,
-          color: '#16a34a', background: '#f0fdf4',
+          color: '#15803d', background: '#f0fdf4',
           border: '1px solid #bbf7d0', borderRadius: '99px', padding: '1px 7px',
         }}>
           {deltaLabel} ALS
         </span>
       </div>
       <p style={{ fontSize: '0.7rem', color: '#64748b', marginBottom: '5px' }}>{item.description}</p>
-      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Est. cost: {formatCost(item.estimated_cost_usd)}</span>
+      <span style={{ fontSize: '0.68rem', color: '#64748b' }}>Est. cost: {formatCost(item.estimated_cost_usd)}</span>
     </button>
   )
 }
@@ -121,7 +121,7 @@ export default function SimPanel() {
         <div className="flex flex-col items-center justify-center text-center" style={{ padding: '24px 0 16px' }}>
           <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>⚡</div>
           <p style={{ color: '#64748b', fontSize: '0.875rem' }}>Select a hotspot first</p>
-          <p style={{ color: '#94a3b8', fontSize: '0.75rem', marginTop: '4px' }}>Click a red zone on the map, then return here</p>
+          <p style={{ color: '#64748b', fontSize: '0.75rem', marginTop: '4px' }}>Click a red zone on the map, then return here</p>
           <button
             type="button"
             onClick={() => setActiveTab('hotspot')}
@@ -156,11 +156,11 @@ export default function SimPanel() {
       }}>
         <div>
           <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#334155' }}>{selectedHotspot.location_label}</p>
-          <p style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Current stress zone</p>
+          <p style={{ fontSize: '0.68rem', color: '#64748b' }}>Current stress zone</p>
         </div>
         <span style={{
           fontSize: '1rem', fontWeight: 800,
-          color: alsBefore >= 0.7 ? '#dc2626' : alsBefore >= 0.5 ? '#ea580c' : '#ca8a04',
+          color: alsBefore >= 0.7 ? '#b91c1c' : alsBefore >= 0.5 ? '#c2410c' : '#a16207',
         }}>
           {beforePct}% ALS
         </span>
@@ -226,15 +226,15 @@ export default function SimPanel() {
           {/* Before → After */}
           <div className="flex items-center justify-center gap-3" style={{ marginBottom: '12px' }}>
             <div style={{ textAlign: 'center' }}>
-              <p style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Before</p>
-              <p style={{ fontSize: '1.4rem', fontWeight: 800, color: '#dc2626' }}>
+              <p style={{ fontSize: '0.65rem', color: '#64748b' }}>Before</p>
+              <p style={{ fontSize: '1.4rem', fontWeight: 800, color: '#b91c1c' }}>
                 {Math.round(simResult.als_before * 100)}%
               </p>
             </div>
-            <span style={{ fontSize: '1.2rem', color: '#94a3b8' }}>→</span>
+            <span style={{ fontSize: '1.2rem', color: '#64748b' }} aria-hidden="true">→</span>
             <div style={{ textAlign: 'center' }}>
-              <p style={{ fontSize: '0.65rem', color: '#94a3b8' }}>After</p>
-              <p style={{ fontSize: '1.4rem', fontWeight: 800, color: '#16a34a' }}>
+              <p style={{ fontSize: '0.65rem', color: '#64748b' }}>After</p>
+              <p style={{ fontSize: '1.4rem', fontWeight: 800, color: '#15803d' }}>
                 {Math.round(simResult.als_after * 100)}%
               </p>
             </div>
@@ -242,8 +242,8 @@ export default function SimPanel() {
               marginLeft: '4px', background: '#dcfce7', border: '1px solid #86efac',
               borderRadius: '99px', padding: '4px 10px', textAlign: 'center',
             }}>
-              <p style={{ fontSize: '0.65rem', color: '#16a34a' }}>Reduction</p>
-              <p style={{ fontSize: '0.9rem', fontWeight: 800, color: '#16a34a' }}>
+              <p style={{ fontSize: '0.65rem', color: '#15803d' }}>Reduction</p>
+              <p style={{ fontSize: '0.9rem', fontWeight: 800, color: '#15803d' }}>
                 -{simResult.percent_reduction}%
               </p>
             </div>
