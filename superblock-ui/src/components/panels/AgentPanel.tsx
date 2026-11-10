@@ -8,60 +8,76 @@ import type { NarrativeReport } from '@/lib/api'
 import type { Agent } from '@/types'
 
 // Rotating messages per agent to simulate live activity
-function HelpIcon({ text }: { text?: string }) {
+function HelpIcon({ text, label }: { text?: string; label: string }) {
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(null)
-  const ref = useRef<HTMLSpanElement>(null)
+  const ref = useRef<HTMLButtonElement>(null)
+  const tipId = `help-${label.replace(/\s+/g, '-').toLowerCase()}`
 
   if (!text) return null
 
-  function handleMouseEnter() {
+  function show() {
     if (!ref.current) return
     const r = ref.current.getBoundingClientRect()
     setCoords({ top: r.bottom + 6, left: r.left + r.width / 2 })
   }
 
+  function hide() {
+    setCoords(null)
+  }
+
   return (
-    <span
-      ref={ref}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={() => setCoords(null)}
-      style={{ display: 'inline-flex', flexShrink: 0, cursor: 'default' }}
-    >
-      {/* ? circle */}
-      <span style={{
-        width: '14px', height: '14px', borderRadius: '50%',
-        background: '#e2e8f0', color: '#64748b',
-        fontSize: '0.6rem', fontWeight: 700,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        userSelect: 'none',
-      }}>
+    <span style={{ display: 'inline-flex', flexShrink: 0, position: 'relative' }}>
+      <button
+        ref={ref}
+        type="button"
+        aria-label={`About ${label}`}
+        aria-describedby={coords ? tipId : undefined}
+        onMouseEnter={show}
+        onMouseLeave={hide}
+        onFocus={show}
+        onBlur={hide}
+        style={{
+          width: '24px', height: '24px', minWidth: 24, minHeight: 24, borderRadius: '50%',
+          background: '#e2e8f0', color: '#475569',
+          fontSize: '0.7rem', fontWeight: 700,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          border: 'none', cursor: 'help', padding: 0,
+        }}
+      >
         ?
-      </span>
+      </button>
 
       {/* Portal tooltip — renders into document.body, never clipped by overflow */}
       {coords && createPortal(
-        <span style={{
-          position: 'fixed',
-          top: coords.top,
-          left: coords.left,
-          transform: 'translateX(-50%)',
-          background: '#1e293b', color: '#f1f5f9',
-          fontSize: '0.68rem', lineHeight: '1.5',
-          padding: '8px 11px', borderRadius: '7px',
-          width: '230px', zIndex: 9999,
-          boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
-          pointerEvents: 'none',
-          whiteSpace: 'normal',
-        }}>
-          {text}
-          <span style={{
-            position: 'absolute', bottom: '100%', left: '50%',
+        <span
+          id={tipId}
+          role="tooltip"
+          style={{
+            position: 'fixed',
+            top: coords.top,
+            left: coords.left,
             transform: 'translateX(-50%)',
-            width: 0, height: 0,
-            borderLeft: '5px solid transparent',
-            borderRight: '5px solid transparent',
-            borderBottom: '5px solid #1e293b',
-          }} />
+            background: '#1e293b', color: '#f1f5f9',
+            fontSize: '0.68rem', lineHeight: '1.5',
+            padding: '8px 11px', borderRadius: '7px',
+            width: '230px', zIndex: 9999,
+            boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+            pointerEvents: 'none',
+            whiteSpace: 'normal',
+          }}
+        >
+          {text}
+          <span
+            aria-hidden="true"
+            style={{
+              position: 'absolute', bottom: '100%', left: '50%',
+              transform: 'translateX(-50%)',
+              width: 0, height: 0,
+              borderLeft: '5px solid transparent',
+              borderRight: '5px solid transparent',
+              borderBottom: '5px solid #1e293b',
+            }}
+          />
         </span>,
         document.body
       )}
@@ -71,9 +87,16 @@ function HelpIcon({ text }: { text?: string }) {
 
 
 const STATUS_COLOR: Record<Agent['status'], string> = {
+  active:     '#15803d',
+  processing: '#b45309',
+  idle:       '#64748b',
+  error:      '#b91c1c',
+}
+
+const STATUS_DOT: Record<Agent['status'], string> = {
   active:     '#22c55e',
   processing: '#f59e0b',
-  idle:       '#cbd5e1',
+  idle:       '#94a3b8',
   error:      '#ef4444',
 }
 
@@ -85,10 +108,13 @@ const STATUS_LABEL: Record<Agent['status'], string> = {
 }
 
 function StatusDot({ status }: { status: Agent['status'] }) {
-  const color = STATUS_COLOR[status]
+  const color = STATUS_DOT[status]
   const pulse = status === 'active' || status === 'processing'
   return (
-    <span style={{ position: 'relative', width: '9px', height: '9px', flexShrink: 0, display: 'inline-flex' }}>
+    <span
+      style={{ position: 'relative', width: '9px', height: '9px', flexShrink: 0, display: 'inline-flex' }}
+      aria-hidden="true"
+    >
       {pulse && (
         <span style={{
           position: 'absolute', inset: 0, borderRadius: '50%',
@@ -188,13 +214,16 @@ export default function AgentPanel() {
     <div className="p-4 flex flex-col gap-2">
       {/* Header row */}
       <div className="flex items-center justify-between" style={{ marginBottom: '4px' }}>
-        <p style={{ color: '#94a3b8', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <h2 style={{ color: '#64748b', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0, fontWeight: 600 }}>
           Agent Pipeline
-        </p>
-        <span style={{
-          fontSize: '0.65rem', color: '#22c55e', background: '#f0fdf4',
-          border: '1px solid #bbf7d0', borderRadius: '99px', padding: '1px 8px',
-        }}>
+        </h2>
+        <span
+          style={{
+            fontSize: '0.65rem', color: '#15803d', background: '#f0fdf4',
+            border: '1px solid #bbf7d0', borderRadius: '99px', padding: '1px 8px',
+          }}
+          aria-live="polite"
+        >
           {activeCount} running
         </span>
       </div>
@@ -218,7 +247,7 @@ export default function AgentPanel() {
             <span style={{
               width: '18px', height: '18px', borderRadius: '50%',
               background: d.status === 'idle' ? '#f1f5f9' : '#ede9fe',
-              color: d.status === 'idle' ? '#94a3b8' : '#6366f1',
+              color: d.status === 'idle' ? '#64748b' : '#6366f1',
               fontSize: '0.6rem', fontWeight: 700,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               flexShrink: 0,
@@ -229,7 +258,7 @@ export default function AgentPanel() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
                 <p style={{ fontSize: '0.8rem', color: '#334155', fontWeight: 500 }}>{agent.label}</p>
-                <HelpIcon text={AGENT_HELP[agent.id]} />
+                <HelpIcon text={AGENT_HELP[agent.id]} label={agent.label} />
               </div>
               <p style={{
                 fontSize: '0.7rem', color: '#64748b',
@@ -258,7 +287,7 @@ export default function AgentPanel() {
             marginTop: '4px', width: '100%', padding: '10px',
             borderRadius: '8px', border: 'none', cursor: reportLoading ? 'not-allowed' : 'pointer',
             background: reportLoading ? '#e2e8f0' : '#0f172a',
-            color: reportLoading ? '#94a3b8' : 'white',
+            color: reportLoading ? '#64748b' : 'white',
             fontSize: '0.8rem', fontWeight: 600,
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
             transition: 'background 0.15s',
@@ -278,7 +307,7 @@ export default function AgentPanel() {
       )}
 
       {reportError && (
-        <p style={{ fontSize: '0.72rem', color: '#dc2626', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 12px' }}>
+        <p style={{ fontSize: '0.72rem', color: '#b91c1c', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 12px' }}>
           {reportError}
         </p>
       )}

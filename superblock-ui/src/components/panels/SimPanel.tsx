@@ -29,26 +29,28 @@ function InterventionChart() {
       <p style={{ fontSize: '0.72rem', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
         Cost vs. Impact
       </p>
-      <p style={{ fontSize: '0.65rem', color: '#94a3b8', marginBottom: '12px' }}>
+      <p style={{ fontSize: '0.65rem', color: '#64748b', marginBottom: '12px' }}>
         Ranked by relief per dollar (best → worst)
       </p>
-      <ResponsiveContainer width="100%" height={150}>
-        <BarChart data={data} layout="vertical" margin={{ top: 0, right: 40, left: 4, bottom: 0 }}>
-          <XAxis type="number" domain={[0, 35]} unit="%" tick={{ fontSize: 9, fill: '#94a3b8' }} />
-          <YAxis
-            type="category" dataKey="name" width={110}
-            tick={{ fontSize: 9, fill: '#475569' }}
-          />
-          <Tooltip
-            formatter={(val, _name, props) => [`${val}% ALS reduction · cost ${props.payload.cost}`, 'Impact']}
-            contentStyle={{ fontSize: '0.72rem', borderRadius: '7px', border: '1px solid #e2e8f0' }}
-          />
-          <Bar dataKey="impact" radius={[0, 4, 4, 0]} barSize={18}>
-            {data.map((_d, i) => <Cell key={i} fill={CHART_COLORS[i]} />)}
-            <LabelList dataKey="cost" position="right" style={{ fontSize: '9px', fill: '#94a3b8' }} />
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+      <div role="img" aria-label={data.map(d => `${d.name}: ${d.impact}% ALS reduction, cost ${d.cost}`).join('. ')}>
+        <ResponsiveContainer width="100%" height={150}>
+          <BarChart data={data} layout="vertical" margin={{ top: 0, right: 40, left: 4, bottom: 0 }}>
+            <XAxis type="number" domain={[0, 35]} unit="%" tick={{ fontSize: 9, fill: '#64748b' }} />
+            <YAxis
+              type="category" dataKey="name" width={110}
+              tick={{ fontSize: 9, fill: '#334155' }}
+            />
+            <Tooltip
+              formatter={(val, _name, props) => [`${val}% ALS reduction · cost ${props.payload.cost}`, 'Impact']}
+              contentStyle={{ fontSize: '0.72rem', borderRadius: '7px', border: '1px solid #e2e8f0' }}
+            />
+            <Bar dataKey="impact" radius={[0, 4, 4, 0]} barSize={18}>
+              {data.map((_d, i) => <Cell key={i} fill={CHART_COLORS[i]} />)}
+              <LabelList dataKey="cost" position="right" style={{ fontSize: '9px', fill: '#64748b' }} />
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   )
 }
@@ -72,12 +74,14 @@ function InterventionCard({
 
   return (
     <button
+      type="button"
       onClick={onSelect}
+      aria-pressed={selected}
       style={{
-        width: '100%', textAlign: 'left', padding: '11px 13px',
+        width: '100%', textAlign: 'left', padding: '11px 13px', minHeight: 44,
         borderRadius: '9px', cursor: 'pointer',
         background: selected ? '#eef2ff' : '#ffffff',
-        border: `1.5px solid ${selected ? '#6366f1' : '#e2e8f0'}`,
+        border: `1.5px solid ${selected ? '#4f46e5' : '#e2e8f0'}`,
         transition: 'border-color 0.15s, background 0.15s',
       }}
     >
@@ -86,14 +90,14 @@ function InterventionCard({
         <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#0f172a', flex: 1 }}>{item.label}</span>
         <span style={{
           fontSize: '0.7rem', fontWeight: 700,
-          color: '#16a34a', background: '#f0fdf4',
+          color: '#15803d', background: '#f0fdf4',
           border: '1px solid #bbf7d0', borderRadius: '99px', padding: '1px 7px',
         }}>
           {deltaLabel} ALS
         </span>
       </div>
       <p style={{ fontSize: '0.7rem', color: '#64748b', marginBottom: '5px' }}>{item.description}</p>
-      <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Est. cost: {formatCost(item.estimated_cost_usd)}</span>
+      <span style={{ fontSize: '0.68rem', color: '#64748b' }}>Est. cost: {formatCost(item.estimated_cost_usd)}</span>
     </button>
   )
 }
@@ -117,13 +121,14 @@ export default function SimPanel() {
         <div className="flex flex-col items-center justify-center text-center" style={{ padding: '24px 0 16px' }}>
           <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>⚡</div>
           <p style={{ color: '#64748b', fontSize: '0.875rem' }}>Select a hotspot first</p>
-          <p style={{ color: '#94a3b8', fontSize: '0.75rem', marginTop: '4px' }}>Click a red zone on the map, then return here</p>
+          <p style={{ color: '#64748b', fontSize: '0.75rem', marginTop: '4px' }}>Click a red zone on the map, then return here</p>
           <button
+            type="button"
             onClick={() => setActiveTab('hotspot')}
             style={{
-              marginTop: '16px', padding: '7px 18px', borderRadius: '7px',
+              marginTop: '16px', padding: '8px 18px', minHeight: 36, borderRadius: '7px',
               background: '#f1f5f9', border: '1px solid #e2e8f0',
-              fontSize: '0.75rem', color: '#475569', cursor: 'pointer',
+              fontSize: '0.75rem', color: '#334155', cursor: 'pointer',
             }}
           >
             Go to Hotspot tab →
@@ -139,9 +144,9 @@ export default function SimPanel() {
 
   return (
     <div className="p-4 flex flex-col gap-3">
-      <p style={{ color: '#94a3b8', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+      <h2 style={{ color: '#64748b', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0, fontWeight: 600 }}>
         Simulate Intervention
-      </p>
+      </h2>
 
       {/* Current hotspot summary */}
       <div style={{
@@ -151,11 +156,11 @@ export default function SimPanel() {
       }}>
         <div>
           <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#334155' }}>{selectedHotspot.location_label}</p>
-          <p style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Current stress zone</p>
+          <p style={{ fontSize: '0.68rem', color: '#64748b' }}>Current stress zone</p>
         </div>
         <span style={{
           fontSize: '1rem', fontWeight: 800,
-          color: alsBefore >= 0.7 ? '#dc2626' : alsBefore >= 0.5 ? '#ea580c' : '#ca8a04',
+          color: alsBefore >= 0.7 ? '#b91c1c' : alsBefore >= 0.5 ? '#c2410c' : '#a16207',
         }}>
           {beforePct}% ALS
         </span>
@@ -177,12 +182,14 @@ export default function SimPanel() {
       {/* Run button */}
       {!simResult && (
         <button
+          type="button"
           onClick={runSimulation}
           disabled={!selectedInterventionId || simRunning}
+          aria-busy={simRunning}
           style={{
-            width: '100%', padding: '11px', borderRadius: '8px',
-            background: selectedInterventionId && !simRunning ? '#6366f1' : '#e2e8f0',
-            color: selectedInterventionId && !simRunning ? 'white' : '#94a3b8',
+            width: '100%', padding: '11px', minHeight: 44, borderRadius: '8px',
+            background: selectedInterventionId && !simRunning ? '#4f46e5' : '#e2e8f0',
+            color: selectedInterventionId && !simRunning ? 'white' : '#64748b',
             fontSize: '0.82rem', fontWeight: 600,
             border: 'none', cursor: selectedInterventionId && !simRunning ? 'pointer' : 'not-allowed',
             transition: 'background 0.15s',
@@ -204,26 +211,30 @@ export default function SimPanel() {
 
       {/* Result card */}
       {simResult && (
-        <div style={{
-          background: '#f0fdf4', border: '1.5px solid #86efac',
-          borderRadius: '10px', padding: '14px 16px',
-        }}>
-          <p style={{ fontSize: '0.72rem', fontWeight: 700, color: '#16a34a', marginBottom: '10px' }}>
+        <div
+          style={{
+            background: '#f0fdf4', border: '1.5px solid #86efac',
+            borderRadius: '10px', padding: '14px 16px',
+          }}
+          role="status"
+          aria-live="polite"
+        >
+          <p style={{ fontSize: '0.72rem', fontWeight: 700, color: '#15803d', marginBottom: '10px' }}>
             Simulation Complete
           </p>
 
           {/* Before → After */}
           <div className="flex items-center justify-center gap-3" style={{ marginBottom: '12px' }}>
             <div style={{ textAlign: 'center' }}>
-              <p style={{ fontSize: '0.65rem', color: '#94a3b8' }}>Before</p>
-              <p style={{ fontSize: '1.4rem', fontWeight: 800, color: '#dc2626' }}>
+              <p style={{ fontSize: '0.65rem', color: '#64748b' }}>Before</p>
+              <p style={{ fontSize: '1.4rem', fontWeight: 800, color: '#b91c1c' }}>
                 {Math.round(simResult.als_before * 100)}%
               </p>
             </div>
-            <span style={{ fontSize: '1.2rem', color: '#94a3b8' }}>→</span>
+            <span style={{ fontSize: '1.2rem', color: '#64748b' }} aria-hidden="true">→</span>
             <div style={{ textAlign: 'center' }}>
-              <p style={{ fontSize: '0.65rem', color: '#94a3b8' }}>After</p>
-              <p style={{ fontSize: '1.4rem', fontWeight: 800, color: '#16a34a' }}>
+              <p style={{ fontSize: '0.65rem', color: '#64748b' }}>After</p>
+              <p style={{ fontSize: '1.4rem', fontWeight: 800, color: '#15803d' }}>
                 {Math.round(simResult.als_after * 100)}%
               </p>
             </div>
@@ -231,19 +242,20 @@ export default function SimPanel() {
               marginLeft: '4px', background: '#dcfce7', border: '1px solid #86efac',
               borderRadius: '99px', padding: '4px 10px', textAlign: 'center',
             }}>
-              <p style={{ fontSize: '0.65rem', color: '#16a34a' }}>Reduction</p>
-              <p style={{ fontSize: '0.9rem', fontWeight: 800, color: '#16a34a' }}>
+              <p style={{ fontSize: '0.65rem', color: '#15803d' }}>Reduction</p>
+              <p style={{ fontSize: '0.9rem', fontWeight: 800, color: '#15803d' }}>
                 -{simResult.percent_reduction}%
               </p>
             </div>
           </div>
 
           <button
+            type="button"
             onClick={() => { setSelectedIntervention(''); }}
             style={{
-              width: '100%', padding: '8px', borderRadius: '7px',
+              width: '100%', padding: '8px', minHeight: 36, borderRadius: '7px',
               background: 'white', border: '1px solid #86efac',
-              fontSize: '0.75rem', color: '#16a34a', cursor: 'pointer',
+              fontSize: '0.75rem', color: '#15803d', cursor: 'pointer',
             }}
           >
             Try another intervention

@@ -1,5 +1,6 @@
 import { useStore } from '@/store/useStore'
 import { alsToLabel } from '@/lib/colorScale'
+import { getMockHotspot, getMockHotspotIds } from '@/data/mock'
 
 const STRESSOR_META: Record<string, { icon: string; label: string; color: string }> = {
   heat:              { icon: '🌡️', label: 'Heat Stress',       color: '#fef3c7' },
@@ -16,22 +17,34 @@ const CONTEXT_META: Record<string, { icon: string; label: string }> = {
 }
 
 const SEVERITY_STYLE: Record<string, { bg: string; color: string }> = {
-  high:   { bg: '#fef2f2', color: '#dc2626' },
-  medium: { bg: '#fff7ed', color: '#ea580c' },
-  low:    { bg: '#f0fdf4', color: '#16a34a' },
+  high:   { bg: '#fef2f2', color: '#b91c1c' },
+  medium: { bg: '#fff7ed', color: '#c2410c' },
+  low:    { bg: '#f0fdf4', color: '#15803d' },
 }
 
 function AlsBar({ score }: { score: number }) {
   const pct = Math.round(score * 100)
-  const color = score < 0.3 ? '#78d28c' : score < 0.5 ? '#ffd03c' : score < 0.7 ? '#ff9137' : '#e14b4b'
+  // Bar fill keeps the map legend hues; label text uses darker AA-safe tokens.
+  const barColor = score < 0.3 ? '#78d28c' : score < 0.5 ? '#ffd03c' : score < 0.7 ? '#ff9137' : '#e14b4b'
+  const textColor = score < 0.3 ? '#15803d' : score < 0.5 ? '#a16207' : score < 0.7 ? '#c2410c' : '#b91c1c'
+  const level = alsToLabel(score)
   return (
     <div>
       <div className="flex justify-between" style={{ marginBottom: '5px' }}>
         <span style={{ fontSize: '0.7rem', color: '#64748b' }}>ALS Score</span>
-        <span style={{ fontSize: '0.7rem', fontWeight: 700, color }}>{pct}%</span>
+        <span style={{ fontSize: '0.7rem', fontWeight: 700, color: textColor }}>
+          {pct}% ({level})
+        </span>
       </div>
-      <div style={{ height: '7px', background: '#f1f5f9', borderRadius: '99px', overflow: 'hidden' }}>
-        <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: '99px', transition: 'width 0.4s ease' }} />
+      <div
+        role="meter"
+        aria-label={`ALS score ${pct} percent, ${level}`}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={pct}
+        style={{ height: '7px', background: '#f1f5f9', borderRadius: '99px', overflow: 'hidden' }}
+      >
+        <div style={{ width: `${pct}%`, height: '100%', background: barColor, borderRadius: '99px', transition: 'width 0.4s ease' }} />
       </div>
     </div>
   )
@@ -42,14 +55,45 @@ export default function HotspotPanel() {
   const selectedHotspot = useStore(s => s.selectedHotspot)
   const tiles          = useStore(s => s.tiles)
   const setActiveTab   = useStore(s => s.setActiveTab)
+  const setSelectedHex = useStore(s => s.setSelectedHex)
 
   // Empty state
   if (!selectedHexId) {
+    const hotspots = getMockHotspotIds()
+      .map(id => ({ id, hotspot: getMockHotspot(id) }))
+      .filter((h): h is { id: string; hotspot: NonNullable<ReturnType<typeof getMockHotspot>> } => Boolean(h.hotspot))
+
     return (
-      <div className="flex flex-col items-center justify-center text-center" style={{ minHeight: '300px', padding: '32px 24px' }}>
-        <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>📍</div>
-        <p style={{ color: '#64748b', fontSize: '0.875rem' }}>Click a colored zone on the map</p>
-        <p style={{ color: '#94a3b8', fontSize: '0.75rem', marginTop: '4px' }}>to inspect its hotspot details</p>
+      <div className="flex flex-col" style={{ minHeight: '300px', padding: '24px' }}>
+        <div className="text-center" style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: '12px' }} aria-hidden="true">📍</div>
+          <p style={{ color: '#475569', fontSize: '0.875rem', margin: 0 }}>Select a hotspot</p>
+          <p style={{ color: '#64748b', fontSize: '0.75rem', marginTop: '4px' }}>
+            Use the list below, or choose a colored zone on the map
+          </p>
+        </div>
+        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {hotspots.map(({ id, hotspot }) => (
+            <li key={id}>
+              <button
+                type="button"
+                onClick={() => setSelectedHex(id)}
+                style={{
+                  width: '100%', textAlign: 'left', minHeight: 44,
+                  padding: '10px 12px', borderRadius: 8, cursor: 'pointer',
+                  border: '1px solid #e2e8f0', background: '#fff', color: '#0f172a',
+                }}
+              >
+                <span style={{ display: 'block', fontWeight: 600, fontSize: '0.85rem' }}>
+                  {hotspot.location_label}
+                </span>
+                <span style={{ display: 'block', fontSize: '0.72rem', color: '#64748b', marginTop: 2 }}>
+                  {alsToLabel(hotspot.als_score)} stress · {hotspot.severity} severity
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
     )
   }
@@ -59,12 +103,12 @@ export default function HotspotPanel() {
     const tile = tiles.find(t => t.h3_index === selectedHexId)
     return (
       <div className="p-4 flex flex-col gap-4">
-        <p style={{ color: '#94a3b8', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <p style={{ color: '#64748b', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           Zone Info
         </p>
         <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '16px' }}>
           {tile ? <AlsBar score={tile.als_score} /> : null}
-          <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '12px', textAlign: 'center' }}>
+          <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '12px', textAlign: 'center' }}>
             No hotspot profile for this zone.
             <br />Try clicking a red or orange area.
           </p>
@@ -80,7 +124,7 @@ export default function HotspotPanel() {
 
   return (
     <div className="p-4 flex flex-col gap-3">
-      <p style={{ color: '#94a3b8', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+      <p style={{ color: '#64748b', fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
         Hotspot Detail
       </p>
 
@@ -139,16 +183,17 @@ export default function HotspotPanel() {
 
       {/* CTA */}
       <button
+        type="button"
         onClick={() => setActiveTab('simulation')}
         style={{
-          width: '100%', padding: '10px', borderRadius: '8px',
-          background: '#6366f1', color: 'white',
+          width: '100%', padding: '10px', minHeight: 44, borderRadius: '8px',
+          background: '#4f46e5', color: 'white',
           fontSize: '0.8rem', fontWeight: 600,
           border: 'none', cursor: 'pointer',
           transition: 'background 0.15s',
         }}
-        onMouseEnter={e => (e.currentTarget.style.background = '#4f46e5')}
-        onMouseLeave={e => (e.currentTarget.style.background = '#6366f1')}
+        onMouseEnter={e => (e.currentTarget.style.background = '#4338ca')}
+        onMouseLeave={e => (e.currentTarget.style.background = '#4f46e5')}
       >
         Run Intervention Simulation →
       </button>
