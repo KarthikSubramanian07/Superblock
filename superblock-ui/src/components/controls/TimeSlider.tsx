@@ -30,19 +30,22 @@ export default function TimeSlider({ value, onChange }: TimeSliderProps) {
       return
     }
     // Autoplay longer than 5s needs a pause control (2.2.2) — play/pause button provides it.
-    // Under reduced motion, advance once then stop instead of looping continuously.
-    if (prefersReducedMotion()) {
-      const next = valueRef.current >= 22 ? 6 : valueRef.current + 1
-      onChange(next)
-      setPlaying(false)
-      return
-    }
     intervalRef.current = setInterval(() => {
       const next = valueRef.current >= 22 ? 6 : valueRef.current + 1
       onChange(next)
     }, 900)
     return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
   }, [playing, onChange])
+
+  function togglePlay() {
+    // Under reduced motion, advance once instead of looping continuously.
+    if (!playing && prefersReducedMotion()) {
+      const next = valueRef.current >= 22 ? 6 : valueRef.current + 1
+      onChange(next)
+      return
+    }
+    setPlaying(p => !p)
+  }
 
   function handleScrub(v: number) {
     setPlaying(false)
@@ -64,7 +67,7 @@ export default function TimeSlider({ value, onChange }: TimeSliderProps) {
       {/* Play / Pause button */}
       <button
         type="button"
-        onClick={() => setPlaying(p => !p)}
+        onClick={togglePlay}
         aria-pressed={playing}
         aria-label={playing ? 'Pause time animation' : 'Play day timeline'}
         style={{
